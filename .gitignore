@@ -48,18 +48,18 @@ logs/
 #linux te files
 *~
 
-Visite/
-Visiteur/
-Ville/
-Fichier/
-Tenant/
-Porte/
-Secteur/
-Pays/
-Agent/
-Bureau/
-Utilisateur/
-Privilege/
+./Visite/
+./Visiteur/
+./Ville/
+./Fichier/
+./Tenant/
+./Porte/
+./Secteur/
+./Pays
+./Agent/
+./Bureau/
+./Utilisateur/
+./Privilege/
 tokens/
 filesStore/
 
