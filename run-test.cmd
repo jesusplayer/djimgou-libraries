@@ -1,0 +1,1 @@
+mvnw.cmd spring-boot:run -Dspring-boot.run.arguments=--spring.profiles.active=test -Dspring-boot.run.fork=false -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector -Dhttp.proxyHost=172.20.160.23 -Dhttp.proxyPort=8080 -Djava.net.useSystemProxies=true

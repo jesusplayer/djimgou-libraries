@@ -1,0 +1,1 @@
+mvnw.cmd spring-boot:run -Dspring-boot.run.arguments=--spring.profiles.active=stag -Dspring-boot.run.fork=false -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector

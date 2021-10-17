@@ -1,0 +1,1 @@
+web: java -jar target/carrent.war --spring.profiles.active=stag

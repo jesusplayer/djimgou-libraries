@@ -1,0 +1,1 @@
+java -jar carrent.war --spring.profiles.active=preProd -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector -Dhttp.proxyHost=172.20.160.23 -Dhttp.proxyPort=8080 -Djava.net.useSystemProxies=true

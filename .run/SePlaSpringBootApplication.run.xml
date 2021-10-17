@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="SePlaSpringBootApplication" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="com.act.SePlanSpringBootApplication" />
+    <module name="act-library-starter" />
+    <option name="PROGRAM_PARAMETERS" value="-Dspring-boot.run.arguments=--spring.profiles.active=devDany" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="com.dachbo.com.sepla.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
