@@ -86,8 +86,8 @@
         </dependency>
     </dependencies>
     <build>
-        <finalName>${project.artifactId}-${project.version}</finalName>
-        <resources>
+        <finalName>${project.artifactId}</finalName>
+       <!-- <resources>
             <resource>
                 <filtering>true</filtering>
                 <directory>src/main/resources</directory>
@@ -96,7 +96,7 @@
                 <directory>src/main/docs</directory>
                 <filtering>true</filtering>
             </resource>
-        </resources>
+        </resources>-->
         <testResources>
             <testResource>
                 <filtering>true</filtering>
@@ -147,6 +147,7 @@
                     </nonFilteredFileExtensions>
                 </configuration>
             </plugin>
+
             <!--<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>

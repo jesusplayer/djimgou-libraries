@@ -25,7 +25,7 @@ import static com.act.core.util.AppUtils.has;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 public class FileStorage {
-    public static final String ROOT_FOLDER = "." + File.separator + "filesStore" + File.separator;
+    public static String ROOT_FOLDER = "." + File.separator + "filesStore" + File.separator;
     public static final String DEFAULT_FOLDER = "store";
     String dossier;
     String name;

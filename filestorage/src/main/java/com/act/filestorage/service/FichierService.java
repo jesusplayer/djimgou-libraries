@@ -8,6 +8,7 @@ import com.act.filestorage.model.Fichier;
 import com.act.filestorage.repository.FichierRepo;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,8 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.UUID;
 
+import static com.act.core.util.AppUtils.has;
+
 
 @Getter
 @Service
@@ -26,8 +29,12 @@ public class FichierService {
     @Autowired
     FichierRepo repo;
 
+    @Value("${filestore.directory}")
+    String filesStoreDir;
+
     @PostConstruct
     void init() throws Exception {
+        FileStorage.ROOT_FOLDER = has(filesStoreDir)?filesStoreDir:FileStorage.ROOT_FOLDER;
         FileStorage.creerDossier(FileStorage.ROOT_FOLDER);
     }
 
