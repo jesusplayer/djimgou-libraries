@@ -2,12 +2,14 @@ package com.act.security;
 
 
 import com.act.audit.model.AuditAction;
-import com.act.security.model.Utilisateur;
-import com.act.security.model.dto.utilisateur.UtilisateurSessionDto;
+import com.act.security.core.UtilisateurDetails;
+import com.act.security.core.model.Utilisateur;
+import com.act.security.core.model.dto.utilisateur.UtilisateurSessionDto;
+import com.act.security.core.service.SecuritySessionService;
 import com.act.core.model.enums.SessionKeys;
-import com.act.security.service.SessionServiceImpl;
-import com.act.security.tracking.authentication.security.service.MyVoter;
+import com.act.security.core.service.MyVoter;
 import com.act.core.util.AppUtils;
+import com.act.session.context.SessionContext;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -37,14 +39,12 @@ import static com.act.core.util.AppUtils.has;
 public class AuthSuccessHandler implements AuthenticationSuccessHandler {
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
-    @Autowired
-    private HttpSession httpSession;
 
     @Autowired
     AuditBdService auditBdService;
 
     @Autowired
-    SessionServiceImpl sessionService;
+    SecuritySessionService sessionService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
@@ -66,8 +66,10 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
         if (AppUtils.has(uDetail)) {
             MyVoter.userSessionToUpdate.put(uDetail.getUsername(), Boolean.FALSE);
             String uId = uDetail.getUtilisateur().getId().toString();
-            request.getSession().setAttribute(SessionKeys.CONNECTED_USER_ID, uId);
-            httpSession.setAttribute(SessionKeys.CONNECTED_USER_ID, uId);
+            final HttpSession session= request.getSession();
+            session.setAttribute(SessionKeys.CONNECTED_USER_ID, uId);
+
+            session.setAttribute(SessionKeys.CONNECTED_USER_ID, uId);
             Utilisateur user = uDetail.getUtilisateur().singleInfo();
             auditBdService.add(user, AuditAction.CONNEXION);
 
@@ -80,7 +82,13 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
             String token = response.getHeader("Authorization");
             uSess.setToken(token);
             String str = objectMapper.writeValueAsString(uSess);
-            httpSession.setAttribute(SessionKeys.CONNECTED_USER, uSess);
+            //session.setAttribute(SessionKeys.CONNECTED_USER, uSess);
+            SessionContext.setCurrentSessionId(session.getId());
+            SessionContext.setCurrentSession(session);
+            SessionContext.setCurrentUsername(uSess.getUsername());
+
+            session.setAttribute("X-USERNAME", uSess.getUsername());
+            session.setAttribute("X-SESSION-ID", session.getId());
             response.setHeader("Content-Type", "application/json");
             response.getWriter().write(str);
             response.getWriter().flush();

@@ -1,5 +1,7 @@
 package com.act.security;
 
+import com.act.session.context.SessionContext;
+import com.act.tenantmanager.aop.TenantContext;
 import org.springframework.security.web.session.InvalidSessionStrategy;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,8 @@ import java.io.IOException;
 public class InvalidSessionHandler implements InvalidSessionStrategy {
     @Override
     public void onInvalidSessionDetected(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+/*        SessionContext.clear();
+        TenantContext.clear();*/
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Votre session a expiré");
     }
 }

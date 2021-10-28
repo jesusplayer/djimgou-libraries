@@ -5,16 +5,16 @@
 package com.act.securityweb.controller;
 
 import com.act.core.exception.ConflitException;
-import com.act.security.exceptions.BadConfirmPasswordException;
-import com.act.security.exceptions.UnautorizedException;
-import com.act.security.exceptions.UtilisateurNotFoundException;
-import com.act.security.model.Utilisateur;
-import com.act.security.model.dto.utilisateur.*;
+import com.act.security.core.model.Utilisateur;
+import com.act.security.core.model.dto.utilisateur.*;
+import com.act.security.core.service.AuthenticationService;
+import com.act.security.core.exceptions.BadConfirmPasswordException;
+import com.act.security.core.exceptions.UnautorizedException;
+import com.act.security.core.exceptions.UtilisateurNotFoundException;
 import com.act.core.model.enums.SessionKeys;
 import com.act.core.exception.NotFoundException;
-import com.act.security.service.AuthenticationService;
-import com.act.security.service.SessionServiceImpl;
-import com.act.security.service.UtilisateurBdServiceBase;
+import com.act.security.core.service.SecuritySessionService;
+import com.act.security.core.service.UtilisateurBdServiceBase;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
@@ -45,7 +45,7 @@ public class CompteUtilisateurController {
     UtilisateurBdServiceBase<Utilisateur, UtilisateurFindDto, UtilisateurFilterDto, UtilisateurDto, ModifierProfilDto> utilisateurBdService;
 
     @Autowired
-    SessionServiceImpl sessionService;
+    SecuritySessionService sessionService;
 
     @Autowired
     AuthenticationService authenticationService;
@@ -53,7 +53,7 @@ public class CompteUtilisateurController {
     @SneakyThrows
     @PutMapping("/profil/modifier")
     @ResponseStatus(HttpStatus.OK)
-    public Utilisateur update( @RequestBody @Valid final ModifierProfilDto utilisateurDto) {
+    public Utilisateur update(@RequestBody @Valid final ModifierProfilDto utilisateurDto) {
             return utilisateurBdService.modifierProfil(utilisateurDto);
     }
 

@@ -1,13 +1,14 @@
 package com.act.security;
 
 import com.act.core.model.enums.SessionKeys;
-import com.act.security.service.SessionServiceImpl;
+import com.act.security.core.UtilisateurDetails;
+import com.act.security.core.service.SecuritySessionService;
+import com.act.session.context.SessionContext;
+import com.act.tenantmanager.aop.TenantContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
-import org.springframework.session.FindByIndexNameSessionRepository;
-import org.springframework.session.Session;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,9 +23,9 @@ import static com.act.core.util.AppUtils.has;
 @Service
 public class CustomLogoutHandler implements LogoutHandler {
     @Autowired
-    SessionServiceImpl sessionService;
-    @Autowired
-    FindByIndexNameSessionRepository<? extends Session> sessions;
+    SecuritySessionService sessionService;
+/*    @Autowired
+    FindByIndexNameSessionRepository<? extends Session> sessions;*/
 
     public CustomLogoutHandler() {
     }
@@ -41,5 +42,7 @@ public class CustomLogoutHandler implements LogoutHandler {
         }
         request.getSession().invalidate();
         SecurityContextHolder.getContext().setAuthentication(null);
+        TenantContext.clear();
+        SessionContext.clear();
     }
 }

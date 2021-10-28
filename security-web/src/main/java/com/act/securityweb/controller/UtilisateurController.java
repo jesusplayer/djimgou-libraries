@@ -4,20 +4,17 @@
  */
 package com.act.securityweb.controller;
 
-import com.act.security.exceptions.UtilisateurNotFoundException;
-import com.act.security.model.Role;
-import com.act.security.model.StatutSecurityWorkflow;
-import com.act.security.model.Utilisateur;
-import com.act.security.model.dto.utilisateur.ModifierProfilDto;
-import com.act.security.model.dto.utilisateur.UtilisateurDto;
-import com.act.security.model.dto.utilisateur.UtilisateurFilterDto;
-import com.act.security.model.dto.utilisateur.UtilisateurFindDto;
-import com.act.security.service.AuthenticationService;
-import com.act.security.service.RoleService;
-import com.act.security.service.SessionServiceImpl;
-import com.act.security.service.UtilisateurBdServiceBase;
-import com.act.security.listeners.SessionManager;
+import com.act.security.core.model.Role;
+import com.act.security.core.exceptions.UtilisateurNotFoundException;
+import com.act.security.core.model.StatutSecurityWorkflow;
+import com.act.security.core.model.Utilisateur;
+import com.act.security.core.model.dto.utilisateur.ModifierProfilDto;
+import com.act.security.core.model.dto.utilisateur.UtilisateurDto;
+import com.act.security.core.model.dto.utilisateur.UtilisateurFilterDto;
+import com.act.security.core.model.dto.utilisateur.UtilisateurFindDto;
+import com.act.security.core.service.*;
 import com.act.core.util.AppUtils;
+import com.act.security.core.service.AuthenticationService;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
@@ -63,7 +60,7 @@ public class UtilisateurController {
 
 
     @Autowired
-    SessionServiceImpl sessionService;
+    SecuritySessionService sessionService;
 
     @Autowired
     SessionManager sessionManager;

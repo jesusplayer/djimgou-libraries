@@ -1,7 +1,7 @@
 package com.act.securityweb.controller.exceptions;
 
 import com.act.core.exception.*;
-import com.act.security.exceptions.*;
+import com.act.security.core.exceptions.*;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

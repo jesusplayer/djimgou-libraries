@@ -1,6 +1,7 @@
 package com.act.security;
 
-import com.act.security.tracking.authentication.security.service.MyVoter;
+import com.act.security.core.model.UrlsAuthorized;
+import com.act.security.core.service.MyVoter;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 

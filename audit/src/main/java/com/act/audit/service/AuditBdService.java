@@ -1,18 +1,15 @@
 package com.act.audit.service;
 
-import com.act.audit.exceptions.AuditNotFoundException;
 import com.act.audit.model.Audit;
 import com.act.audit.model.AuditAction;
 import com.act.audit.model.QAudit;
 import com.act.audit.model.dto.AuditFilterDto;
 import com.act.audit.model.dto.AuditFindDto;
 import com.act.audit.repository.AuditRepo;
-import com.act.core.exception.NotFoundException;
-import com.act.core.infra.Filter;
 import com.act.core.infra.CustomPageable;
-import com.act.core.service.AbstractBdService;
 import com.act.core.service.AbstractDomainService;
 import com.act.core.util.AppUtils;
+import com.act.session.service.SessionService;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,7 +20,6 @@ import com.querydsl.jpa.impl.JPAQuery;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -47,6 +43,7 @@ public class AuditBdService extends AbstractDomainService<Audit, AuditFindDto, A
 
     @Autowired
     AppUtils appUtils;
+
 
     @Autowired
     SessionService sessionService;

@@ -1,5 +1,6 @@
 package com.act.tenantmanager.aop;
 
+import com.act.session.service.SessionService;
 import com.act.tenantmanager.exceptions.TenantSessionNotFoundException;
 import com.act.tenantmanager.model.Tenant;
 import com.act.tenantmanager.model.dto.tenant.TenantSessionDto;
@@ -26,10 +27,10 @@ import static com.act.core.util.AppUtils.has;
 @Component
 public class RepositoryInterceptor  {
     @Autowired
-    TenantSessionService sessionService;
+    TenantSessionService tenantSessionService;
 
     @Autowired
-    private HttpSession httpSession;
+    SessionService sessionService;
 
     @Autowired
     private EntityManager entityManager;
@@ -50,8 +51,9 @@ public class RepositoryInterceptor  {
             }
         }
         if (checkTenant) {
+            HttpSession httpSession = sessionService.getSession();
             TenantSessionDto ten = (TenantSessionDto) httpSession.getAttribute(SessionKeys.TENANT);
-            Optional<Tenant> tenant = sessionService.putTenant(ten);
+            Optional<Tenant> tenant = tenantSessionService.putTenant(ten);
             TenantContext.setCurrentTenant(tenant.orElseThrow(TenantSessionNotFoundException::new));
             Session session = entityManager.unwrap(Session.class);
             String id = TenantContext.getCurrentTenantId();

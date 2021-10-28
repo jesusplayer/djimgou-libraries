@@ -1,10 +1,11 @@
 package com.act.security;
 
-import com.act.security.model.*;
-import com.act.security.repo.ConfirmationTokenRepo;
-import com.act.security.repo.PrivilegeRepo;
-import com.act.security.repo.RoleRepo;
-import com.act.security.repo.UtilisateurRepo;
+import com.act.security.core.AppSecurityConfig;
+import com.act.security.core.model.*;
+import com.act.security.core.repo.ConfirmationTokenRepo;
+import com.act.security.core.repo.PrivilegeRepo;
+import com.act.security.core.repo.RoleRepo;
+import com.act.security.core.repo.UtilisateurRepo;
 import com.act.core.util.AppUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.SetUtils;

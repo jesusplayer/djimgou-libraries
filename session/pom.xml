@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <developers>
+        <developer>
+            <id>jesusplayer</id>
+            <name>Djimgou Nkenne Dany Marc</name>
+            <email>danydjimgou@gmail.com</email>
+            <roles>
+                <role>project lead</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <description>
+        Permet uniquement de fournir la fonctionnalité relative à la gestion de
+        la session elle permetrat d'utiliser les interfaces nécessaire
+        de sorte que l'application sois capable de gérer les sessions
+        clusteriser: Http ou Spring session JDBC ou Redis
+    </description>
+    <parent>
+        <artifactId>act-library-starter</artifactId>
+        <groupId>com.act</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>session</artifactId>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.maxmind.geoip2</groupId>
+            <artifactId>geoip2</artifactId>
+            <version>2.15.0</version>
+        </dependency>
+    </dependencies>
+</project>

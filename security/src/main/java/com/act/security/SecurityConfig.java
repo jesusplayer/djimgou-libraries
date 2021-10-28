@@ -1,17 +1,16 @@
 package com.act.security;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import com.act.security.tracking.authentication.dao.ResourceRepository;
-import com.act.security.tracking.authentication.security.service.MyVoter;
+import com.act.security.core.AppSecurityConfig;
+import com.act.security.core.model.UrlsAuthorized;
+import com.act.security.core.tracking.authentication.dao.ResourceRepository;
+import com.act.security.core.service.MyVoter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
@@ -35,9 +34,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.session.SessionManagementFilter;
-import org.springframework.session.web.http.SessionRepositoryFilter;
+//import org.springframework.session.web.http.SessionRepositoryFilter;
 
-import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 import javax.servlet.http.HttpServletResponse;
 

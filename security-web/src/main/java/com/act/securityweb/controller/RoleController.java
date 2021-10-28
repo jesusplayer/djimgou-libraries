@@ -4,14 +4,14 @@
  */
 package com.act.securityweb.controller;
 
-import com.act.security.exceptions.RoleNotFoundException;
-import com.act.security.model.Role;
-import com.act.security.model.dto.role.RoleDto;
-import com.act.security.model.dto.role.RoleFilterDto;
-import com.act.security.model.dto.role.RoleFindDto;
-import com.act.security.service.PrivilegeService;
-import com.act.security.service.RoleService;
-import com.act.security.service.SessionServiceImpl;
+import com.act.security.core.exceptions.RoleNotFoundException;
+import com.act.security.core.model.Role;
+import com.act.security.core.model.dto.role.RoleDto;
+import com.act.security.core.model.dto.role.RoleFilterDto;
+import com.act.security.core.model.dto.role.RoleFindDto;
+import com.act.security.core.service.PrivilegeService;
+import com.act.security.core.service.RoleService;
+import com.act.security.core.service.SecuritySessionService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -41,7 +41,7 @@ import static com.act.core.util.AppUtils.has;
 public class RoleController {
 
     @Autowired
-    SessionServiceImpl sessionService;
+    SecuritySessionService sessionService;
     @Autowired
     PrivilegeService privilegeService;
     @Autowired

@@ -5,12 +5,12 @@
 package com.act.securityweb.controller;
 
 
-import com.act.security.exceptions.PrivilegeNotFoundException;
-import com.act.security.model.Privilege;
-import com.act.security.model.dto.privilege.PrivilegeDto;
-import com.act.security.model.dto.privilege.PrivilegeFilterDto;
-import com.act.security.model.dto.privilege.PrivilegeFindDto;
-import com.act.security.service.PrivilegeService;
+import com.act.security.core.exceptions.PrivilegeNotFoundException;
+import com.act.security.core.model.Privilege;
+import com.act.security.core.model.dto.privilege.PrivilegeDto;
+import com.act.security.core.model.dto.privilege.PrivilegeFilterDto;
+import com.act.security.core.model.dto.privilege.PrivilegeFindDto;
+import com.act.security.core.service.PrivilegeService;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;

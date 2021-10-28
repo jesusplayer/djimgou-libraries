@@ -2,12 +2,15 @@ package com.act.security;
 
 
 import com.act.audit.model.AuditAction;
-import com.act.security.model.Utilisateur;
+import com.act.security.core.UtilisateurDetails;
+import com.act.security.core.model.Utilisateur;
+import com.act.security.core.service.SecuritySessionService;
+import com.act.security.core.service.UtilisateurBdService;
 import com.act.core.model.enums.SessionKeys;
-import com.act.security.service.SessionServiceImpl;
-import com.act.security.service.UtilisateurBdService;
-import com.act.security.tracking.authentication.security.service.MyVoter;
+import com.act.security.core.service.MyVoter;
 import com.act.core.util.AppUtils;
+import com.act.session.context.SessionContext;
+import com.act.tenantmanager.aop.TenantContext;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -37,7 +40,7 @@ public class AuthLogoutSuccessHandler implements org.springframework.security.we
     AuditBdService auditBdService;
 
     @Autowired
-    SessionServiceImpl sessionService;
+    SecuritySessionService sessionService;
 
     @Autowired
     UtilisateurBdService utilisateurBdService;
@@ -61,6 +64,8 @@ public class AuthLogoutSuccessHandler implements org.springframework.security.we
             Utilisateur user = utilisa.singleInfo();
             auditBdService.add(user, AuditAction.DECONNEXION);
             MyVoter.userSessionToUpdate.remove(user.getUsername());
+            TenantContext.clear();
+            SessionContext.clear();
         }
         response.getWriter().write(String.valueOf(true));
         response.getWriter().flush();

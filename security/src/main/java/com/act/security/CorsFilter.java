@@ -15,6 +15,9 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.act.core.util.AppUtils.has;
+
 /**
  * DJIMGOU NKENNE DANY MARC 08/2020- 09/2021
  */
@@ -25,6 +28,7 @@ public class CorsFilter extends GenericFilterBean {
 
     @Autowired
     HttpSession httpSession;
+
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         // https://stackoverflow.com/questions/43114750/header-in-the-response-must-not-be-the-wildcard-when-the-requests-credentia
@@ -35,21 +39,24 @@ public class CorsFilter extends GenericFilterBean {
             // request.getRequestURI().replace(request.getContextPath(),"")
             // Access-Control-Allow-Origin
             String origin = request.getHeader("Origin");
-            response.setHeader("Access-Control-Allow-Origin", allowedOrigins.contains(origin) ? origin : "");
-            response.setHeader("Vary", "Origin");
+            final String ACCES_CONTROL = "Access-Control-Allow-Origin";
+            if(!has(response.getHeader(ACCES_CONTROL))){
+                response.setHeader(ACCES_CONTROL, allowedOrigins.contains(origin) ? origin : "");
+                response.setHeader("Vary", "Origin");
 
-            // Access-Control-Max-Age
-            response.setHeader("Access-Control-Max-Age", "3600");
+                // Access-Control-Max-Age
+                response.setHeader("Access-Control-Max-Age", "3600");
 
-            // Access-Control-Allow-Credentials
-            response.setHeader("Access-Control-Allow-Credentials", "true");
+                // Access-Control-Allow-Credentials
+                response.setHeader("Access-Control-Allow-Credentials", "true");
 
-            // Access-Control-Allow-Methods
-            response.setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, OPTIONS, DELETE");
+                // Access-Control-Allow-Methods
+                response.setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, OPTIONS, DELETE");
 
-            // Access-Control-Allow-Headers
-            response.setHeader("Access-Control-Allow-Headers",
-                    "Origin, X-Requested-With, Content-Type, Accept, " + "X-CSRF-TOKEN");
+                // Access-Control-Allow-Headers
+                response.setHeader("Access-Control-Allow-Headers",
+                        "Origin, X-Requested-With, Content-Type, Accept, " + "X-CSRF-TOKEN");
+            }
         }
 
         filterChain.doFilter(servletRequest, servletResponse);

@@ -2,6 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+    <developers>
+        <developer>
+            <id>jesusplayer</id>
+            <name>Djimgou Nkenne Dany Marc</name>
+            <email>danydjimgou@gmail.com</email>
+            <roles>
+                <role>project lead</role>
+            </roles>
+        </developer>
+    </developers>
     <modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
     <modules>
@@ -18,6 +28,10 @@
         <module>reporting-web</module>
         <module>security-web</module>
         <module>tenant-manager-web</module>
+        <module>act-app-starter-parent-ms</module>
+        <module>session</module>
+        <module>session-jdbc</module>
+        <module>security-core</module>
         <!--        <module>appsepla</module>-->
 <!--        <module>apprayaleauto</module>-->
     </modules>

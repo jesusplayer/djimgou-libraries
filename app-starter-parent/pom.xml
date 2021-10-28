@@ -2,6 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <developers>
+        <developer>
+            <id>jesusplayer</id>
+            <name>Djimgou Nkenne Dany Marc</name>
+            <email>danydjimgou@gmail.com</email>
+            <roles>
+                <role>project lead</role>
+            </roles>
+        </developer>
+    </developers>
     <parent>
         <groupId>com.act</groupId>
         <artifactId>act-library-starter</artifactId>
@@ -26,6 +36,12 @@
         <dependency>
             <groupId>com.act</groupId>
             <artifactId>tenant-manager-web</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.act</groupId>
+            <artifactId>session</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
@@ -110,6 +126,13 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build-image</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>com.mysema.maven</groupId>
