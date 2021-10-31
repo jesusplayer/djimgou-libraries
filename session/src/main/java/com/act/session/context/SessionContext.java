@@ -6,13 +6,10 @@ public class SessionContext {
      *
      * @Autowired FindByIndexNameSessionRepository<? extends Session> sessions;
      */
-    private static ThreadLocal<Object> currentSession = new InheritableThreadLocal<>();
     private static ThreadLocal<String> currentSessionId = new InheritableThreadLocal<>();
+    private static ThreadLocal<String> currentTenantId = new InheritableThreadLocal<>();
     private static ThreadLocal<String> currentUsername = new InheritableThreadLocal<>();
 
-    public static Object getCurrentSession() {
-        return currentSession.get();
-    }
 
     public static String getCurrentUsername() {
         return currentUsername.get();
@@ -21,22 +18,21 @@ public class SessionContext {
         return currentSessionId.get();
     }
 
-    public static void setCurrentSession(Object tenant) {
-        currentSession.set(tenant);
-    }
-
     public static void setCurrentUsername(String username) {
         currentUsername.set(username);
     }
+    public static void setCurrentTenantId(String tenantId) {
+        currentTenantId.set(tenantId);
+    }
 
     public static void setCurrentSessionId(String sessionId) {
-        currentUsername.set(sessionId);
+        currentSessionId.set(sessionId);
     }
 
     public static void clear() {
-        currentSession.set(null);
         currentUsername.set(null);
         currentSessionId.set(null);
+        currentTenantId.set(null);
     }
 
 }

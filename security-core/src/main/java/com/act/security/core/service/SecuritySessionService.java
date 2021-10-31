@@ -2,8 +2,7 @@ package com.act.security.core.service;
 
 import com.act.core.util.AppUtils;
 import com.act.security.core.UtilisateurDetails;
-import com.act.security.core.model.dto.utilisateur.UtilisateurSessionDto;
-import com.act.core.model.enums.SessionKeys;
+import com.act.session.enums.SessionKeys;
 import com.act.security.core.model.Utilisateur;
 import com.act.session.service.SessionService;
 import lombok.extern.log4j.Log4j2;
@@ -44,8 +43,8 @@ public class SecuritySessionService {
     // @Autowired
     // WebInvocationPrivilegeEvaluator evaluator;
 
-    public HttpSession getSession() {
-        return sessionService.getSession();
+    public SessionService getSession() {
+        return sessionService;
     }
 
     public UtilisateurDetails currentUser() {
@@ -55,8 +54,7 @@ public class SecuritySessionService {
     }
 
     public Optional<UUID> currentUserId() {
-        String id = (String) getSession().getAttribute(SessionKeys.CONNECTED_USER_ID);
-        return Optional.ofNullable(has(id) ? UUID.fromString(id) : null);
+        return sessionService.currentUserId();
     }
 
 

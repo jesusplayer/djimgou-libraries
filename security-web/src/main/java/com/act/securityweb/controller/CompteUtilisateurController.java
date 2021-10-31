@@ -11,7 +11,6 @@ import com.act.security.core.service.AuthenticationService;
 import com.act.security.core.exceptions.BadConfirmPasswordException;
 import com.act.security.core.exceptions.UnautorizedException;
 import com.act.security.core.exceptions.UtilisateurNotFoundException;
-import com.act.core.model.enums.SessionKeys;
 import com.act.core.exception.NotFoundException;
 import com.act.security.core.service.SecuritySessionService;
 import com.act.security.core.service.UtilisateurBdServiceBase;
@@ -23,7 +22,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.UUID;
 
@@ -78,12 +76,12 @@ public class CompteUtilisateurController {
         authenticationService.changePassword(logininfo);
     }
 
-    @PutMapping("/applyUserSession/{utilisateurId}")
+/*    @PutMapping("/applyUserSession/{utilisateurId}")
     @ResponseStatus(HttpStatus.OK)
     public void applyUserSession(@PathVariable("utilisateurId") final UUID id, HttpSession httpSession) throws NotFoundException, BadConfirmPasswordException {
         utilisateurBdService.findById(id).orElseThrow(UtilisateurNotFoundException::new);
         httpSession.setAttribute(SessionKeys.CONNECTED_USER_ID, id.toString());
-    }
+    }*/
 
     @SneakyThrows
     @PostMapping("/inviter/{utilisateurId}")

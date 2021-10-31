@@ -1,6 +1,7 @@
 package com.act.session.jdbc;
 
 import com.act.session.context.SessionContext;
+import com.act.session.enums.SessionKeys;
 import com.act.session.service.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.session.Session;
@@ -50,9 +51,17 @@ public class SessionServiceImpl implements SessionService {
      */
     @Override
     public HttpSession getSession() {
-        if (null == httpSession) {
-            Session s = sessionRepo.findById(SessionContext.getCurrentSessionId());
-            return (HttpSession) s;
+        if (null == httpSession || httpSession.getAttribute(SessionKeys.USERNAME) == null) {
+            if (SessionContext.getCurrentSessionId() == null) {
+                return httpSession;
+            }
+
+            Session sess = sessionRepo.findById(SessionContext.getCurrentSessionId());
+            if (sess != null) {
+                SessionContext.setCurrentUsername(sess.getAttribute(SessionKeys.USERNAME));
+            }
+
+            return new CusHttpSession(sess);
         }
 
         return httpSession;

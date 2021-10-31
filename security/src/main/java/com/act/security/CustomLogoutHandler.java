@@ -1,6 +1,6 @@
 package com.act.security;
 
-import com.act.core.model.enums.SessionKeys;
+import com.act.session.enums.SessionKeys;
 import com.act.security.core.UtilisateurDetails;
 import com.act.security.core.service.SecuritySessionService;
 import com.act.session.context.SessionContext;
@@ -38,7 +38,7 @@ public class CustomLogoutHandler implements LogoutHandler {
         //String userName = UserUtils.getAuthenticatedUserName();
         UtilisateurDetails u = sessionService.currentUser(authentication);
         if(has(u)){
-            request.setAttribute(SessionKeys.CONNECTED_USER_ID, Objects.requireNonNull(u.getUtilisateur().getId()).toString());
+            request.setAttribute(SessionKeys.USER_ID, Objects.requireNonNull(u.getUtilisateur().getId()).toString());
         }
         request.getSession().invalidate();
         SecurityContextHolder.getContext().setAuthentication(null);

@@ -6,7 +6,7 @@ import com.act.security.core.UtilisateurDetails;
 import com.act.security.core.model.Utilisateur;
 import com.act.security.core.service.SecuritySessionService;
 import com.act.security.core.service.UtilisateurBdService;
-import com.act.core.model.enums.SessionKeys;
+import com.act.session.enums.SessionKeys;
 import com.act.security.core.service.MyVoter;
 import com.act.core.util.AppUtils;
 import com.act.session.context.SessionContext;
@@ -49,8 +49,8 @@ public class AuthLogoutSuccessHandler implements org.springframework.security.we
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         Utilisateur utilisa = null;
-        String userId = (String) request.getAttribute(SessionKeys.CONNECTED_USER_ID);
-        request.removeAttribute(SessionKeys.CONNECTED_USER_ID);
+        String userId = (String) request.getAttribute(SessionKeys.USER_ID);
+        request.removeAttribute(SessionKeys.USER_ID);
         //sessions.findByPrincipalName()
         if (has(userId)) {
             Optional<Utilisateur> u = utilisateurBdService.findById(UUID.fromString(userId));

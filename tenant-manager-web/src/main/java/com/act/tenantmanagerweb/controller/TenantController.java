@@ -7,7 +7,7 @@ import com.act.tenantmanager.model.dto.tenant.TenantDto;
 import com.act.tenantmanager.model.dto.tenant.TenantFilterDto;
 import com.act.tenantmanager.model.dto.tenant.TenantFindDto;
 import com.act.tenantmanager.model.dto.tenant.TenantSessionDto;
-import com.act.core.model.enums.SessionKeys;
+import com.act.session.enums.SessionKeys;
 import com.act.tenantmanager.service.TenantService;
 import com.act.tenantmanager.service.TenantSessionService;
 import lombok.SneakyThrows;
@@ -75,7 +75,7 @@ public class TenantController {
         Tenant tenant = sessionService.putTenant(tenantId.toString()).get();
         TenantSessionDto dto = new TenantSessionDto();
         dto = (TenantSessionDto) tenant.toDto(dto);
-        session.setAttribute(SessionKeys.TENANT, dto);
+        session.setAttribute(SessionKeys.TENANT_ID, tenantId.toString());
         return dto;
     }
 

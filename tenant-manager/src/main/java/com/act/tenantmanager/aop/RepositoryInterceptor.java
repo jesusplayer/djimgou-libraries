@@ -4,7 +4,7 @@ import com.act.session.service.SessionService;
 import com.act.tenantmanager.exceptions.TenantSessionNotFoundException;
 import com.act.tenantmanager.model.Tenant;
 import com.act.tenantmanager.model.dto.tenant.TenantSessionDto;
-import com.act.core.model.enums.SessionKeys;
+import com.act.session.enums.SessionKeys;
 import com.act.tenantmanager.repository.TenantRepo;
 import com.act.tenantmanager.service.TenantSessionService;
 import lombok.extern.log4j.Log4j2;
@@ -25,7 +25,7 @@ import static com.act.core.util.AppUtils.has;
 @Log4j2
 @Aspect()
 @Component
-public class RepositoryInterceptor  {
+public class RepositoryInterceptor {
     @Autowired
     TenantSessionService tenantSessionService;
 
@@ -38,6 +38,7 @@ public class RepositoryInterceptor  {
 
     @Value("${spring.profiles.active:prod}")
     private String activeProfile;
+
     @Around("execution(* com.act.tenantmanager.aop.CustomRepository+.*(..))")
     public Object inWebLayer(ProceedingJoinPoint joinPoint) throws Throwable {
         boolean checkTenant = false;
@@ -52,8 +53,9 @@ public class RepositoryInterceptor  {
         }
         if (checkTenant) {
             HttpSession httpSession = sessionService.getSession();
-            TenantSessionDto ten = (TenantSessionDto) httpSession.getAttribute(SessionKeys.TENANT);
-            Optional<Tenant> tenant = tenantSessionService.putTenant(ten);
+            //HttpSession httpSession = sessionService.getSession();
+            String tenantId = (String) httpSession.getAttribute(SessionKeys.TENANT_ID);
+            Optional<Tenant> tenant = tenantSessionService.putTenant(tenantId);
             TenantContext.setCurrentTenant(tenant.orElseThrow(TenantSessionNotFoundException::new));
             Session session = entityManager.unwrap(Session.class);
             String id = TenantContext.getCurrentTenantId();

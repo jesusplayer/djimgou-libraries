@@ -1,5 +1,6 @@
 package com.act.security;
 
+import com.act.security.core.exceptions.UnautorizedException;
 import com.act.security.core.model.UrlsAuthorized;
 import com.act.security.core.service.MyVoter;
 import org.springframework.security.access.AccessDeniedException;
@@ -15,13 +16,14 @@ import java.io.IOException;
  */
 public class AuthAccessDeniedHandler implements AccessDeniedHandler {
     @Override
-    public void handle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AccessDeniedException e) throws IOException, ServletException {
+    public void handle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AccessDeniedException e) throws IOException {
         HttpSession session = httpServletRequest.getSession(true);
         Boolean isNotC = (Boolean) session.getAttribute(MyVoter.USER_PASSWORD_NOT_CHANGED);
         if (isNotC != null && isNotC) {
             httpServletResponse.sendRedirect(UrlsAuthorized.CHANGE_PASSWORD.toString());
         } else {
-            httpServletResponse.sendRedirect(UrlsAuthorized.UNAUTHORIZED.toString());
+            //httpServletResponse.sendRedirect(UrlsAuthorized.UNAUTHORIZED.toString());
+            httpServletResponse.sendError(HttpServletResponse.SC_FORBIDDEN,"Vous n'êtes pas autorisé à effectuer cette requête");
         }
 
     }
