@@ -30,7 +30,7 @@ public interface UtilisateurBaseRepo<T extends Utilisateur, I> extends JpaReposi
             "LOWER(d.email) LIKE LOWER(CONCAT('%',:searchText, '%')) OR " +
             "LOWER(d.prenom) LIKE LOWER(CONCAT('%',:searchText, '%')) " +
             ")")
-    Page<Utilisateur> findBySearchText(@Param("searchText") String searchText, Pageable pageRequest);
+    Page<T> findBySearchText(@Param("searchText") String searchText, Pageable pageRequest);
 
 
 

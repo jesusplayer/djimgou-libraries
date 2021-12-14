@@ -32,33 +32,33 @@ import java.util.UUID;
  */
 public interface UtilisateurBdServiceBase<U extends Utilisateur, D extends UtilisateurFindDto, F extends UtilisateurFilterDto, T extends UtilisateurDto, M extends ModifierProfilDto> {
     @Transactional
-    Utilisateur saveUtilisateur(UUID id, T dto) throws UtilisateurNotFoundException, BadConfirmPasswordException, ConflitException;
+    U saveUtilisateur(UUID id, T dto) throws NotFoundException, BadConfirmPasswordException, ConflitException;
 
-    Page<Utilisateur> findBy(F filter) throws Exception;
+    Page<U> findBy(F filter) throws Exception;
 
     void checkDuplicate(UUID id, M dto) throws ConflitException;
 
-    Utilisateur addTenant(UUID utilisateurId, UUID tenantId) throws UtilisateurNotFoundException, TenantNotFoundException, TenantNotFoundException;
+    U addTenant(UUID utilisateurId, UUID tenantId) throws UtilisateurNotFoundException, TenantNotFoundException;
 
-    Utilisateur createUtilisateur(T utilisateurDto) throws BadConfirmPasswordException, ConflitException, UtilisateurNotFoundException;
+    U createUtilisateur(T utilisateurDto) throws BadConfirmPasswordException, ConflitException, NotFoundException;
 
-    Utilisateur createCompteUtilisateur(T utilisateurDto) throws BadConfirmPasswordException, ConflitException, UtilisateurNotFoundException;
+    U createCompteUtilisateur(T utilisateurDto) throws BadConfirmPasswordException, ConflitException, NotFoundException;
 
     UtilisateurBaseRepo<U, UUID> getRepo();
 
     Optional<U> findById(UUID id) throws NotFoundException;
 
-    SearchResult<U> search(UtilisateurFindDto utilisateurFindDto);
+    SearchResult<U> search(D utilisateurFindDto);
 
-    Page<Utilisateur> searchPageable2(UtilisateurFindDto filter) throws Exception;
+    Page<U> searchPageable2(D filter) throws Exception;
 
-    Page<U> searchPageable(UtilisateurFindDto utilisateurFindDto);
+    Page<U> searchPageable(D utilisateurFindDto);
 
     List<U> findAll();
 
     Page<U> findAll(Pageable pageable);
 
-    U modifierProfil(M utilisateurDto) throws UtilisateurNotFoundException, ConflitException, UnautorizedException;
+    U modifierProfil(M utilisateurDto) throws NotFoundException, ConflitException, UnautorizedException;
 
     void activer(UUID utilisateurId);
 

@@ -125,12 +125,11 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
         }
         if (has(dto.getAuthorities())) {
             Utilisateur finalUser = user;
-            dto.setAuthorities(
-                    dto.getAuthorities().stream()
-                            .map(privilege -> roleRepo.findById(privilege.getId()).orElse(null))
-                            .collect(Collectors.toSet())
-            );
-            dto.getAuthorities().stream()
+            Set<Role> auto = dto.getAuthorities().stream()
+                    .map(privilege -> roleRepo.findById(privilege.getId()).orElse(null))
+                    .collect(Collectors.toSet());
+
+            auto.stream()
                     .filter(privilege -> !finalUser.getAuthorities().contains(privilege))
                     .forEach(toAdd::add);
         }
@@ -157,12 +156,10 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
         }
         if (has(dto.getTenants())) {
             Utilisateur finalUser = user;
-            dto.setTenants(
-                    dto.getTenants().stream()
-                            .map(privilege -> tenantRepo.findById(privilege.getId()).orElse(null))
-                            .collect(Collectors.toSet())
-            );
-            dto.getTenants().stream()
+            Set<Tenant> tenants = dto.getTenants().stream()
+                    .map(privilege -> tenantRepo.findById(privilege.getId()).orElse(null))
+                    .collect(Collectors.toSet());
+            tenants.stream()
                     .filter(privilege -> !finalUser.getTenants().contains(privilege))
                     .forEach(toAdd::add);
         }
@@ -198,7 +195,7 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
         if (byUsername.isPresent() && !Objects.equals(byUsername.get().getId(), id)) {
             throw new ConflitException("Un utilisateur avec ce nom d'utilisateur existe déjà");
         }
-        
+
         user.fromDto(dto);
 
         if (!has(id)) {
@@ -239,7 +236,7 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
 
         if (has(txt)) {
             page = repo.findBySearchText(txt, cpg);
-       // if (has(exp)) {
+            // if (has(exp)) {
             //page = repo.findAll(exp, cpg);
         } else {
             page = repo.findAll(cpg);
