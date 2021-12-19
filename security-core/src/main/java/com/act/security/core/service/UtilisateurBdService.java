@@ -7,10 +7,7 @@ import com.act.security.core.model.QUtilisateur;
 import com.act.security.core.model.Role;
 import com.act.security.core.model.StatutSecurityWorkflow;
 import com.act.security.core.model.Utilisateur;
-import com.act.security.core.model.dto.utilisateur.ModifierProfilDto;
-import com.act.security.core.model.dto.utilisateur.UtilisateurDto;
-import com.act.security.core.model.dto.utilisateur.UtilisateurFilterDto;
-import com.act.security.core.model.dto.utilisateur.UtilisateurFindDto;
+import com.act.security.core.model.dto.utilisateur.*;
 import com.act.core.infra.CustomPageable;
 import com.act.core.exception.ConflitException;
 import com.act.core.exception.NotFoundException;
@@ -70,10 +67,12 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
         super();
     }
 
+    @Transactional
     public Utilisateur createUtilisateur(UtilisateurDto utilisateurDto) throws BadConfirmPasswordException, ConflitException, UtilisateurNotFoundException {
         return saveUtilisateur(null, utilisateurDto);
     }
 
+    @Transactional
     public Utilisateur createCompteUtilisateur(UtilisateurDto utilisateurDto) throws BadConfirmPasswordException, ConflitException, UtilisateurNotFoundException {
         return saveUtilisateur(null, utilisateurDto);
     }
@@ -112,6 +111,42 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
             user.setTenants(new HashSet<>());
         }
         user.getTenants().add(tenant);
+        return user;
+    }
+
+    public Utilisateur ajouterRoles(UUID utilisateurId, IdsDto rolesIdDto) throws UtilisateurNotFoundException {
+        Utilisateur user = repo.findById(utilisateurId).orElseThrow(UtilisateurNotFoundException::new);
+        if (has(rolesIdDto.getIds())) {
+            Set<Role> toAdd = rolesIdDto.getIds().stream()
+                    .map(role -> roleRepo.findById(role.getId()).orElse(null))
+                    .collect(Collectors.toSet());
+
+            if (user.getAuthorities() == null) {
+                user.setAuthorities(toAdd);
+            } else {
+                user.getAuthorities().addAll(toAdd);
+            }
+            return save(user);
+        }
+        return user;
+    }
+
+    @Transactional
+    public Utilisateur modifierRoles(UUID utilisateurId, IdsDto rolesIdDto) throws UtilisateurNotFoundException {
+        Utilisateur user = repo.findById(utilisateurId).orElseThrow(UtilisateurNotFoundException::new);
+        if (has(rolesIdDto.getIds())) {
+            Set<Role> toAdd = rolesIdDto.getIds().stream()
+                    .map(role -> roleRepo.findById(role.getId()).orElse(null))
+                    .collect(Collectors.toSet());
+
+            if (user.getAuthorities() == null) {
+                user.setAuthorities(toAdd);
+            } else {
+                user.getAuthorities().clear();
+                user.getAuthorities().addAll(toAdd);
+            }
+            return save(user);
+        }
         return user;
     }
 
@@ -181,14 +216,14 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
         Utilisateur user = new Utilisateur();
         if (has(id)) {
             user = getRepo().findById(id).orElseThrow(UtilisateurNotFoundException::new);
-            updateRoleChildren(user, dto);
-            updateTenantChildren(user, dto);
         } else {
             if (!has(dto.getPasswordConfirm()) || !Objects.equals(dto.getPasswordConfirm(), dto.getPassword())) {
                 throw new BadConfirmPasswordException();
             }
             //user.setPassword(bCryptPasswordEncoder.encode(dto.getPasswordConfirm()));
         }
+        updateRoleChildren(user, dto);
+        updateTenantChildren(user, dto);
         checkDuplicate(id, dto);
 
         final Optional<Utilisateur> byUsername = getRepo().findByUsername(dto.getUsername());
@@ -257,32 +292,36 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
         String username = filter.getUsername();
         String tel = filter.getTelephone();
         String email = filter.getEmail();
+        String roleName = filter.getRoleName();
 
-        QUtilisateur qDevise = QUtilisateur.utilisateur;
+        QUtilisateur qUser = QUtilisateur.utilisateur;
 
         JPAQuery query = new JPAQuery(em);
-        JPAQueryBase exp2 = query.from(qDevise);
+        JPAQueryBase exp2 = query.from(qUser);
         List<BooleanExpression> expressionList = new ArrayList<>();
         if (has(name)) {
-            expressionList.add(qDevise.nom.containsIgnoreCase(name));
+            expressionList.add(qUser.nom.containsIgnoreCase(name));
         }
         if (has(prenom)) {
-            expressionList.add(qDevise.prenom.containsIgnoreCase(name));
+            expressionList.add(qUser.prenom.containsIgnoreCase(name));
         }
         if (has(username)) {
-            expressionList.add(qDevise.username.containsIgnoreCase(username));
+            expressionList.add(qUser.username.containsIgnoreCase(username));
         }
         if (has(tel)) {
-            expressionList.add(qDevise.telephone.containsIgnoreCase(tel));
+            expressionList.add(qUser.telephone.containsIgnoreCase(tel));
         }
         if (has(email)) {
-            expressionList.add(qDevise.email.containsIgnoreCase(tel));
+            expressionList.add(qUser.email.containsIgnoreCase(tel));
+        }
+        if (has(roleName)) {
+            expressionList.add(qUser.authorities.any().name.eq(roleName));
         }
 
 
         BooleanExpression exp = expressionList.stream().reduce(null, (old, newE) -> has(old) ? old.and(newE) : newE);
 
-        exp2.where(exp).orderBy(qDevise.nom.asc());
+        exp2.where(exp).orderBy(qUser.nom.asc());
 
         if (has(exp)) {
             page = getRepo().findAll(exp, cpg);

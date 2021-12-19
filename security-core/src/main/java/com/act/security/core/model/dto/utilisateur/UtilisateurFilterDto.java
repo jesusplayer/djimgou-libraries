@@ -17,9 +17,7 @@ public class UtilisateurFilterDto extends BaseFilterDto {
 
     String username;
 
-    String password;
-
-    String passwordConfirm;
-
     String telephone;
+
+    String roleName;
 }
