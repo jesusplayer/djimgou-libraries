@@ -31,22 +31,23 @@ public class Fichier extends BaseBdEntity {
     String fichier3;
     String dossier;
     String type;
+    String customData;
 
     @Transient
     public String getFichier1Url() {
-        if(!has(fichier1)) return null;
+        if (!has(fichier1)) return null;
         return FileStorage.downloadUrl(dossier, getFichier1());
     }
 
     @Transient
     public String getFichier2Url() {
-        if(!has(fichier2)) return null;
+        if (!has(fichier2)) return null;
         return FileStorage.downloadUrl(dossier, getFichier2());
     }
 
     @Transient
     public String getFichier3Url() {
-        if(!has(fichier3)) return null;
+        if (!has(fichier3)) return null;
         return FileStorage.downloadUrl(dossier, getFichier3());
     }
 
@@ -62,6 +63,11 @@ public class Fichier extends BaseBdEntity {
         this.dossier = dossier;
         this.type = type;
         buildUrl();
+    }
+
+    public Fichier(String dossier, String nom, String type, String customData) {
+        this(nom, dossier, type);
+        this.customData = customData;
     }
 
     public void buildUrl() {

@@ -36,8 +36,8 @@ public class FichierController {
     private FichierService fichierService;
 
     @PostMapping(value = "/uploadFichier", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public Fichier uploadFile(@RequestPart("fichier") @NotNull MultipartFile file/*, @RequestParam("dossier") String dossier, @RequestParam("nomFichier") String nomFichier*/) throws Exception {
-        Fichier fichier = new Fichier(null, file.getOriginalFilename(), file.getContentType());
+    public Fichier uploadFile(@RequestPart("fichier") @NotNull MultipartFile file/*, @RequestParam("dossier") String dossier, @RequestParam("nomFichier") String nomFichier*/, @RequestParam("customData") String customData) throws Exception {
+        Fichier fichier = new Fichier(null, file.getOriginalFilename(), file.getContentType(), customData);
         return fichierService.save(file, fichier);
     }
 
@@ -50,9 +50,9 @@ public class FichierController {
     }*/
 
     @PostMapping(value = "/upload3Fichiers", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public Fichier uploadMultipleFiles(@RequestPart("fichiers") @NotEmpty @NotNull MultipartFile[] files) throws BadRequestException, AppException, FichierInvalidNameException {
+    public Fichier uploadMultipleFiles(@RequestPart("fichiers") @NotEmpty @NotNull MultipartFile[] files, @RequestParam("customData") String customData) throws BadRequestException, AppException, FichierInvalidNameException {
         Fichier fichier = new Fichier(
-                null, files[0].getOriginalFilename(), files[0].getContentType());
+                null, files[0].getOriginalFilename(), files[0].getContentType(), customData);
         return fichierService.save3Files(files, fichier);
     }
 
