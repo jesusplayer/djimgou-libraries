@@ -24,10 +24,6 @@ import static com.act.core.util.AppUtils.has;
 @Log4j2
 @Component
 public class SecuritySessionService {
-    /**
-     * Permet d'indiquer que le module de suiviEntite est chargé
-     */
-    public static final String SUIVI_ENTITE_LOADED = "suiviEntiteLoaded";
 
     @Autowired(required = false)
     UtilisateurBdService utilisateurBdService;

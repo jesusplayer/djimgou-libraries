@@ -2,7 +2,7 @@ package com.act.security.service;
 
 import com.act.security.core.UtilisateurDetails;
 import com.act.security.core.model.Utilisateur;
-import com.act.security.core.repo.UtilisateurRepo;
+import com.act.security.core.repo.UtilisateurBaseRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
+
+import static com.act.core.util.AppUtils.has;
 
 
 // https://www.baeldung.com/role-and-privilege-for-spring-security-registration
@@ -23,21 +26,29 @@ import java.util.Optional;
 @Service//("userDetailsService")
 public class UserDetailsServiceImpl implements UserDetailsService {
 
+    @Qualifier("appUtilisateurRepo")
+    @Autowired(required = false)
+    UtilisateurBaseRepo<Utilisateur, UUID> customRepo;
+
     @Qualifier("appDefaultUtilisateurRepo")
-    @Autowired
-    private UtilisateurRepo utilisateurRepo;
+    @Autowired()
+    UtilisateurBaseRepo<Utilisateur, UUID> repo;
 
     // @Autowired
     // BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        Optional<Utilisateur> optionalUser = utilisateurRepo.findValidatedUsername(userName);
+        Optional<Utilisateur> optionalUser = getRepo().findValidatedUsername(userName);
         if (optionalUser.isPresent()) {
             Utilisateur user = optionalUser.get();
             return new UtilisateurDetails(user);
         } else {
             throw new UsernameNotFoundException("Cet utilisateur n'existe pas");
         }
+    }
+
+    public UtilisateurBaseRepo<Utilisateur, UUID> getRepo() {
+        return has(customRepo) ? customRepo : repo;
     }
 }
