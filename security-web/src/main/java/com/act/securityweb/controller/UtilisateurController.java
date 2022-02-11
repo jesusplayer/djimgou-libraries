@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -55,8 +56,8 @@ public class UtilisateurController {
     @Autowired
     RoleService authorityBdService;
 
-/*    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;*/
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
     @Autowired
@@ -81,7 +82,9 @@ public class UtilisateurController {
     @PostMapping("/creer")
     @ResponseStatus(HttpStatus.CREATED)
     public Utilisateur create(@RequestBody @Valid UtilisateurDto utilisateurDto) {
-        return  getService().createUtilisateur(utilisateurDto);
+        //return  getService().createUtilisateur(utilisateurDto);
+        utilisateurDto.setEncodedPasswd(bCryptPasswordEncoder.encode(utilisateurDto.getPasswordConfirm()));
+        return getService().createCompteUtilisateur(utilisateurDto);
     }
 
     @SneakyThrows
@@ -90,6 +93,20 @@ public class UtilisateurController {
     public Utilisateur update(
             @PathVariable("utilisateurId") final UUID id, @RequestBody @Valid final UtilisateurDto utilisateurDto) {
         return  getService().saveUtilisateur(id, utilisateurDto);
+    }
+
+    @SneakyThrows
+    @PostMapping("/activer/{utilisateurId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void activateProfil(@PathVariable("utilisateurId") final UUID utilisateurId) {
+        getService().activer(utilisateurId);
+    }
+
+    @SneakyThrows
+    @PostMapping("/desactiver/{utilisateurId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void desactivateProfil(@PathVariable("utilisateurId") final UUID utilisateurId) {
+        getService().desactiver(utilisateurId);
     }
 
     @SneakyThrows

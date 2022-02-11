@@ -3,6 +3,7 @@ package com.act.security.core.model.dto.utilisateur;
 import com.act.security.core.model.Role;
 import com.act.security.core.model.dto.role.IdDto;
 import com.act.tenantmanager.model.Tenant;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -24,4 +25,6 @@ public class UtilisateurDto  extends ModifierProfilDto{
     String fonction;
     Set<IdDto> authorities;
     Set<IdDto> tenants;
+    @JsonIgnore
+    private String encodedPasswd;
 }

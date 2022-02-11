@@ -19,11 +19,13 @@ import com.act.tenantmanager.repository.TenantRepo;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAQueryBase;
 import com.querydsl.jpa.impl.JPAQuery;
+import lombok.Getter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +39,7 @@ import static com.act.core.util.AppUtils.has;
 /**
  * @author DJIMGOU NKENNE DANY MARC 08/2020
  */
+@Getter
 @Service("appDefaultUtilisateurService")
 public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur, UtilisateurFindDto, UtilisateurFilterDto> implements UtilisateurBdServiceBase<Utilisateur, UtilisateurFindDto, UtilisateurFilterDto, UtilisateurDto, ModifierProfilDto> {
 
@@ -56,8 +59,8 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
 
     @PersistenceContext
     EntityManager em;
-/*
-    @Autowired
+
+    /*@Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;*/
 
     @Autowired
@@ -220,6 +223,8 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
             if (!has(dto.getPasswordConfirm()) || !Objects.equals(dto.getPasswordConfirm(), dto.getPassword())) {
                 throw new BadConfirmPasswordException();
             }
+            dto.setPassword(dto.getEncodedPasswd());
+            user.setPassword(dto.getEncodedPasswd());
             //user.setPassword(bCryptPasswordEncoder.encode(dto.getPasswordConfirm()));
         }
         updateRoleChildren(user, dto);

@@ -1,5 +1,6 @@
 package com.act.security.core.model.dto.utilisateur;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -22,4 +23,7 @@ public class PasswordChangeDto {
 
     @NotNull @NotBlank @NotEmpty
     String newPassword;
+
+    @JsonIgnore
+    String passwordEnc;
 }

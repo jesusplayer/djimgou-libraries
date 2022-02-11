@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="carrent-run-devPreProd" type="MavenRunConfiguration" factoryName="Maven">
+  <configuration default="false" name="rayale-auto-devDany" type="MavenRunConfiguration" factoryName="Maven">
     <MavenSettings>
       <option name="myGeneralSettings" />
       <option name="myRunnerSettings">
@@ -15,7 +15,7 @@
           <option name="passParentEnv" value="true" />
           <option name="runMavenInBackground" value="true" />
           <option name="skipTests" value="false" />
-          <option name="vmOptions" value="-Dspring-boot.run.arguments=--spring.profiles.active=devPreProd -Dspring-boot.run.fork=false -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector" />
+          <option name="vmOptions" value="-Dspring-boot.run.fork=false" />
         </MavenRunnerSettings>
       </option>
       <option name="myRunnerParameters">
@@ -30,10 +30,12 @@
           </option>
           <option name="pomFileName" />
           <option name="profilesMap">
-            <map />
+            <map>
+              <entry key="devDany" value="true" />
+            </map>
           </option>
           <option name="resolveToWorkspace" value="false" />
-          <option name="workingDirPath" value="$PROJECT_DIR$" />
+          <option name="workingDirPath" value="$PROJECT_DIR$/../app-rayale-auto" />
         </MavenRunnerParameters>
       </option>
     </MavenSettings>

@@ -20,6 +20,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -48,6 +49,10 @@ public class CompteUtilisateurController {
     @Autowired
     AuthenticationService authenticationService;
 
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+
     @SneakyThrows
     @PutMapping("/profil/modifier")
     @ResponseStatus(HttpStatus.OK)
@@ -59,6 +64,7 @@ public class CompteUtilisateurController {
     @PostMapping("/profil/creer")
     @ResponseStatus(HttpStatus.OK)
     public Utilisateur updateProfil(@RequestBody @Valid final UtilisateurDto utilisateurDto) {
+        utilisateurDto.setEncodedPasswd(bCryptPasswordEncoder.encode(utilisateurDto.getPasswordConfirm()));
         Utilisateur user = utilisateurBdService.createCompteUtilisateur(utilisateurDto);
         authenticationService.inviteUser(user);
         return user;
@@ -105,21 +111,7 @@ public class CompteUtilisateurController {
     @GetMapping("/confirmerInvitation/{token}")
     @ResponseStatus(HttpStatus.OK)
     public void confirmInvitaion(@PathVariable("token") final String token, @RequestParam(value = "password", required = false) String password) {
-        authenticationService.confirmUtilisateurAccount(token, password);
-    }
-
-    @SneakyThrows
-    @PostMapping("/activer/{utilisateurId}")
-    @ResponseStatus(HttpStatus.OK)
-    public void activateProfil(@PathVariable("utilisateurId") final UUID utilisateurId) {
-        utilisateurBdService.activer(utilisateurId);
-    }
-
-    @SneakyThrows
-    @PostMapping("/desactiver/{utilisateurId}")
-    @ResponseStatus(HttpStatus.OK)
-    public void desactivateProfil(@PathVariable("utilisateurId") final UUID utilisateurId) {
-        utilisateurBdService.desactiver(utilisateurId);
+        authenticationService.confirmUtilisateurAccount(token, password, bCryptPasswordEncoder.encode(password));
     }
 
 }

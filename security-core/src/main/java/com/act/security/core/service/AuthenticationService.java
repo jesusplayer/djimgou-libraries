@@ -8,8 +8,6 @@ import com.act.security.core.model.Utilisateur;
 import com.act.security.core.model.dto.utilisateur.PasswordChangeDto;
 import com.act.security.core.model.dto.utilisateur.UserNameChangeDto;
 import com.act.security.core.repo.ConfirmationTokenRepo;
-import com.act.security.core.service.SecuritySessionService;
-import com.act.security.core.service.UtilisateurBdService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -17,7 +15,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,9 +48,9 @@ public class AuthenticationService {
 
     @Autowired
     SecuritySessionService sessionService;
-
+/*
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private BCryptPasswordEncoder bCryptPasswordEncoder;*/
 
     @Value("${auth.expiryTokenDay:}")
     Integer expiryTokenDay;
@@ -129,7 +126,7 @@ public class AuthenticationService {
      * @throws Exception exception
      */
     @Transactional
-    public void confirmUtilisateurAccount(String token, String password) throws BadInvitationLinkException, NotFoundException {
+    public void confirmUtilisateurAccount(String token, String password, String passwordEnc) throws BadInvitationLinkException, NotFoundException {
         ConfirmationToken confirmationToken = confirmationTokenRepo.findByConfirmationToken(token);
         if (has(confirmationToken)) {
             Utilisateur user = utilisateurBdService.
@@ -139,7 +136,8 @@ public class AuthenticationService {
             user.setIsInvitationPending(Boolean.FALSE);
             password = has(password) ? password : user.getPassword();
             if (has(password)) {
-                user.setPassword(bCryptPasswordEncoder.encode(password));
+                user.setPassword(passwordEnc);
+               // user.setPassword(utilisateurBdService.getBCryptPasswordEncoder().encode(password));
             }
             utilisateurBdService.save(user);
             confirmationTokenRepo.delete(confirmationToken);
@@ -148,10 +146,10 @@ public class AuthenticationService {
         }
     }
 
-    @Transactional
+ /*   @Transactional
     public void confirmUtilisateurAccount(String token) throws BadInvitationLinkException, NotFoundException {
         confirmUtilisateurAccount(token, null);
-    }
+    }*/
 
     public void changePassword(String encryptedPassword, Utilisateur utilisateur) {
         utilisateurBdService.changePassword(encryptedPassword, utilisateur);
@@ -194,7 +192,8 @@ public class AuthenticationService {
                         authenticationManager.authenticate(authReq);
                     }
                     // L'utilisateur a bien saisi l'ancien nom d'utilisateur
-                    utilisateurBdService.changePassword(user.getId(), bCryptPasswordEncoder.encode(dto.getNewPassword()));
+                    utilisateurBdService.changePassword(user.getId(), dto.getPasswordEnc());
+                    //utilisateurBdService.changePassword(user.getId(), utilisateurBdService.getBCryptPasswordEncoder().encode(dto.getNewPassword()));
                 } else {
                     throw new BadConfirmPasswordException();
                 }
