@@ -38,35 +38,9 @@ public abstract class AbstractBaseEntity implements Persistable<UUID>, Serializa
     @Column(name = "created_date")
     private Date createdDate;
 
-/*    @CreatedDate
-    @Column(name = "created_date")
-    private Date createdDate;*/
-
     @Transient
     @JsonIgnore
     private boolean isNew = true;
-
-    /**
-     * Permet d'afficher le resultat de l'évaluation de l'entité au cas où elle
-     * est soumise au moteur de règle
-     */
-
-    /**
-     * Utilisateur créateur ou celui fait passer l'entité du statut UNAUTHORIZED_LIVE au statut LIVE
-     */
-    @Column(name = "utilisateur1_Id")
-    UUID utilisateur1Id;
-
-
-    /**
-     * Utilisateur validateur toujours différent du créateur
-     */
-    @Column(name = "utilisateur2_Id")
-    UUID utilisateur2Id;
-
-
-    @Lob
-    String historique = "";
 
     @Override
     @JsonIgnore

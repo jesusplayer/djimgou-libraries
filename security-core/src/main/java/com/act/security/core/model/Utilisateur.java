@@ -131,7 +131,6 @@ public class Utilisateur extends SecurityBaseEntity {
 
         authorities = new HashSet<>();
         tenants = new HashSet<>();
-        setStatutCreation(StatutSecurityWorkflow.EN_ATTENTE_DE_VALIDATION);
 
     }
 

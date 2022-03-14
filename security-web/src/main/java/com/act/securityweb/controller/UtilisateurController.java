@@ -80,7 +80,7 @@ public class UtilisateurController {
     //@FieldFilterSetting(className = Utilisateur.class, fields = {"password"})
     @SneakyThrows
     @PostMapping("/creer")
-    @ResponseStatus(HttpStatus.CREATED)
+    //@ResponseStatus(HttpStatus.CREATED)
     public Utilisateur create(@RequestBody @Valid UtilisateurDto utilisateurDto) {
         //return  getService().createUtilisateur(utilisateurDto);
         utilisateurDto.setEncodedPasswd(bCryptPasswordEncoder.encode(utilisateurDto.getPasswordConfirm()));
@@ -89,7 +89,7 @@ public class UtilisateurController {
 
     @SneakyThrows
     @PutMapping("/modifier/{utilisateurId}")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public Utilisateur update(
             @PathVariable("utilisateurId") final UUID id, @RequestBody @Valid final UtilisateurDto utilisateurDto) {
         return  getService().saveUtilisateur(id, utilisateurDto);
@@ -97,21 +97,21 @@ public class UtilisateurController {
 
     @SneakyThrows
     @PostMapping("/activer/{utilisateurId}")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public void activateProfil(@PathVariable("utilisateurId") final UUID utilisateurId) {
         getService().activer(utilisateurId);
     }
 
     @SneakyThrows
     @PostMapping("/desactiver/{utilisateurId}")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public void desactivateProfil(@PathVariable("utilisateurId") final UUID utilisateurId) {
         getService().desactiver(utilisateurId);
     }
 
     @SneakyThrows
     @PutMapping("/ajouterTenant/{utilisateurId}")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public Utilisateur addTenant(
             @PathVariable("utilisateurId") final UUID id, @RequestParam("tenantId") UUID tenantId) {
         return  getService().addTenant(id, tenantId);
@@ -137,33 +137,33 @@ public class UtilisateurController {
     }
 
     @GetMapping("/")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public Collection<Utilisateur> findUtilisateurs() {
         return  getService().findAll();
     }
 
     @GetMapping("/list")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public Page<Utilisateur> listUtilisateurs(Pageable pageable) {
         return  getService().findAll(pageable);
     }
 
     @GetMapping("/filter")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public Page<Utilisateur> filterUtilisateurs(UtilisateurFilterDto utilisateurFilterDto) throws Exception {
         //utilisateurService.findByDto()
         return  getService().findBy(utilisateurFilterDto);
     }
 
     @GetMapping("/search")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public List<Utilisateur> searchUtilisateurs(UtilisateurFindDto utilisateurFindDto) throws Exception {
         //utilisateurService.findByDto()
         return  getService().search(utilisateurFindDto).hits();
     }
 
     @GetMapping("/find")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public Page<Utilisateur> findUtilisateurs(UtilisateurFindDto utilisateurFindDto) throws Exception {
         //utilisateurService.findByDto()
         return  getService().searchPageable2(utilisateurFindDto);

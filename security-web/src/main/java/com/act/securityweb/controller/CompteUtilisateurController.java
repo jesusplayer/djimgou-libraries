@@ -55,14 +55,14 @@ public class CompteUtilisateurController {
 
     @SneakyThrows
     @PutMapping("/profil/modifier")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public Utilisateur update(@RequestBody @Valid final ModifierProfilDto utilisateurDto) {
             return utilisateurBdService.modifierProfil(utilisateurDto);
     }
 
     @SneakyThrows
     @PostMapping("/profil/creer")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public Utilisateur updateProfil(@RequestBody @Valid final UtilisateurDto utilisateurDto) {
         utilisateurDto.setEncodedPasswd(bCryptPasswordEncoder.encode(utilisateurDto.getPasswordConfirm()));
         Utilisateur user = utilisateurBdService.createCompteUtilisateur(utilisateurDto);
@@ -71,19 +71,19 @@ public class CompteUtilisateurController {
     }
 
     @PutMapping("/changerNomUtilisateur")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public void changeusername(@RequestBody @Valid UserNameChangeDto logininfo) throws NotFoundException, UnautorizedException, ConflitException {
         authenticationService.changeUsername(logininfo);
     }
 
     @PutMapping("/changerMotDePasse")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public void changePassword(@RequestBody @Valid PasswordChangeDto logininfo) throws NotFoundException, BadConfirmPasswordException, UnautorizedException {
         authenticationService.changePassword(logininfo);
     }
 
 /*    @PutMapping("/applyUserSession/{utilisateurId}")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public void applyUserSession(@PathVariable("utilisateurId") final UUID id, HttpSession httpSession) throws NotFoundException, BadConfirmPasswordException {
         utilisateurBdService.findById(id).orElseThrow(UtilisateurNotFoundException::new);
         httpSession.setAttribute(SessionKeys.CONNECTED_USER_ID, id.toString());
@@ -91,7 +91,7 @@ public class CompteUtilisateurController {
 
     @SneakyThrows
     @PostMapping("/inviter/{utilisateurId}")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public void invite(@PathVariable("utilisateurId") final UUID id) {
         Utilisateur user = utilisateurBdService.getRepo().
                 findById(id).orElseThrow(UtilisateurNotFoundException::new);
@@ -100,7 +100,7 @@ public class CompteUtilisateurController {
 
     @SneakyThrows
     @PostMapping("/inviterParEmail/{utilisateurEmail}")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public void inviteByEmail(@PathVariable("utilisateurEmail") final String utilisateurEmail) {
         Utilisateur user = utilisateurBdService.getRepo().
                 findOneByEmail(utilisateurEmail).orElseThrow(UtilisateurNotFoundException::new);
@@ -109,7 +109,7 @@ public class CompteUtilisateurController {
 
     @SneakyThrows
     @GetMapping("/confirmerInvitation/{token}")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public void confirmInvitaion(@PathVariable("token") final String token, @RequestParam(value = "password", required = false) String password) {
         authenticationService.confirmUtilisateurAccount(token, password, bCryptPasswordEncoder.encode(password));
     }

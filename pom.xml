@@ -42,7 +42,7 @@
     </parent>
     <groupId>com.act</groupId>
     <artifactId>act-library-starter</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <name>act-library-starter</name>
 
     <properties>

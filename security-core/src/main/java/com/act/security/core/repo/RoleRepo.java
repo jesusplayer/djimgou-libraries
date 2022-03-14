@@ -26,37 +26,6 @@ public interface RoleRepo extends JpaRepository<Role, UUID>, QuerydslPredicateEx
 
 
     Role findByName(String authority);
+;
 
-    @Modifying
-    @Query("UPDATE Role u SET " +
-            "u.dirty = NULL, " +
-            "u.dirtyValueId = NULL " +
-            "where u.id = :id")
-    void invalidate(@Param("id") UUID uuid);
-
-    //    @Query("SELECT  d FROM Role d WHERE d.dirty=FALSE")
-//    Page<Role> findAll(Specification<Role> spec, Pageable pageRequest);
-    Page<Role> findByDirtyFalseOrDirtyNull(Pageable pageRequest);
-
-    @Modifying
-    @Query("UPDATE Role u SET " +
-            "u.statutCreation = :statutCreation, " +
-            "u.adminValidateurId = :validateurId, " +
-            "u.commentaireAdminValidateur = :commentaireAdminValidateur " +
-            "where u.id = :id")
-    void validateEntity(
-            @Param("statutCreation") StatutSecurityWorkflow statutSecurityWorkflow,
-            @Param("validateurId") UUID validateurId,
-            @Param("commentaireAdminValidateur") String commentaireAdminValidateur,
-            @Param("id") UUID id
-    );
-
-    @Modifying
-    @Query("UPDATE Role u SET " +
-            "u.statutCreation = :statutCreation " +
-            "where u.id = :id")
-    void updateStatut(
-            @Param("statutCreation") StatutSecurityWorkflow statutSecurityWorkflow,
-            @Param("id") UUID id
-    );
 }

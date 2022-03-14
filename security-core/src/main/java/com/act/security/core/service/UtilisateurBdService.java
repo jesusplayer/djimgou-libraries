@@ -240,7 +240,6 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
 
         if (!has(id)) {
             Utilisateur conUser = sessionService.currentUserFromDb();
-            user.setAdminCreateurId(has(conUser) ? conUser.getId() : user.getAdminCreateurId());
 /*            if (!user.getEnabled() && has(user) && user.getStatutCreation().equals(StatutSecurityWorkflow.VALIDE)) {
                 user.setEnabled(Boolean.TRUE);
                 authenticationService.sendPaswordToUser(user, user.fullPassword());
@@ -362,12 +361,10 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
 
     @Override
     public void delete(Utilisateur entity) throws NotFoundException {
-        if (has(entity.getDirtyValueId()) && existsById(entity.getDirtyValueId())) {
-            Utilisateur oldEnt = searchById(entity.getDirtyValueId());
-            oldEnt.getAuthorities().clear();
-            getRepo().delete(oldEnt);
-        }
         entity.getAuthorities().clear();
+        if (has(entity.getTenants())) {
+            entity.getTenants().clear();
+        }
         getRepo().delete(entity);
     }
 
@@ -400,6 +397,7 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
         }
     }
 
+
     @Transactional
     @Override
     public Utilisateur save(Utilisateur entity, Utilisateur oldEntity) {
@@ -410,89 +408,11 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
                 //Utils.addDetailMessage("Cet utilisateur existe déjà ", FacesMessage.SEVERITY_ERROR);
             }
         }
-        if (!entity.isNew()) {
-            oldEntity = searchById(entity.getId());
-        }
-        if (has(entity.getStatutCreation()) && entity.getStatutCreation().isValide()) {
-            // recupération ancienne entité
-
-            // sa dirty value avec la nouvelle donnée à enregistrer
-            Utilisateur dirtyCopy = new Utilisateur();
-            BeanUtils.copyProperties(entity, dirtyCopy, "id");
-            dirtyCopy.setStatutCreation(StatutSecurityWorkflow.EN_ATTENTE_DE_VALIDATION);
-            dirtyCopy.setDirty(Boolean.TRUE);
-            getRepo().save(dirtyCopy);
-            oldEntity.setStatutCreation(StatutSecurityWorkflow.EN_ATTENTE_DE_VALIDATION);
-            oldEntity.setDirtyValueId(dirtyCopy.getId());
-            oldEntity.updateCreateur(currentUserId());
-            oldEntity.setAdminValidateurId(null);
-            // je retourne la nouvelle valeur
-            BeanUtils.copyProperties(oldEntity, entity, "id");
 
 
-        } else {
-            entity.updateCreateur(currentUserId());
-            entity.setStatutCreation(StatutSecurityWorkflow.EN_ATTENTE_DE_VALIDATION);
-            if (has(oldEntity)) {
-                oldEntity.updateCreateur(currentUserId());
-                oldEntity.setStatutCreation(StatutSecurityWorkflow.EN_ATTENTE_DE_VALIDATION);
-                getRepo().save(oldEntity);
-            }
-        }
         return super.save(entity);
     }
 
-    /**
-     * * Validation entité:
-     * * - Je recherche sa copie dirty je la met au statut validé
-     * * - Je merge les propriétés de la copie dirty (sauf l'ID) dans l'entité
-     * * - Je supprime la dirty
-     *
-     * @param entity                     entite
-     * @param validateurId               id du validateur
-     * @param commentaireAdminValidateur commentaire du validateur
-     * @param id                         identifiant de l'entité
-     */
-    @Override
-    public void validateEntity(Utilisateur entity, StatutSecurityWorkflow statutSecurityWorkflow, UUID validateurId, String commentaireAdminValidateur, UUID id) {
-        getRepo().validateEntity(statutSecurityWorkflow, validateurId, commentaireAdminValidateur, entity.getId(), statutSecurityWorkflow.isValide());
-        entity = searchById(entity.getId());
-        if (has(entity.getDirtyValueId())) {
-            Utilisateur dirtyValue = searchById(entity.getDirtyValueId());
-
-            if (statutSecurityWorkflow.isValide()) {
-                dirtyValue.setStatutWorkflow(StatutSecurityWorkflow.VALIDE);
-                Set<Role> authorities = dirtyValue.getAuthorities().stream().collect(Collectors.toSet());
-
-                dirtyValue.getAuthorities().clear();
-                entity.getAuthorities().clear();
-
-                BeanUtils.copyProperties(dirtyValue, entity, "id", "authorities");
-                entity.getAuthorities().addAll(authorities);
-                entity.updateValidateur(currentUserId());
-                entity.setDirty(null);
-                entity.setDirtyValueId(null);
-                entity.setEnabled(Boolean.TRUE);
-                getRepo().save(entity);
-                getRepo().delete(dirtyValue);
-            }
-
-        }
-        /*if (statutSecurityWorkflow.isRejeter()) {
-            entity.setDirty(null);
-            entity.setDirtyValueId(null);
-
-            if (has(entity.getDirtyValueId())) {
-                Authority dirtyValue = findById(entity.getDirtyValueId());
-                dirtyValue.getPrivileges().clear();
-                entity.setStatutCreation(StatutSecurityWorkflow.VALIDE);
-                repo.delete(dirtyValue);
-            }
-
-            repo.save(entity);
-        }*/
-
-    }
 
     @Transactional
     public void activer(UUID utilisateurId) {

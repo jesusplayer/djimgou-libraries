@@ -41,14 +41,14 @@ public class PrivilegeController {
 
     @SneakyThrows
     @PostMapping("/creer")
-    @ResponseStatus(HttpStatus.CREATED)
+    //@ResponseStatus(HttpStatus.CREATED)
     public Privilege create(@RequestBody @Valid PrivilegeDto privilegeDto) {
         return privilegeService.createPrivilege(privilegeDto);
     }
 
     @SneakyThrows
     @PutMapping("/modifier/{privilegeId}")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public Privilege update(
             @PathVariable("privilegeId") final UUID id, @RequestBody @Valid final PrivilegeDto privilegeDto) {
         return privilegeService.savePrivilege(id, privilegeDto);
@@ -62,39 +62,39 @@ public class PrivilegeController {
     }
 
     @DeleteMapping("supprimer/{privilegeId}")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public void delete(@PathVariable("privilegeId") UUID privilegeId) throws Exception {
         privilegeService.deleteById(privilegeId);
     }
 
     @GetMapping("/")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public Collection<Privilege> findPrivileges() {
         return privilegeService.findAll();
     }
 
     @GetMapping("/list")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public Page<Privilege> listPrivileges(Pageable pageable) {
         return privilegeService.findAll(pageable);
     }
 
     @GetMapping("/filter")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public Page<Privilege> filterPrivileges(PrivilegeFilterDto privilegeFilterDto) throws Exception {
         //privilegeService.findByDto()
         return privilegeService.findBy(privilegeFilterDto);
     }
 
     @GetMapping("/search")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public List<Privilege> searchPrivileges(PrivilegeFindDto privilegeFindDto) throws Exception {
         //privilegeService.findByDto()
         return privilegeService.search(privilegeFindDto).hits();
     }
 
     @GetMapping("/find")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public Page<Privilege> findPrivileges(PrivilegeFindDto privilegeFindDto) throws Exception {
         //privilegeService.findByDto()
         return privilegeService.searchPageable2(privilegeFindDto);

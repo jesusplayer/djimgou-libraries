@@ -90,7 +90,6 @@ public class Role extends SecurityBaseEntity {
     }
 
     public Role() {
-        statutCreation = StatutSecurityWorkflow.EN_ATTENTE_DE_VALIDATION;
         utilisateurs = new HashSet<>();
         //privileges = new HashSet<>();
     }
@@ -109,6 +108,18 @@ public class Role extends SecurityBaseEntity {
         if (Objects.equals(this.getId(), role.getId())) return true;
         //if (!super.equals(o)) return false;
         return Objects.equals(name, role.name);
+    }
+
+    public void clear() {
+        if (has(privileges)) {
+            privileges.clear();
+        }
+        if (has(enfants)) {
+            enfants.clear();
+        }
+        if (has(enfants)) {
+            enfants.clear();
+        }
     }
 
     @Override

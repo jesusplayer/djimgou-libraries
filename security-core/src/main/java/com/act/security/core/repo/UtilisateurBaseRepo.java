@@ -62,16 +62,12 @@ public interface UtilisateurBaseRepo<T extends Utilisateur, I> extends JpaReposi
 
     Optional<T> findByUsernameAndIdNot(String username, UUID id);
 
-    @Query("SELECT d FROM Utilisateur d WHERE (d.dirty IS NULL OR d.dirty=FALSE) AND " +
-            "d.username = :username")
+    @Query("SELECT d FROM Utilisateur d WHERE d.username = :username")
     Optional<T> findValidatedUsername(@Param("username") String username);
 
 
     Optional<T> findOneByNomAndPrenom(String nom, String prenom);
 
-    Optional<T> findOneByTelephone(String telephone);
-
-    Boolean existsByTelephone(String telephone);
 
     @Transactional
     Optional<T> findOneByEmail(String email);
@@ -82,48 +78,14 @@ public interface UtilisateurBaseRepo<T extends Utilisateur, I> extends JpaReposi
     @Transactional
     Page<T> findByEnabledFalse(Pageable pageable);
 
-    Optional<T> findOneByEmailAndIdNot(String email, UUID uuid);
 
     Page<T> findAll(Specification<T> spec, Pageable pageRequest);
 
-    Page<T> findByIsInvitationPendingTrue(Pageable pageRequest);
 
-    Page<T> findByIsAccountLockedTrue(Pageable pageRequest);
-
-    Page<T> findByIsAccountNonExpiredTrue(Pageable pageRequest);
-
-    Page<T> findByIsCredentialsExpiredTrue(Pageable pageRequest);
-
-    Page<T> findByDirtyFalseOrDirtyNull(Pageable pageRequest);
 
     @Modifying
     @Query("UPDATE Utilisateur u SET u.enabled = ?1 where u.id = ?2")
     void validerUtilisateur(Boolean enabled, UUID id);
-
-    @Modifying
-    @Query("UPDATE Utilisateur u SET " +
-            "u.statutCreation = :statutCreation, " +
-            "u.adminValidateurId = :validateurId, " +
-            "u.enabled = :enabled, " +
-            "u.commentaireAdminValidateur = :commentaireAdminValidateur " +
-            "where u.id = :id")
-    void validateEntity(
-            @Param("statutCreation") StatutSecurityWorkflow statutSecurityWorkflow,
-            @Param("validateurId") UUID validateurId,
-            @Param("commentaireAdminValidateur") String commentaireAdminValidateur,
-            @Param("id") UUID id,
-            @Param("enabled") Boolean enabled
-    );
-
-    @Modifying
-    @Query("UPDATE Utilisateur u SET " +
-            "u.statutCreation = :statutCreation " +
-            "where u.id = :id")
-    void updateStatut(
-            @Param("statutCreation") StatutSecurityWorkflow statutSecurityWorkflow,
-            @Param("id") UUID id
-    );
-
 
     @Modifying
     @Query("UPDATE Utilisateur u SET " +

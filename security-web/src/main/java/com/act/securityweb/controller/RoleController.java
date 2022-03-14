@@ -56,14 +56,14 @@ public class RoleController {
 
     @SneakyThrows
         @PostMapping("/creer")
-    @ResponseStatus(HttpStatus.CREATED)
+    //@ResponseStatus(HttpStatus.CREATED)
     public Role create(@RequestBody @Valid RoleDto roleDto) {
         return roleService.createRole(roleDto);
     }
 
     @SneakyThrows
     @PutMapping("/modifier/{roleId}")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public Role update(
             @PathVariable("roleId") final UUID id, @RequestBody @Valid final RoleDto roleDto) {
         return roleService.saveRole(id, roleDto);
@@ -71,7 +71,7 @@ public class RoleController {
 
     @SneakyThrows
     @PutMapping("/ajouterPrivilege/{roleId}")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public Role update(
             @PathVariable("roleId") final UUID roleId, @RequestBody() final UUID privilegeId) {
 
@@ -80,7 +80,7 @@ public class RoleController {
 
     @SneakyThrows
     @PutMapping("/ajouterPrivileges/{roleId}")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public Role update(
             @PathVariable("roleId") final UUID roleId, @RequestBody() final List<UUID>  privilegeIds) {
         return roleService.addPrivileges(roleId, privilegeIds);
@@ -94,39 +94,39 @@ public class RoleController {
     }
 
     @DeleteMapping("supprimer/{roleId}")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public void delete(@PathVariable("roleId") UUID roleId) throws Exception {
         roleService.deleteById(roleId);
     }
 
     @GetMapping("/")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public Collection<Role> findRoles() {
         return roleService.findAll();
     }
 
     @GetMapping("/list")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public Page<Role> listRoles(Pageable pageable) {
         return roleService.findAll(pageable);
     }
 
     @GetMapping("/filter")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public Page<Role> filterRoles(RoleFilterDto roleFilterDto) throws Exception {
         //roleService.findByDto()
         return roleService.findBy(roleFilterDto);
     }
 
     @GetMapping("/search")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public List<Role> searchRoles(RoleFindDto roleFindDto) throws Exception {
         //roleService.findByDto()
         return roleService.search(roleFindDto).hits();
     }
 
     @GetMapping("/find")
-    @ResponseStatus(HttpStatus.OK)
+    // @ResponseStatus(HttpStatus.OK)
     public Page<Role> findRoles(RoleFindDto roleFindDto) throws Exception {
         //roleService.findByDto()
         return roleService.searchPageable2(roleFindDto);

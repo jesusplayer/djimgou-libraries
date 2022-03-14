@@ -39,24 +39,9 @@ public abstract class AbstractSecurityBdService<T extends SecurityBaseEntity, S 
         return null;
     }
 
-    /**
-     * * Validation entité:
-     * * - Je recherche sa copie je la met au statut validé
-     * * - Je merge les propriétés de la copie(sauf l'ID) dans l'entité
-     * * - Je supprime la dirty
-     *
-     * @param entity                     entité à traiter
-     * @param validateurId               id du validateur
-     * @param commentaireAdminValidateur commentaire du validateur
-     * @param id                         id de l'entite
-     * @param statutSecurityWorkflow     statut workflow
-     */
-    public abstract void validateEntity(T entity, StatutSecurityWorkflow statutSecurityWorkflow, UUID validateurId, String commentaireAdminValidateur, UUID id);
-
     public T save(T entity) {
         T item = null;
         try {
-            if (entity.isNew()) entity.updateCreateur(currentUserId());
             item = getRepo().save(entity);
         } catch (Exception e) {
             log.error("Erreur d'enregistrement", e);
@@ -77,47 +62,10 @@ public abstract class AbstractSecurityBdService<T extends SecurityBaseEntity, S 
     @Transactional
     public T markEntityDeleted(T entity) {
         T ent = searchById(entity.getId());
-        ent.setStatutCreation(StatutSecurityWorkflow.SUPPRIMER);
-        ent.updateSuppresseur(currentUserId());
-        ent.updateCreateur(currentUserId());
         return this.save(ent);
     }
 
-    /**
-     * Annuler la suppression d'une entité
-     *
-     * @param entity entité
-     * @return l'entité
-     * @throws Exception exception
-     */
-    public T revokeEntityDeleted(T entity) throws Exception {
-        T ent = searchById(entity.getId());
-        if (has(ent.getDirtyValueId())) {
-            T dirty = searchById(ent.getDirtyValueId());
-            ent.setStatutCreation(StatutSecurityWorkflow.VALIDE);
-            ent.setDirtyValueId(null);
-            this.delete(dirty);
-        } else {
-            ent.setStatutCreation(StatutSecurityWorkflow.EN_ATTENTE_DE_VALIDATION);
-        }
-        ent.updateValidateur(currentUserId());
-        return this.save(ent);
-    }
 
-    public T revokeModifiedEntity(T entity) throws Exception {
-        T ent = searchById(entity.getId());
-        if (has(ent.getDirtyValueId())) {
-            T dirty = searchById(ent.getDirtyValueId());
-            ent.setStatutCreation(StatutSecurityWorkflow.VALIDE);
-            this.delete(dirty);
-        } else {
-            ent.setStatutCreation(StatutSecurityWorkflow.EN_ATTENTE_DE_VALIDATION);
-        }
-        ent.setDirty(null);
-        ent.setDirtyValueId(null);
-        ent.updateValidateur(currentUserId());
-        return this.save(ent);
-    }
 
     /**
      * Supprime l'entité. Implémenter cette methode au besoin dans le cas
@@ -130,9 +78,6 @@ public abstract class AbstractSecurityBdService<T extends SecurityBaseEntity, S 
     @Override
     public void delete(T entity) throws NotFoundException {
         try {
-            if (has(entity.getDirtyValueId()) && existsById(entity.getDirtyValueId())) {
-                getRepo().deleteById(entity.getDirtyValueId());
-            }
             getRepo().deleteById(entity.getId());
         } catch (Exception e) {
             throw e;

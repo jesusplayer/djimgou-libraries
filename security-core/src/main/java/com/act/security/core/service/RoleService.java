@@ -194,97 +194,11 @@ public class RoleService extends AbstractSecurityBdService<Role, RoleFindDto, Ro
     @Override
     public Role save(Role entity, Role oldEntity) {
         // Modification d'une entité qui était valide. elle passe en dirty
-
-        if (!entity.isNew()) {
-            oldEntity = searchById(entity.getId());
-        }
-
-        if (has(entity.getStatutCreation()) && entity.getStatutCreation().isValide()) {
-            // recupération ancienne entité
-            // sa dirty value avec la nouvelle donnée à enregistrer
-            Role dirtyCopy = new Role();
-            BeanUtils.copyProperties(entity, dirtyCopy, "id");
-            dirtyCopy.setStatutCreation(StatutSecurityWorkflow.EN_ATTENTE_DE_VALIDATION);
-            dirtyCopy.setDirty(Boolean.TRUE);
-            repo.save(dirtyCopy);
-            oldEntity.setStatutCreation(StatutSecurityWorkflow.EN_ATTENTE_DE_VALIDATION);
-            oldEntity.setDirtyValueId(dirtyCopy.getId());
-            oldEntity.updateCreateur(currentUserId());
-            oldEntity.setAdminValidateurId(null);
-            // je retourne la nouvelle valeur
-            BeanUtils.copyProperties(oldEntity, entity, "id");
-
-
-        } else {
-            entity.updateCreateur(currentUserId());
-            entity.setStatutCreation(StatutSecurityWorkflow.EN_ATTENTE_DE_VALIDATION);
-            if (has(oldEntity)) {
-                oldEntity.updateCreateur(currentUserId());
-                oldEntity.setStatutCreation(StatutSecurityWorkflow.EN_ATTENTE_DE_VALIDATION);
-                repo.save(oldEntity);
-            }
-//            }
-        }
         return super.save(entity);
-    }
-
-    /**
-     * * Validation entité:
-     * * - Je recherche sa copie dirty je la met au statut validé
-     * * - Je merge les propriétés de la copie dirty (sauf l'ID) dans l'entité
-     * * - Je supprime la dirty
-     *
-     * @param entity                     entite
-     * @param validateurId               id du validateur
-     * @param commentaireAdminValidateur commentaire du validateur
-     * @param id                         identifiant de l'entité
-     */
-    @Override
-    public void validateEntity(Role entity, StatutSecurityWorkflow statutSecurityWorkflow, UUID validateurId, String commentaireAdminValidateur, UUID id) {
-        repo.validateEntity(statutSecurityWorkflow, validateurId, commentaireAdminValidateur, entity.getId());
-        entity = searchById(entity.getId());
-        if (has(entity.getDirtyValueId())) {
-            Role dirtyValue = searchById(entity.getDirtyValueId());
-
-            if (statutSecurityWorkflow.isValide()) {
-                dirtyValue.setStatutWorkflow(StatutSecurityWorkflow.VALIDE);
-                BeanUtils.copyProperties(dirtyValue, entity, "id");
-                entity.setPrivileges(dirtyValue.getPrivileges().stream().collect(Collectors.toSet()));
-//                entity.setAdminCreateurId(null);
-                entity.updateValidateur(currentUserId());
-                entity.setDirty(null);
-                entity.setDirtyValueId(null);
-                repo.save(entity);
-                dirtyValue.getPrivileges().clear();
-                repo.delete(dirtyValue);
-            }
-
-        }
-        if (statutSecurityWorkflow.isRejeter()) {
-            entity.setDirty(null);
-            entity.setDirtyValueId(null);
-            entity.updateValidateur(currentUserId());
-
-            /*
-            if (has(entity.getDirtyValueId())) {
-                Role dirtyValue = findById(entity.getDirtyValueId());
-                dirtyValue.getPrivileges().clear();
-                entity.setStatutCreation(StatutSecurityWorkflow.VALIDE);
-                repo.delete(dirtyValue);
-            }
-
-            repo.save(entity);*/
-        }
-
     }
 
     @Override
     public void delete(Role entity) throws RoleNotFoundException {
-        if (has(entity.getDirtyValueId()) && existsById(entity.getDirtyValueId())) {
-            Role oldEnt = searchById(entity.getDirtyValueId());
-            oldEnt.getEnfants().clear();
-            repo.delete(oldEnt);
-        }
         entity.getEnfants().clear();
         repo.delete(entity);
         afterDataDeleted(entity);

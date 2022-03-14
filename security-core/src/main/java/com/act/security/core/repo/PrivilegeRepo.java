@@ -31,28 +31,4 @@ public interface PrivilegeRepo extends JpaRepository<Privilege, UUID>, QuerydslP
     Optional<Privilege> findByCode(String nom);
 
     Page<Privilege> findAll(Specification<Privilege> spec, Pageable pageRequest);
-
-    Page<Privilege> findByDirtyFalseOrDirtyNull(Pageable pageRequest);
-
-    @Modifying
-    @Query("UPDATE Privilege u SET " +
-            "u.statutCreation = :statutCreation, " +
-            "u.adminValidateurId = :validateurId, " +
-            "u.commentaireAdminValidateur = :commentaireAdminValidateur " +
-            "where u.id = :id")
-    void validateEntity(
-            @Param("statutCreation") StatutSecurityWorkflow statutSecurityWorkflow,
-            @Param("validateurId") UUID validateurId,
-            @Param("commentaireAdminValidateur") String commentaireAdminValidateur,
-            @Param("id") UUID id
-    );
-
-    @Modifying
-    @Query("UPDATE Privilege u SET " +
-            "u.statutCreation = :statutCreation " +
-            "where u.id = :id")
-    void updateStatut(
-            @Param("statutCreation") StatutSecurityWorkflow statutSecurityWorkflow,
-            @Param("id") UUID id
-    );
 }

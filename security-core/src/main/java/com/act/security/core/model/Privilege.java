@@ -55,7 +55,6 @@ public class Privilege extends SecurityBaseEntity {
 
 
     public Privilege() {
-        statutCreation = StatutSecurityWorkflow.EN_ATTENTE_DE_VALIDATION;
     }
 
 
