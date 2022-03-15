@@ -5,7 +5,9 @@
 package com.act.securityweb.controller;
 
 
+import com.act.core.exception.NotFoundException;
 import com.act.security.core.exceptions.PrivilegeNotFoundException;
+import com.act.security.core.exceptions.ReadOnlyException;
 import com.act.security.core.model.Privilege;
 import com.act.security.core.model.dto.privilege.PrivilegeDto;
 import com.act.security.core.model.dto.privilege.PrivilegeFilterDto;
@@ -35,9 +37,11 @@ import java.util.*;
 @RequestMapping("/privilege")
 public class PrivilegeController {
 
-    @Autowired
-    PrivilegeService privilegeService;
+    private PrivilegeService privilegeService;
 
+    public PrivilegeController(PrivilegeService privilegeService) {
+        this.privilegeService = privilegeService;
+    }
 
     @SneakyThrows
     @PostMapping("/creer")
@@ -63,7 +67,9 @@ public class PrivilegeController {
 
     @DeleteMapping("supprimer/{privilegeId}")
     // @ResponseStatus(HttpStatus.OK)
-    public void delete(@PathVariable("privilegeId") UUID privilegeId) throws Exception {
+    public void delete(@PathVariable("privilegeId") UUID privilegeId) throws NotFoundException, ReadOnlyException {
+        Privilege p = privilegeService.findById(privilegeId).orElseThrow(PrivilegeNotFoundException::new);
+        privilegeService.chackreadOnly(p);
         privilegeService.deleteById(privilegeId);
     }
 

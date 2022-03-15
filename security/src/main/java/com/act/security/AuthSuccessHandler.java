@@ -40,11 +40,14 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
 
-    @Autowired
-    AuditBdService auditBdService;
+    private AuditBdService auditBdService;
 
-    @Autowired
-    SecuritySessionService sessionService;
+    private SecuritySessionService sessionService;
+
+    public AuthSuccessHandler(AuditBdService auditBdService, SecuritySessionService sessionService) {
+        this.auditBdService = auditBdService;
+        this.sessionService = sessionService;
+    }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {

@@ -1,6 +1,7 @@
 package com.act.security.core.service;
 
 import com.act.security.core.exceptions.PrivilegeNotFoundException;
+import com.act.security.core.exceptions.ReadOnlyException;
 import com.act.security.core.model.Privilege;
 import com.act.security.core.model.QPrivilege;
 import com.act.security.core.model.dto.privilege.PrivilegeDto;
@@ -38,13 +39,15 @@ import static com.act.core.util.AppUtils.has;
 @Log4j2
 @Service
 public class PrivilegeService extends AbstractSecurityBdService<Privilege, PrivilegeFindDto, PrivilegeFilterDto> {
-    @Autowired
-    PrivilegeRepo repo;
+    private PrivilegeRepo repo;
+
     @PersistenceContext
     EntityManager em;
 
-    public PrivilegeService() {
+    @Autowired
+    public PrivilegeService(PrivilegeRepo repo) {
         super();
+        this.repo = repo;
     }
 
     @Override
@@ -124,10 +127,11 @@ public class PrivilegeService extends AbstractSecurityBdService<Privilege, Privi
         return page;
     }
 
-    public Privilege savePrivilege(UUID id, PrivilegeDto dto) throws PrivilegeNotFoundException, NotFoundException {
+    public Privilege savePrivilege(UUID id, PrivilegeDto dto) throws PrivilegeNotFoundException, NotFoundException, ReadOnlyException {
         Privilege priv = new Privilege();
         if (has(id)) {
             priv = repo.findById(id).orElseThrow(PrivilegeNotFoundException::new);
+            chackreadOnly(priv);
         }
         priv.fromDto(dto);
         if (has(dto.getParentId())) {
@@ -137,8 +141,14 @@ public class PrivilegeService extends AbstractSecurityBdService<Privilege, Privi
         return save(priv);
     }
 
-    public Privilege createPrivilege(PrivilegeDto dto) throws PrivilegeNotFoundException, NotFoundException {
+    public Privilege createPrivilege(PrivilegeDto dto) throws PrivilegeNotFoundException, NotFoundException, ReadOnlyException {
         return savePrivilege(null, dto);
+    }
+
+    public void chackreadOnly(Privilege priv) throws ReadOnlyException {
+        if (priv.getReadonlyValue() != null && priv.getReadonlyValue()) {
+            throw new ReadOnlyException();
+        }
     }
 
     /**
@@ -177,7 +187,7 @@ public class PrivilegeService extends AbstractSecurityBdService<Privilege, Privi
 
     @Override
     public void deleteById(UUID id) throws PrivilegeNotFoundException {
-        repo.findById(id).orElseThrow(PrivilegeNotFoundException::new);
+        Privilege p = repo.findById(id).orElseThrow(PrivilegeNotFoundException::new);
         repo.deleteById(id);
     }
 

@@ -28,11 +28,9 @@ import static com.act.core.util.AppUtils.has;
  */
 @Service
 public class AuthenticationService {
-    @Autowired
-    UtilisateurBdService utilisateurBdService;
+    private UtilisateurBdService utilisateurBdService;
 
-    @Autowired
-    ConfirmationTokenRepo confirmationTokenRepo;
+    private ConfirmationTokenRepo confirmationTokenRepo;
 
     /**
      * Dans le cas où le module parent est un microservice,
@@ -41,30 +39,49 @@ public class AuthenticationService {
      * Donc impossible de vérifier si c'est le bon user qui a le
      * bon mot de passe il faut donc un filtre pour la requete de
      * changement de mot de passe qui sera effectué par Zuul ou Spring cloud gateway
-     *
      */
-    @Autowired(required = false)
     private AuthenticationManager authenticationManager;
 
-    @Autowired
-    SecuritySessionService sessionService;
+    private SecuritySessionService sessionService;
+    private Integer expiryTokenDay;
+
+    private String host;
+
+    private String contextPath;
+
+    private String port;
+
+    private String ssl;
+
+    public AuthenticationService(
+            UtilisateurBdService utilisateurBdService,
+            ConfirmationTokenRepo confirmationTokenRepo,
+            Optional<AuthenticationManager> authenticationManager,
+            SecuritySessionService sessionService,
+            @Value("${auth.expiryTokenDay:}") Integer expiryTokenDay,
+            @Value("${server.address:}") String host,
+            @Value("${server.servlet.context-path:}") String contextPath,
+            @Value("${server.port:}") String port,
+            @Value("${server.ssl.enabled:}") String ssl
+    ) {
+        this.utilisateurBdService = utilisateurBdService;
+        this.confirmationTokenRepo = confirmationTokenRepo;
+        this.sessionService = sessionService;
+        if (authenticationManager.isPresent()) {
+            this.authenticationManager = authenticationManager.get();
+        }
+        this.expiryTokenDay = expiryTokenDay;
+        this.host = host;
+        this.contextPath = contextPath;
+        this.port = port;
+        this.ssl = ssl;
+
+    }
+
 /*
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;*/
 
-    @Value("${auth.expiryTokenDay:}")
-    Integer expiryTokenDay;
-
-    @Value("${server.address:}")
-    String host;
-
-    @Value("${server.servlet.context-path:}")
-    String contextPath;
-
-    @Value("${server.port:}")
-    String port;
-    @Value("${server.ssl.enabled:}")
-    String ssl;
 
     /**
      * Envoi de l'email de confirmation
@@ -137,7 +154,7 @@ public class AuthenticationService {
             password = has(password) ? password : user.getPassword();
             if (has(password)) {
                 user.setPassword(passwordEnc);
-               // user.setPassword(utilisateurBdService.getBCryptPasswordEncoder().encode(password));
+                // user.setPassword(utilisateurBdService.getBCryptPasswordEncoder().encode(password));
             }
             utilisateurBdService.save(user);
             confirmationTokenRepo.delete(confirmationToken);
@@ -164,7 +181,7 @@ public class AuthenticationService {
         // Tentative de changement du nom d'utilisateur
         if (has(dto.getNewUsername()) && Objects.equals(user.getUsername(), dto.getUsername())) {
             // L'utilisateur a bien saisi l'ancien nom d'utilisateur
-            utilisateurBdService.checkDuplicateUserName(dto.getNewUsername(),userId);
+            utilisateurBdService.checkDuplicateUserName(dto.getNewUsername(), userId);
             utilisateurBdService.changeUsername(user.getId(), dto.getNewUsername());
         }
     }
@@ -188,7 +205,7 @@ public class AuthenticationService {
                      * nest pas controlé par spring security
                      * par co
                      */
-                    if(has(authenticationManager)){
+                    if (has(authenticationManager)) {
                         authenticationManager.authenticate(authReq);
                     }
                     // L'utilisateur a bien saisi l'ancien nom d'utilisateur

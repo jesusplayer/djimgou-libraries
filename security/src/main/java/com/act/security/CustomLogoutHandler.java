@@ -22,12 +22,12 @@ import static com.act.core.util.AppUtils.has;
  */
 @Service
 public class CustomLogoutHandler implements LogoutHandler {
-    @Autowired
-    SecuritySessionService sessionService;
+   private SecuritySessionService sessionService;
 /*    @Autowired
     FindByIndexNameSessionRepository<? extends Session> sessions;*/
 
-    public CustomLogoutHandler() {
+    public CustomLogoutHandler(SecuritySessionService sessionService) {
+        this.sessionService = sessionService;
     }
 
     @Override

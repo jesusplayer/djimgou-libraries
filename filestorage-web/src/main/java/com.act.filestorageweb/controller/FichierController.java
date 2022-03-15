@@ -32,8 +32,11 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/fichier")
 public class FichierController {
-    @Autowired
     private FichierService fichierService;
+
+    public FichierController(FichierService fichierService) {
+        this.fichierService = fichierService;
+    }
 
     @PostMapping(value = "/uploadFichier", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public Fichier uploadFile(@RequestPart("fichier") @NotNull MultipartFile file/*, @RequestParam("dossier") String dossier, @RequestParam("nomFichier") String nomFichier*/, @RequestParam("customData") String customData) throws Exception {

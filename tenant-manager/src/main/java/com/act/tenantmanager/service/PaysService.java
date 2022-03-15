@@ -33,15 +33,15 @@ import static com.act.core.util.AppUtils.has;
  */
 @Service
 public class PaysService extends AbstractDomainService<Pays, PaysFindDto, PaysFilterDto> {
-    @Autowired
-    PaysRepo repo;
+    private PaysRepo repo;
 
     @PersistenceContext
     EntityManager em;
 
-
-    public PaysService() {
+    @Autowired
+    public PaysService(PaysRepo repo) {
         super();
+        this.repo = repo;
     }
 
     @Override
@@ -51,8 +51,7 @@ public class PaysService extends AbstractDomainService<Pays, PaysFindDto, PaysFi
 
 
     public Page<Pays> findBySearchText(String text, Pageable pg) {
-        Page<Pays> page = repo.findBySearchText(text, pg);
-        return page;
+        return repo.findBySearchText(text, pg);
     }
 
     @Transactional(/*propagation = Propagation.NESTED*/)

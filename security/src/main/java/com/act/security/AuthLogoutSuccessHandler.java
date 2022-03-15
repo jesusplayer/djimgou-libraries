@@ -36,14 +36,17 @@ public class AuthLogoutSuccessHandler implements org.springframework.security.we
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
     /*    @Autowired
         FindByIndexNameSessionRepository<? extends Session> sessions;*/
-    @Autowired
-    AuditBdService auditBdService;
+    private AuditBdService auditBdService;
 
-    @Autowired
-    SecuritySessionService sessionService;
+    private SecuritySessionService sessionService;
 
-    @Autowired
-    UtilisateurBdService utilisateurBdService;
+    private UtilisateurBdService utilisateurBdService;
+
+    public AuthLogoutSuccessHandler(AuditBdService auditBdService, SecuritySessionService sessionService, UtilisateurBdService utilisateurBdService) {
+        this.auditBdService = auditBdService;
+        this.sessionService = sessionService;
+        this.utilisateurBdService = utilisateurBdService;
+    }
 
     @SneakyThrows
     @Override

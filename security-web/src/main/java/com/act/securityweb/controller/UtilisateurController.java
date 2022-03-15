@@ -20,6 +20,7 @@ import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -43,15 +44,9 @@ import static com.act.core.util.AppUtils.has;
 @RestController()
 @RequestMapping("/utilisateur")
 public class UtilisateurController {
-    Boolean refreshList = Boolean.TRUE;
-    List<Item<Role>> authoritiesItems = new ArrayList<>();
-    //List<Authority> selectedItems = new ArrayList<>();
-    List<Role> toRemove = new ArrayList<>();
-
+    public static final String APP_UTILISATEUR_SERVICE = "appUtilisateurService";
     @Autowired
-    AppUtils appUtils;
-
-    List<StatutSecurityWorkflow> statutCreations = Arrays.asList(StatutSecurityWorkflow.values());
+    ApplicationContext appContext;
 
     @Autowired
     RoleService authorityBdService;
@@ -73,7 +68,7 @@ public class UtilisateurController {
     @Autowired
     UtilisateurBdServiceBase<Utilisateur, UtilisateurFindDto, UtilisateurFilterDto, UtilisateurDto, ModifierProfilDto> utilisateurBdService;
 
-    @Qualifier("appUtilisateurService")
+    @Qualifier(APP_UTILISATEUR_SERVICE)
     @Autowired(required = false)
     UtilisateurBdServiceBase<? extends Utilisateur, UtilisateurFindDto, UtilisateurFilterDto, UtilisateurDto, ModifierProfilDto> customBdService;
 
@@ -92,7 +87,7 @@ public class UtilisateurController {
     // @ResponseStatus(HttpStatus.OK)
     public Utilisateur update(
             @PathVariable("utilisateurId") final UUID id, @RequestBody @Valid final UtilisateurDto utilisateurDto) {
-        return  getService().saveUtilisateur(id, utilisateurDto);
+        return getService().saveUtilisateur(id, utilisateurDto);
     }
 
     @SneakyThrows
@@ -114,63 +109,66 @@ public class UtilisateurController {
     // @ResponseStatus(HttpStatus.OK)
     public Utilisateur addTenant(
             @PathVariable("utilisateurId") final UUID id, @RequestParam("tenantId") UUID tenantId) {
-        return  getService().addTenant(id, tenantId);
+        return getService().addTenant(id, tenantId);
     }
 
     @GetMapping("/detail/{utilisateurId}")
     @SneakyThrows
     public Utilisateur findById(@PathVariable("utilisateurId") UUID id) {
-        return  getService().findById(id)
+        return getService().findById(id)
                 .orElseThrow(UtilisateurNotFoundException::new);
     }
 
     @GetMapping("/actifs")
     @SneakyThrows
     public Page<Utilisateur> displayActifs(Pageable pageable) {
-        return  getService().getRepo().findByEnabledTrue(pageable);
+        return getService().getRepo().findByEnabledTrue(pageable);
     }
 
     @GetMapping("/inactifs")
     @SneakyThrows
     public Page<Utilisateur> displayIActifs(Pageable pageable) {
-        return  getService().getRepo().findByEnabledFalse(pageable);
+        return getService().getRepo().findByEnabledFalse(pageable);
     }
 
     @GetMapping("/")
     // @ResponseStatus(HttpStatus.OK)
     public Collection<Utilisateur> findUtilisateurs() {
-        return  getService().findAll();
+        return getService().findAll();
     }
 
     @GetMapping("/list")
     // @ResponseStatus(HttpStatus.OK)
     public Page<Utilisateur> listUtilisateurs(Pageable pageable) {
-        return  getService().findAll(pageable);
+        return getService().findAll(pageable);
     }
 
     @GetMapping("/filter")
     // @ResponseStatus(HttpStatus.OK)
     public Page<Utilisateur> filterUtilisateurs(UtilisateurFilterDto utilisateurFilterDto) throws Exception {
         //utilisateurService.findByDto()
-        return  getService().findBy(utilisateurFilterDto);
+        return getService().findBy(utilisateurFilterDto);
     }
 
     @GetMapping("/search")
     // @ResponseStatus(HttpStatus.OK)
     public List<Utilisateur> searchUtilisateurs(UtilisateurFindDto utilisateurFindDto) throws Exception {
         //utilisateurService.findByDto()
-        return  getService().search(utilisateurFindDto).hits();
+        return getService().search(utilisateurFindDto).hits();
     }
 
     @GetMapping("/find")
     // @ResponseStatus(HttpStatus.OK)
     public Page<Utilisateur> findUtilisateurs(UtilisateurFindDto utilisateurFindDto) throws Exception {
         //utilisateurService.findByDto()
-        return  getService().searchPageable2(utilisateurFindDto);
+        return getService().searchPageable2(utilisateurFindDto);
     }
 
     public UtilisateurBdServiceBase<Utilisateur, UtilisateurFindDto, UtilisateurFilterDto, UtilisateurDto, ModifierProfilDto>
     getService() {
+        if(appContext.containsBean(APP_UTILISATEUR_SERVICE) && !has(customBdService)){
+            customBdService = appContext.getBean(APP_UTILISATEUR_SERVICE,UtilisateurBdServiceBase.class);
+        }
         return AppUtils.has(customBdService) ? (UtilisateurBdServiceBase<Utilisateur, UtilisateurFindDto, UtilisateurFilterDto, UtilisateurDto, ModifierProfilDto>) customBdService : utilisateurBdService;
     }
 

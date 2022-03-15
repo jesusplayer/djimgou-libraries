@@ -39,25 +39,26 @@ import static com.act.core.util.AppUtils.has;
 @RestController()
 @RequestMapping("/compteUtilisateur")
 public class CompteUtilisateurController {
-    @Qualifier("appDefaultUtilisateurService")
-    @Autowired
-    UtilisateurBdServiceBase<Utilisateur, UtilisateurFindDto, UtilisateurFilterDto, UtilisateurDto, ModifierProfilDto> utilisateurBdService;
+    private UtilisateurBdServiceBase<Utilisateur, UtilisateurFindDto, UtilisateurFilterDto, UtilisateurDto, ModifierProfilDto> utilisateurBdService;
 
-    @Autowired
-    SecuritySessionService sessionService;
+    private SecuritySessionService sessionService;
 
-    @Autowired
-    AuthenticationService authenticationService;
+    private AuthenticationService authenticationService;
 
-    @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    public CompteUtilisateurController(@Qualifier("appDefaultUtilisateurService") UtilisateurBdServiceBase<Utilisateur, UtilisateurFindDto, UtilisateurFilterDto, UtilisateurDto, ModifierProfilDto> utilisateurBdService, SecuritySessionService sessionService, AuthenticationService authenticationService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.utilisateurBdService = utilisateurBdService;
+        this.sessionService = sessionService;
+        this.authenticationService = authenticationService;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
 
     @SneakyThrows
     @PutMapping("/profil/modifier")
     // @ResponseStatus(HttpStatus.OK)
     public Utilisateur update(@RequestBody @Valid final ModifierProfilDto utilisateurDto) {
-            return utilisateurBdService.modifierProfil(utilisateurDto);
+        return utilisateurBdService.modifierProfil(utilisateurDto);
     }
 
     @SneakyThrows

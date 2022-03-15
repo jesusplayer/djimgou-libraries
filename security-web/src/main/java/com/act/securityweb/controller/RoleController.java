@@ -40,19 +40,23 @@ import static com.act.core.util.AppUtils.has;
 @RequestMapping("/role")
 public class RoleController {
 
-    @Autowired
-    SecuritySessionService sessionService;
-    @Autowired
-    PrivilegeService privilegeService;
-    @Autowired
-    RoleService roleService;
+    private SecuritySessionService sessionService;
+    private PrivilegeService privilegeService;
+    private RoleService roleService;
 
-    @Autowired
-    ApplicationContext applicationContext;
+    private ApplicationContext applicationContext;
 
 
-    @Autowired
-    ApplicationEventPublisher applicationEventPublisher;
+    private   ApplicationEventPublisher applicationEventPublisher;
+
+
+    public RoleController(SecuritySessionService sessionService, PrivilegeService privilegeService, RoleService roleService, ApplicationContext applicationContext, ApplicationEventPublisher applicationEventPublisher) {
+        this.sessionService = sessionService;
+        this.privilegeService = privilegeService;
+        this.roleService = roleService;
+        this.applicationContext = applicationContext;
+        this.applicationEventPublisher = applicationEventPublisher;
+    }
 
     @SneakyThrows
         @PostMapping("/creer")

@@ -31,11 +31,15 @@ https://www.baeldung.com/swagger-2-documentation-for-spring-rest-api
 @RequestMapping("/tenant")
 public class TenantController {
 
-    @Autowired
-    TenantService tenantService;
+    private TenantService tenantService;
+
+    private TenantSessionService sessionService;
 
     @Autowired
-    TenantSessionService sessionService;
+    public TenantController(TenantService tenantService, TenantSessionService sessionService) {
+        this.tenantService = tenantService;
+        this.sessionService = sessionService;
+    }
 
     @PostMapping("/creer")
     @ResponseStatus(HttpStatus.CREATED)

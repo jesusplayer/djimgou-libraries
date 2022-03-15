@@ -20,12 +20,11 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAQueryBase;
 import com.querydsl.jpa.impl.JPAQuery;
 import lombok.Getter;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,32 +41,40 @@ import static com.act.core.util.AppUtils.has;
 @Getter
 @Service("appDefaultUtilisateurService")
 public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur, UtilisateurFindDto, UtilisateurFilterDto> implements UtilisateurBdServiceBase<Utilisateur, UtilisateurFindDto, UtilisateurFilterDto, UtilisateurDto, ModifierProfilDto> {
-
-    @Qualifier("appUtilisateurRepo")
-    @Autowired(required = false)
-    UtilisateurBaseRepo<Utilisateur, UUID> customRepo;
-
-    @Qualifier("appDefaultUtilisateurRepo")
-    @Autowired()
-    UtilisateurBaseRepo<Utilisateur, UUID> repo;
-
-    @Autowired
-    TenantRepo tenantRepo;
-
-    @Autowired
-    RoleRepo roleRepo;
-
+    public static final String APP_UTILISATEUR_REPO = "appUtilisateurRepo";
+    @Setter
     @PersistenceContext
     EntityManager em;
 
-    /*@Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;*/
 
-    @Autowired
-    SecuritySessionService sessionService;
+    private UtilisateurBaseRepo<Utilisateur, UUID> customRepo;
 
-    public UtilisateurBdService() {
-        super();
+    private UtilisateurBaseRepo<Utilisateur, UUID> repo;
+
+    private TenantRepo tenantRepo;
+
+    private RoleRepo roleRepo;
+
+    private SecuritySessionService securitySessionService;
+
+
+    public UtilisateurBdService(
+            @Qualifier(APP_UTILISATEUR_REPO) Optional<UtilisateurBaseRepo<Utilisateur, UUID>> customRepo,
+            @Qualifier("appDefaultUtilisateurRepo") UtilisateurBaseRepo<Utilisateur, UUID> repo,
+            ApplicationContext appContext,
+            TenantRepo tenantRepo, RoleRepo roleRepo, SecuritySessionService sessionService) {
+        this.repo = repo;
+        this.tenantRepo = tenantRepo;
+        this.roleRepo = roleRepo;
+        this.securitySessionService = sessionService;
+
+        if (customRepo.isPresent()) {
+            this.customRepo = customRepo.get();
+        } else {
+            if (appContext.containsBean(APP_UTILISATEUR_REPO)) {
+                this.customRepo = appContext.getBean(APP_UTILISATEUR_REPO, UtilisateurBaseRepo.class);
+            }
+        }
     }
 
     @Transactional
@@ -98,7 +105,7 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
     }
 
     public Utilisateur modifierProfil(ModifierProfilDto dto) throws UtilisateurNotFoundException, ConflitException, UnautorizedException {
-        Optional<UUID> optid = sessionService.currentUserId();
+        Optional<UUID> optid = securitySessionService.currentUserId();
         UUID id = optid.orElseThrow(UnautorizedException::new);
         Utilisateur user = getRepo().findById(id).orElseThrow(UtilisateurNotFoundException::new);
         checkDuplicate(id, dto);
@@ -239,7 +246,7 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
         user.fromDto(dto);
 
         if (!has(id)) {
-            Utilisateur conUser = sessionService.currentUserFromDb();
+            Utilisateur conUser = securitySessionService.currentUserFromDb();
 /*            if (!user.getEnabled() && has(user) && user.getStatutCreation().equals(StatutSecurityWorkflow.VALIDE)) {
                 user.setEnabled(Boolean.TRUE);
                 authenticationService.sendPaswordToUser(user, user.fullPassword());

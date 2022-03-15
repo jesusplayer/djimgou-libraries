@@ -14,10 +14,15 @@ import static com.act.core.util.AppUtils.has;
 
 @Service
 public class TenantSessionService {
-    private static HashMap<String, Tenant> tenantMap = new HashMap<String, Tenant>();
+    private static HashMap<String, Tenant> tenantMap = new HashMap<>();
+
+
+    private TenantRepo tenantRepo;
 
     @Autowired(required = false)
-    TenantRepo tenantRepo;
+    public TenantSessionService(TenantRepo tenantRepo) {
+        this.tenantRepo = tenantRepo;
+    }
 
     public synchronized Optional<Tenant> putTenant(String tenantId) throws TenantSessionNotFoundException {
         if (!has(tenantId)) {

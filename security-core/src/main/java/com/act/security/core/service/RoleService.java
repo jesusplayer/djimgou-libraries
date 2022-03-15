@@ -40,19 +40,18 @@ public class RoleService extends AbstractSecurityBdService<Role, RoleFindDto, Ro
     EntityManager em;
 
 
-    @Autowired
-    RoleRepo repo;
+    private RoleRepo repo;
 
-    @Autowired
-    SessionManager sessionManager;
+    private SessionManager sessionManager;
 
-    @Autowired
-    PrivilegeRepo privilegeRepo;
+    private PrivilegeRepo privilegeRepo;
 
-    public RoleService() {
+    public RoleService(RoleRepo repo, SessionManager sessionManager, PrivilegeRepo privilegeRepo) {
         super();
+        this.repo = repo;
+        this.sessionManager = sessionManager;
+        this.privilegeRepo = privilegeRepo;
     }
-
 
     @Override
     public RoleRepo getRepo() {

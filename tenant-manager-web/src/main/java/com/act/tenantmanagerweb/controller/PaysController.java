@@ -28,9 +28,12 @@ https://www.baeldung.com/swagger-2-documentation-for-spring-rest-api
 @RequestMapping("/pays")
 public class PaysController {
 
-    @Autowired
-    PaysService paysService;
+    private PaysService paysService;
 
+    @Autowired
+    public PaysController(PaysService paysService) {
+        this.paysService = paysService;
+    }
 
     @PostMapping("/creer")
     @ResponseStatus(HttpStatus.CREATED)

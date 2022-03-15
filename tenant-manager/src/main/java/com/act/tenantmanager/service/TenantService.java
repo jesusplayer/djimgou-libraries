@@ -41,15 +41,19 @@ import static com.act.core.util.AppUtils.toPage;
  */
 @Service
 public class TenantService {
-    @Autowired
-    TenantRepo repo;
 
-    @Autowired
-    PaysRepo etageRepo;
+    private TenantRepo repo;
+
+    private PaysRepo etageRepo;
 
     @PersistenceContext
-    EntityManager em;
+    private EntityManager em;
 
+    @Autowired
+    public TenantService(TenantRepo repo, PaysRepo etageRepo) {
+        this.repo = repo;
+        this.etageRepo = etageRepo;
+    }
 
     public Page<Tenant> findBySearchText(String text, Pageable pg) {
         Page<Tenant> page = repo.findBySearchText(text, pg);

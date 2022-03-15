@@ -56,8 +56,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     AppSecurityConfig appSecurityConfig;
 
-    @Autowired
-    CustomLogoutHandler logoutHandler;
+/*    @Autowired
+    CustomLogoutHandler logoutHandler;*/
 
     @Autowired
     InvalidSessionHandler invalidSessionHandler;

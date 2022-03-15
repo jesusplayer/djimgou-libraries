@@ -2,7 +2,6 @@ package com.act.security.core.service;
 
 import com.act.core.util.AppUtils;
 import com.act.security.core.UtilisateurDetails;
-import com.act.session.enums.SessionKeys;
 import com.act.security.core.model.Utilisateur;
 import com.act.session.service.SessionService;
 import lombok.extern.log4j.Log4j2;
@@ -14,12 +13,9 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpSession;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
-
-import static com.act.core.util.AppUtils.has;
 
 @Log4j2
 @Component
@@ -34,8 +30,6 @@ public class SecuritySessionService {
     @Autowired
     SessionService sessionService;
 
-
-    UtilisateurDetails currentUser;
     // @Autowired
     // WebInvocationPrivilegeEvaluator evaluator;
 

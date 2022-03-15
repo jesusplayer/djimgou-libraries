@@ -26,11 +26,15 @@ import static com.act.core.util.AppUtils.has;
 @Service
 public class FichierService {
 
-    @Autowired
-    FichierRepo repo;
+    private FichierRepo repo;
 
-    @Value("${filestore.directory}")
-    String filesStoreDir;
+
+    private String filesStoreDir;
+
+    public FichierService(FichierRepo repo, @Value("${filestore.directory}") String filesStoreDir) {
+        this.repo = repo;
+        this.filesStoreDir = filesStoreDir;
+    }
 
     @PostConstruct
     void init() throws Exception {
