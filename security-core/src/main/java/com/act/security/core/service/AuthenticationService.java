@@ -2,15 +2,16 @@ package com.act.security.core.service;
 
 import com.act.core.exception.ConflitException;
 import com.act.core.exception.NotFoundException;
+import com.act.mail.EmailSenderService;
 import com.act.security.core.exceptions.*;
 import com.act.security.core.model.ConfirmationToken;
 import com.act.security.core.model.Utilisateur;
 import com.act.security.core.model.dto.utilisateur.PasswordChangeDto;
 import com.act.security.core.model.dto.utilisateur.UserNameChangeDto;
 import com.act.security.core.repo.ConfirmationTokenRepo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -52,21 +53,40 @@ public class AuthenticationService {
     private String port;
 
     private String ssl;
+    private String mailFrom;
+    private String mailSubject;
+    private String mailSignupMsg;
+    private String signupConfirmUrl;
+    private String mailClickLinkText;
+    private String mailFromName;
+
+    private EmailSenderService emailSender;
 
     public AuthenticationService(
             UtilisateurBdService utilisateurBdService,
             ConfirmationTokenRepo confirmationTokenRepo,
             Optional<AuthenticationManager> authenticationManager,
             SecuritySessionService sessionService,
+            EmailSenderService emailSenderService,
             @Value("${auth.expiryTokenDay:}") Integer expiryTokenDay,
             @Value("${server.address:}") String host,
             @Value("${server.servlet.context-path:}") String contextPath,
             @Value("${server.port:}") String port,
-            @Value("${server.ssl.enabled:}") String ssl
+            @Value("${server.ssl.enabled:}") String ssl,
+            @Value("${auth.mail.signup.text:" +
+                    "Bienvenue<p> Merci pour votre inscription. Pour confirmez votre compte, cliquez ici : " +
+                    "}") String mailSignupMsg,
+            @Value("${auth.mail.signup.clickLinkText}") String mailClickLinkText,
+            @Value("${auth.mail.signup.from}") String mailFrom,
+            @Value("${auth.mail.signup.fromName}") String mailFromName,
+            @Value("${auth.mail.signup.confirmationUrl:}") String signupConfirmUrl,
+            @Value("${auth.mail.signup.subject:Completez votre enregistrement!" +
+                    "}") String mailSubject
     ) {
         this.utilisateurBdService = utilisateurBdService;
         this.confirmationTokenRepo = confirmationTokenRepo;
         this.sessionService = sessionService;
+        this.emailSender = emailSenderService;
         if (authenticationManager.isPresent()) {
             this.authenticationManager = authenticationManager.get();
         }
@@ -75,7 +95,12 @@ public class AuthenticationService {
         this.contextPath = contextPath;
         this.port = port;
         this.ssl = ssl;
-
+        this.mailSignupMsg = mailSignupMsg;
+        this.signupConfirmUrl = signupConfirmUrl;
+        this.mailFrom = mailFrom;
+        this.mailSubject = mailSubject;
+        this.mailClickLinkText = mailClickLinkText;
+        this.mailFromName = mailFromName;
     }
 
 /*
@@ -89,6 +114,7 @@ public class AuthenticationService {
      * @param user utilisateur
      * @throws Exception exception
      */
+    // @Async
     @Transactional
     public void inviteUser(Utilisateur user) throws UtilisateurConfiltException {
 
@@ -102,19 +128,24 @@ public class AuthenticationService {
 
             ConfirmationToken confirmationToken = new ConfirmationToken(user);
 
+            String prefixConfirmUrl = signupConfirmUrl;
+            if (!has(signupConfirmUrl)) {
+                prefixConfirmUrl = (Boolean.parseBoolean(ssl) ? "https://" : "http://")
+                        + (has(host) ? host : "localhost") + ":" + port + contextPath;
+                prefixConfirmUrl = prefixConfirmUrl + "/compteUtilisateur/confirmerInvitation/";
+            }
+            final String url = prefixConfirmUrl +
+                    confirmationToken.getConfirmationToken();
 
-            SimpleMailMessage mailMessage = new SimpleMailMessage();
-            mailMessage.setTo(user.getEmail());
-            mailMessage.setSubject("Completez votre enregistrement!");
-            mailMessage.setFrom("CarRent");
-            final String url = (Boolean.parseBoolean(ssl) ? "https://" : "http://") + (has(host) ? host : "localhost") + ":" + port + contextPath + "/compteUtilisateur/confirmerInvitation/" + confirmationToken.getConfirmationToken();
-            mailMessage.setText("Bienvenue sur <h1>CARRENT</h1> Votre com.act.audit.service de location de voiture.<p> Pour confirmez votre compte, cliquez ici : "
-                    + "<a href=\"" + url + ">" + url + "</a>");
-
-            //         emailSenderService.sendEmail(mailMessage);
-            //gmailMessageService.send(mailMessage);
+            MimeMessagePreparator msg = emailSender.buildMessage(
+                    mailFrom,
+                    mailFromName,
+                    mailSubject, user.getEmail(), null, null,
+                    mailSignupMsg + " <a href=\"" + url + "\">" + mailClickLinkText + "</a>",
+                    null);
+            emailSender.sendEmail(msg);
+            // gmailMessageService.send(mailMessage);
             confirmationTokenRepo.save(confirmationToken);
-
         }
 
     }
@@ -149,6 +180,7 @@ public class AuthenticationService {
             Utilisateur user = utilisateurBdService.
                     findById(confirmationToken.getUtilisateurId())
                     .orElseThrow(UtilisateurNotFoundException::new);
+            validateVerificationToken(token,user.getEmail());
             user.setEnabled(true);
             user.setIsInvitationPending(Boolean.FALSE);
             password = has(password) ? password : user.getPassword();
@@ -222,24 +254,24 @@ public class AuthenticationService {
 
     }
 
-    public void validateVerificationToken(String token, String email) throws Exception {
+    public void validateVerificationToken(String token, String email) throws BadInvitationLinkException, NotFoundException {
         final ConfirmationToken verificationToken = confirmationTokenRepo.findByConfirmationToken(token);
         if (verificationToken == null) {
-            throw new Exception("Token invalide");
+            throw new BadInvitationLinkException("Token invalide");
         }
 
         final Utilisateur user = utilisateurBdService.findById(verificationToken.getUtilisateurId())
                 .orElseThrow(UtilisateurNotFoundException::new);
 
         if (!(has(user) && has(user.getEmail()) && user.getEmail().equals(email))) {
-            throw new Exception("Cet email est invalide vérifiez qu'il s'agit de la bonne adresse d'invitation");
+            throw new BadInvitationLinkException("Cet email est invalide vérifiez qu'il s'agit de la bonne adresse d'invitation");
         }
         final Date dateDujour = Calendar.getInstance().getTime();
         long diff = dateDujour.getTime() - verificationToken.getCreatedDate().getTime();
         diff = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
         if ((int) diff > expiryTokenDay) {
             confirmationTokenRepo.delete(verificationToken);
-            throw new Exception("Token expiré");
+            throw new BadInvitationLinkException("Token expiré");
         }
 
     }

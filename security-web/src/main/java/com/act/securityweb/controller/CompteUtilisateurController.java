@@ -5,12 +5,10 @@
 package com.act.securityweb.controller;
 
 import com.act.core.exception.ConflitException;
+import com.act.security.core.exceptions.*;
 import com.act.security.core.model.Utilisateur;
 import com.act.security.core.model.dto.utilisateur.*;
 import com.act.security.core.service.AuthenticationService;
-import com.act.security.core.exceptions.BadConfirmPasswordException;
-import com.act.security.core.exceptions.UnautorizedException;
-import com.act.security.core.exceptions.UtilisateurNotFoundException;
 import com.act.core.exception.NotFoundException;
 import com.act.security.core.service.SecuritySessionService;
 import com.act.security.core.service.UtilisateurBdServiceBase;
@@ -54,17 +52,17 @@ public class CompteUtilisateurController {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    @SneakyThrows
+
     @PutMapping("/profil/modifier")
     // @ResponseStatus(HttpStatus.OK)
-    public Utilisateur update(@RequestBody @Valid final ModifierProfilDto utilisateurDto) {
+    public Utilisateur update(@RequestBody @Valid final ModifierProfilDto utilisateurDto) throws ConflitException, UnautorizedException, NotFoundException {
         return utilisateurBdService.modifierProfil(utilisateurDto);
     }
 
-    @SneakyThrows
+
     @PostMapping("/profil/creer")
     // @ResponseStatus(HttpStatus.OK)
-    public Utilisateur updateProfil(@RequestBody @Valid final UtilisateurDto utilisateurDto) {
+    public Utilisateur updateProfil(@RequestBody @Valid final UtilisateurDto utilisateurDto) throws UtilisateurConfiltException, ConflitException, BadConfirmPasswordException, NotFoundException {
         utilisateurDto.setEncodedPasswd(bCryptPasswordEncoder.encode(utilisateurDto.getPasswordConfirm()));
         Utilisateur user = utilisateurBdService.createCompteUtilisateur(utilisateurDto);
         authenticationService.inviteUser(user);
@@ -90,28 +88,28 @@ public class CompteUtilisateurController {
         httpSession.setAttribute(SessionKeys.CONNECTED_USER_ID, id.toString());
     }*/
 
-    @SneakyThrows
+
     @PostMapping("/inviter/{utilisateurId}")
     // @ResponseStatus(HttpStatus.OK)
-    public void invite(@PathVariable("utilisateurId") final UUID id) {
+    public void invite(@PathVariable("utilisateurId") final UUID id) throws UtilisateurNotFoundException, UtilisateurConfiltException {
         Utilisateur user = utilisateurBdService.getRepo().
                 findById(id).orElseThrow(UtilisateurNotFoundException::new);
         authenticationService.inviteUser(user);
     }
 
-    @SneakyThrows
+
     @PostMapping("/inviterParEmail/{utilisateurEmail}")
     // @ResponseStatus(HttpStatus.OK)
-    public void inviteByEmail(@PathVariable("utilisateurEmail") final String utilisateurEmail) {
+    public void inviteByEmail(@PathVariable("utilisateurEmail") final String utilisateurEmail) throws UtilisateurConfiltException, UtilisateurNotFoundException {
         Utilisateur user = utilisateurBdService.getRepo().
                 findOneByEmail(utilisateurEmail).orElseThrow(UtilisateurNotFoundException::new);
         authenticationService.inviteUser(user);
     }
 
-    @SneakyThrows
+
     @GetMapping("/confirmerInvitation/{token}")
     // @ResponseStatus(HttpStatus.OK)
-    public void confirmInvitaion(@PathVariable("token") final String token, @RequestParam(value = "password", required = false) String password) {
+    public void confirmInvitaion(@PathVariable("token") final String token, @RequestParam(value = "password", required = false) String password) throws BadInvitationLinkException, NotFoundException {
         authenticationService.confirmUtilisateurAccount(token, password, bCryptPasswordEncoder.encode(password));
     }
 
