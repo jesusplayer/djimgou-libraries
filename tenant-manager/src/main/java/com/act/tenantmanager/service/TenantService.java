@@ -14,7 +14,6 @@ import com.act.tenantmanager.repository.TenantRepo;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAQueryBase;
 import com.querydsl.jpa.impl.JPAQuery;
-import lombok.SneakyThrows;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.mapper.orm.Search;
@@ -82,8 +81,7 @@ public class TenantService {
         return null;
     }
 
-    @SneakyThrows
-    public Tenant createTenant(TenantDto tenantDto) {
+    public Tenant createTenant(TenantDto tenantDto) throws TenantNotFoundException, PaysNotFoundException {
         return saveTenant(null, tenantDto);
     }
 

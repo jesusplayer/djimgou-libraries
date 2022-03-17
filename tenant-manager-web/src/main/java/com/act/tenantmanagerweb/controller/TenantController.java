@@ -1,5 +1,6 @@
 package com.act.tenantmanagerweb.controller;
 
+import com.act.tenantmanager.exceptions.PaysNotFoundException;
 import com.act.tenantmanager.exceptions.TenantNotFoundException;
 import com.act.tenantmanager.exceptions.TenantSessionNotFoundException;
 import com.act.tenantmanager.model.Tenant;
@@ -10,11 +11,9 @@ import com.act.tenantmanager.model.dto.tenant.TenantSessionDto;
 import com.act.session.enums.SessionKeys;
 import com.act.tenantmanager.service.TenantService;
 import com.act.tenantmanager.service.TenantSessionService;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
@@ -42,16 +41,13 @@ public class TenantController {
     }
 
     @PostMapping("/creer")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Tenant create(@RequestBody @Valid TenantDto tenantDto) {
+    public Tenant create(@RequestBody @Valid TenantDto tenantDto) throws TenantNotFoundException, PaysNotFoundException {
         return tenantService.createTenant(tenantDto);
     }
 
-    @SneakyThrows
     @PutMapping("/modifier/{tenantId}")
-    @ResponseStatus(HttpStatus.OK)
     public Tenant update(
-            @PathVariable("tenantId") final UUID tenantId, @RequestBody @Valid final TenantDto tenantDto) {
+            @PathVariable("tenantId") final UUID tenantId, @RequestBody @Valid final TenantDto tenantDto) throws TenantNotFoundException, PaysNotFoundException {
         return tenantService.saveTenant(tenantId, tenantDto);
     }
 
@@ -62,19 +58,16 @@ public class TenantController {
     }
 
     @DeleteMapping("supprimer/{tenantId}")
-    @ResponseStatus(HttpStatus.OK)
-    public void delete(@PathVariable("tenantId") UUID tenantId) throws Exception {
+    public void delete(@PathVariable("tenantId") UUID tenantId) {
         tenantService.deleteById(tenantId);
     }
 
     @GetMapping("/")
-    @ResponseStatus(HttpStatus.OK)
     public Collection<Tenant> findTenants(HttpSession session) {
         return tenantService.findAll();
     }
 
     @PostMapping("/selectTenant/{tenantId}")
-    @ResponseStatus(HttpStatus.OK)
     public TenantSessionDto selectTenant(@PathVariable("tenantId") UUID tenantId, HttpSession session) throws TenantSessionNotFoundException {
         Tenant tenant = sessionService.putTenant(tenantId.toString()).get();
         TenantSessionDto dto = new TenantSessionDto();
@@ -84,28 +77,23 @@ public class TenantController {
     }
 
     @GetMapping("/list")
-    @ResponseStatus(HttpStatus.OK)
     public Page<Tenant> listTenants(@Valid Pageable pageable) {
         return tenantService.findAll(pageable);
     }
 
     @GetMapping("/filter")
-    @ResponseStatus(HttpStatus.OK)
     public Page<Tenant> filterTenants(@Valid TenantFilterDto tenantFilterDto) throws Exception {
         return tenantService.findBy(tenantFilterDto);
     }
 
     @GetMapping("/search")
-    @ResponseStatus(HttpStatus.OK)
-    public List<Tenant> searchTenants(@Valid TenantFindDto tenantFindDto) throws Exception {
+    public List<Tenant> searchTenants(@Valid TenantFindDto tenantFindDto) {
         return tenantService.search(tenantFindDto).hits();
     }
 
     @GetMapping("/find")
-    @ResponseStatus(HttpStatus.OK)
     public Page<Tenant> findTenants(@Valid TenantFindDto tenantFindDto) throws Exception {
         return tenantService.searchPageable2(tenantFindDto);
     }
-
 
 }

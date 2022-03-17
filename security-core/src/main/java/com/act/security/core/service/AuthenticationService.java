@@ -180,12 +180,14 @@ public class AuthenticationService {
             Utilisateur user = utilisateurBdService.
                     findById(confirmationToken.getUtilisateurId())
                     .orElseThrow(UtilisateurNotFoundException::new);
-            validateVerificationToken(token,user.getEmail());
+            validateVerificationToken(token, user.getEmail());
             user.setEnabled(true);
             user.setIsInvitationPending(Boolean.FALSE);
             password = has(password) ? password : user.getPassword();
             if (has(password)) {
-                user.setPassword(passwordEnc);
+                if (has(passwordEnc)) {
+                    user.setPassword(passwordEnc);
+                }
                 // user.setPassword(utilisateurBdService.getBCryptPasswordEncoder().encode(password));
             }
             utilisateurBdService.save(user);

@@ -19,7 +19,6 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAQueryBase;
 import com.querydsl.jpa.impl.JPAQuery;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -187,8 +186,7 @@ public class ReportService extends AbstractDomainService<Report, ReportFindDto, 
         return save(etage);
     }
 
-    @SneakyThrows
-    public Report createReportTemplate(ReportDto paysDto) {
+    public Report createReportTemplate(ReportDto paysDto) throws NotFoundException {
         return saveReportTemplate(null, paysDto);
     }
 

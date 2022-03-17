@@ -16,7 +16,8 @@ public class GlobalSecurityExceptionHandler extends AppExceptionHandler {
             ConversionFailedException.class,
             BadConfirmPasswordException.class,
             BadInvitationLinkException.class,
-            BadRequestException.class
+            BadRequestException.class,
+            ReadOnlyException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handleConnversion(Exception ex) {

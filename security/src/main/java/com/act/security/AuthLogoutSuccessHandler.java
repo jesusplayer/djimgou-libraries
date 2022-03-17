@@ -2,22 +2,21 @@ package com.act.security;
 
 
 import com.act.audit.model.AuditAction;
+import com.act.audit.service.AuditBdService;
+import com.act.core.util.AppUtils;
 import com.act.security.core.UtilisateurDetails;
 import com.act.security.core.model.Utilisateur;
+import com.act.security.core.service.MyVoter;
 import com.act.security.core.service.SecuritySessionService;
 import com.act.security.core.service.UtilisateurBdService;
-import com.act.session.enums.SessionKeys;
-import com.act.security.core.service.MyVoter;
-import com.act.core.util.AppUtils;
 import com.act.session.context.SessionContext;
+import com.act.session.enums.SessionKeys;
 import com.act.tenantmanager.aop.TenantContext;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.stereotype.Component;
-import com.act.audit.service.AuditBdService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

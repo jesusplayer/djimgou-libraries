@@ -12,7 +12,6 @@ import com.act.tenantmanager.repository.PaysRepo;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAQueryBase;
 import com.querydsl.jpa.impl.JPAQuery;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -64,8 +63,7 @@ public class PaysService extends AbstractDomainService<Pays, PaysFindDto, PaysFi
         return save(etage);
     }
 
-    @SneakyThrows
-    public Pays createPays(PaysDto paysDto) {
+    public Pays createPays(PaysDto paysDto) throws PaysNotFoundException {
         return savePays(null, paysDto);
     }
 

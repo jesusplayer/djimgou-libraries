@@ -14,16 +14,14 @@ import com.act.security.core.model.dto.privilege.PrivilegeFilterDto;
 import com.act.security.core.model.dto.privilege.PrivilegeFindDto;
 import com.act.security.core.service.PrivilegeService;
 import lombok.Getter;
-import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.*;
-
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -43,30 +41,26 @@ public class PrivilegeController {
         this.privilegeService = privilegeService;
     }
 
-    @SneakyThrows
     @PostMapping("/creer")
     //@ResponseStatus(HttpStatus.CREATED)
-    public Privilege create(@RequestBody @Valid PrivilegeDto privilegeDto) {
+    public Privilege create(@RequestBody @Valid PrivilegeDto privilegeDto) throws NotFoundException, ReadOnlyException {
         return privilegeService.createPrivilege(privilegeDto);
     }
 
-    @SneakyThrows
     @PutMapping("/modifier/{privilegeId}")
     // @ResponseStatus(HttpStatus.OK)
     public Privilege update(
-            @PathVariable("privilegeId") final UUID id, @RequestBody @Valid final PrivilegeDto privilegeDto) {
+            @PathVariable("privilegeId") final UUID id, @RequestBody @Valid final PrivilegeDto privilegeDto) throws NotFoundException, ReadOnlyException {
         return privilegeService.savePrivilege(id, privilegeDto);
     }
 
     @GetMapping("/detail/{privilegeId}")
-    @SneakyThrows
-    public Privilege findById(@PathVariable("privilegeId") UUID privilegeId) {
+    public Privilege findById(@PathVariable("privilegeId") UUID privilegeId) throws NotFoundException {
         return privilegeService.findById(privilegeId)
                 .orElseThrow(PrivilegeNotFoundException::new);
     }
 
     @DeleteMapping("supprimer/{privilegeId}")
-    // @ResponseStatus(HttpStatus.OK)
     public void delete(@PathVariable("privilegeId") UUID privilegeId) throws NotFoundException, ReadOnlyException {
         Privilege p = privilegeService.findById(privilegeId).orElseThrow(PrivilegeNotFoundException::new);
         privilegeService.chackreadOnly(p);

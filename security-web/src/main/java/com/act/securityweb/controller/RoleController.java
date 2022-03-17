@@ -4,6 +4,7 @@
  */
 package com.act.securityweb.controller;
 
+import com.act.core.exception.NotFoundException;
 import com.act.security.core.exceptions.RoleNotFoundException;
 import com.act.security.core.model.Role;
 import com.act.security.core.model.dto.role.RoleDto;
@@ -14,19 +15,16 @@ import com.act.security.core.service.RoleService;
 import com.act.security.core.service.SecuritySessionService;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.*;
-
-import static com.act.core.util.AppUtils.has;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Classe Manage Bean permettant l'Edition d'un Rôle(Authority)
@@ -47,7 +45,7 @@ public class RoleController {
     private ApplicationContext applicationContext;
 
 
-    private   ApplicationEventPublisher applicationEventPublisher;
+    private ApplicationEventPublisher applicationEventPublisher;
 
 
     public RoleController(SecuritySessionService sessionService, PrivilegeService privilegeService, RoleService roleService, ApplicationContext applicationContext, ApplicationEventPublisher applicationEventPublisher) {
@@ -58,81 +56,62 @@ public class RoleController {
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
-    @SneakyThrows
-        @PostMapping("/creer")
-    //@ResponseStatus(HttpStatus.CREATED)
-    public Role create(@RequestBody @Valid RoleDto roleDto) {
+    @PostMapping("/creer")
+    public Role create(@RequestBody @Valid RoleDto roleDto) throws NotFoundException {
         return roleService.createRole(roleDto);
     }
 
-    @SneakyThrows
     @PutMapping("/modifier/{roleId}")
-    // @ResponseStatus(HttpStatus.OK)
     public Role update(
-            @PathVariable("roleId") final UUID id, @RequestBody @Valid final RoleDto roleDto) {
+            @PathVariable("roleId") final UUID id, @RequestBody @Valid final RoleDto roleDto) throws NotFoundException {
         return roleService.saveRole(id, roleDto);
     }
 
-    @SneakyThrows
     @PutMapping("/ajouterPrivilege/{roleId}")
-    // @ResponseStatus(HttpStatus.OK)
     public Role update(
-            @PathVariable("roleId") final UUID roleId, @RequestBody() final UUID privilegeId) {
-
+            @PathVariable("roleId") final UUID roleId, @RequestBody() final UUID privilegeId) throws NotFoundException {
         return roleService.addPrivilege(roleId, privilegeId);
     }
 
-    @SneakyThrows
     @PutMapping("/ajouterPrivileges/{roleId}")
-    // @ResponseStatus(HttpStatus.OK)
     public Role update(
-            @PathVariable("roleId") final UUID roleId, @RequestBody() final List<UUID>  privilegeIds) {
+            @PathVariable("roleId") final UUID roleId, @RequestBody() final List<UUID> privilegeIds) throws NotFoundException {
         return roleService.addPrivileges(roleId, privilegeIds);
     }
 
     @GetMapping("/detail/{roleId}")
-    @SneakyThrows
-    public Role findById(@PathVariable("roleId") UUID id) {
+    public Role findById(@PathVariable("roleId") UUID id) throws NotFoundException {
         return roleService.findById(id)
                 .orElseThrow(RoleNotFoundException::new);
     }
 
     @DeleteMapping("supprimer/{roleId}")
-    // @ResponseStatus(HttpStatus.OK)
     public void delete(@PathVariable("roleId") UUID roleId) throws Exception {
         roleService.deleteById(roleId);
     }
 
     @GetMapping("/")
-    // @ResponseStatus(HttpStatus.OK)
     public Collection<Role> findRoles() {
         return roleService.findAll();
     }
 
     @GetMapping("/list")
-    // @ResponseStatus(HttpStatus.OK)
     public Page<Role> listRoles(Pageable pageable) {
         return roleService.findAll(pageable);
     }
 
     @GetMapping("/filter")
-    // @ResponseStatus(HttpStatus.OK)
     public Page<Role> filterRoles(RoleFilterDto roleFilterDto) throws Exception {
-        //roleService.findByDto()
         return roleService.findBy(roleFilterDto);
     }
 
     @GetMapping("/search")
-    // @ResponseStatus(HttpStatus.OK)
     public List<Role> searchRoles(RoleFindDto roleFindDto) throws Exception {
-        //roleService.findByDto()
         return roleService.search(roleFindDto).hits();
     }
 
     @GetMapping("/find")
-    // @ResponseStatus(HttpStatus.OK)
     public Page<Role> findRoles(RoleFindDto roleFindDto) throws Exception {
-        //roleService.findByDto()
         return roleService.searchPageable2(roleFindDto);
     }
 

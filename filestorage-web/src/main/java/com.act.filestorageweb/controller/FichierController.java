@@ -100,13 +100,11 @@ public class FichierController {
     }
 
     @GetMapping("/list")
-    @ResponseStatus(HttpStatus.OK)
     public Page<Fichier> listPartenaires(Pageable pageable) {
         return fichierService.findAll(pageable);
     }
 
     @DeleteMapping("supprimer/{fichierId}")
-    @ResponseStatus(HttpStatus.OK)
     public void delete(@PathVariable("fichierId") UUID fichierId) throws FichierNotFoundException, AppException, IOException {
         fichierService.deleteById(fichierId);
     }

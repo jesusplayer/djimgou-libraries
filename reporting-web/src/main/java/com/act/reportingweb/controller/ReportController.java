@@ -2,6 +2,7 @@ package com.act.reportingweb.controller;
 
 import com.act.core.exception.AppException;
 import com.act.core.exception.BadRequestException;
+import com.act.core.exception.NotFoundException;
 import com.act.core.infra.DeleteAfterReadResource;
 import com.act.filestorage.exception.FichierInvalidNameException;
 import com.act.filestorage.exception.FichierNotFoundException;
@@ -10,7 +11,6 @@ import com.act.reporting.model.dto.ReportDto;
 import com.act.reporting.model.dto.ReportFilterDto;
 import com.act.reporting.model.dto.ReportFindDto;
 import com.act.reporting.service.ReportService;
-import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -61,22 +61,18 @@ public class ReportController {
     }
 
     @DeleteMapping("supprimer/{reportId}")
-    @ResponseStatus(HttpStatus.OK)
     public void delete(@PathVariable("reportId") UUID fichierId) throws FichierNotFoundException, AppException, IOException {
         reportService.deleteWithId(fichierId);
     }
 
     @PostMapping("/creer")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Report create(@RequestBody @Valid ReportDto clientDto) {
+    public Report create(@RequestBody @Valid ReportDto clientDto) throws NotFoundException {
         return reportService.createReportTemplate(clientDto);
     }
 
-    @SneakyThrows
     @PutMapping("/modifier/{reportId}")
-    @ResponseStatus(HttpStatus.OK)
     public Report update(
-            @PathVariable("reportId") final UUID reportId, @RequestBody @Valid final ReportDto reportDto) {
+            @PathVariable("reportId") final UUID reportId, @RequestBody @Valid final ReportDto reportDto) throws NotFoundException {
         return reportService.saveReportTemplate(reportId, reportDto);
     }
 
@@ -87,9 +83,8 @@ public class ReportController {
     }
 
     @GetMapping("/genererHtml/{reportId}")
-    @SneakyThrows
     public ResponseEntity<String> genererHtml(@PathVariable("reportId") UUID reportId,
-                                              HttpServletRequest request) {
+                                              HttpServletRequest request) throws NotFoundException, IOException {
         Resource resource = reportService.getHtml(reportId, request.getParameterMap());
         // Try to determine file's content type
         String content = Files.readAllLines(resource.getFile().toPath())
@@ -101,10 +96,9 @@ public class ReportController {
     }
 
     @GetMapping("/genererPdf/{reportId}")
-    @SneakyThrows
     public ResponseEntity<Resource> genererPdf(@PathVariable("reportId") UUID reportId,
                                                WebRequest webRequest,
-                                               HttpServletRequest request) {
+                                               HttpServletRequest request) throws IOException, NotFoundException {
 
         Resource resource = reportService.getPdf(reportId, request.getParameterMap());
         // Try to determine file's content type
@@ -113,18 +107,16 @@ public class ReportController {
 
 
     @GetMapping("/genererXlsx/{reportId}")
-    @SneakyThrows
     public ResponseEntity<Resource> genererXlsx(@PathVariable("reportId") UUID reportId,
-                                                HttpServletRequest request) {
+                                                HttpServletRequest request) throws NotFoundException, IOException {
         Resource resource = reportService.getXlsx(reportId, request.getParameterMap());
         // Try to determine file's content type
         return downloadBlob(resource);
     }
 
     @GetMapping("/genererDocx/{reportId}")
-    @SneakyThrows
     public ResponseEntity<Resource> genererDocx(@PathVariable("reportId") UUID reportId,
-                                                HttpServletRequest request) {
+                                                HttpServletRequest request) throws NotFoundException, IOException {
         Resource resource = reportService.getDocx(reportId, request.getParameterMap());
         // Try to determine file's content type
         return downloadBlob(resource);
@@ -148,25 +140,21 @@ public class ReportController {
     }
 
     @GetMapping("/")
-    @ResponseStatus(HttpStatus.OK)
     public Collection<Report> findReportTemplates() {
         return reportService.findAll();
     }
 
     @GetMapping("/list")
-    @ResponseStatus(HttpStatus.OK)
     public Page<Report> listReportTemplates(@Valid Pageable pageable) {
         return reportService.findAll(pageable);
     }
 
     @GetMapping("/filter")
-    @ResponseStatus(HttpStatus.OK)
     public Page<Report> filterReportTemplates(@Valid ReportFilterDto reportFilterDto) throws Exception {
         return reportService.findBy(reportFilterDto);
     }
 
     @GetMapping("/search")
-    @ResponseStatus(HttpStatus.OK)
     public List<Report> searchReportTemplates(@Valid ReportFindDto reportFindDto) throws Exception {
         return reportService.search(reportFindDto).hits();
     }

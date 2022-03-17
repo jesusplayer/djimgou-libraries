@@ -8,7 +8,6 @@ import com.act.tenantmanager.model.dto.pays.PaysFilterDto;
 import com.act.tenantmanager.model.dto.pays.PaysFindDto;
 
 import com.act.tenantmanager.service.PaysService;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,16 +35,13 @@ public class PaysController {
     }
 
     @PostMapping("/creer")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Pays create(@RequestBody @Valid PaysDto paysDto) {
+    public Pays create(@RequestBody @Valid PaysDto paysDto) throws PaysNotFoundException {
         return paysService.createPays(paysDto);
     }
 
-    @SneakyThrows
     @PutMapping("/modifier/{paysId}")
-    @ResponseStatus(HttpStatus.OK)
     public Pays update(
-            @PathVariable("paysId") final UUID paysId, @RequestBody @Valid final PaysDto agentDto) {
+            @PathVariable("paysId") final UUID paysId, @RequestBody @Valid final PaysDto agentDto) throws PaysNotFoundException {
         return paysService.savePays(paysId, agentDto);
     }
 
@@ -56,37 +52,31 @@ public class PaysController {
     }
 
     @DeleteMapping("supprimer/{paysId}")
-    @ResponseStatus(HttpStatus.OK)
     public void delete(@PathVariable("paysId") UUID paysId) throws Exception {
         paysService.deleteById(paysId);
     }
 
     @GetMapping("/")
-    @ResponseStatus(HttpStatus.OK)
     public Collection<Pays> findPayss() {
         return paysService.findAll();
     }
 
     @GetMapping("/list")
-    @ResponseStatus(HttpStatus.OK)
     public Page<Pays> listPayss(@Valid Pageable pageable) {
         return paysService.findAll(pageable);
     }
 
     @GetMapping("/filter")
-    @ResponseStatus(HttpStatus.OK)
     public Page<Pays> filterPayss(@Valid PaysFilterDto paysFilterDto) throws Exception {
         return paysService.findBy(paysFilterDto);
     }
 
     @GetMapping("/search")
-    @ResponseStatus(HttpStatus.OK)
-    public List<Pays> searchPayss(@Valid PaysFindDto agentFindDto) throws Exception {
+    public List<Pays> searchPayss(@Valid PaysFindDto agentFindDto) {
         return paysService.search(agentFindDto).hits();
     }
 
     @GetMapping("/find")
-    @ResponseStatus(HttpStatus.OK)
     public Page<Pays> findPayss(@Valid PaysFindDto agentFindDto) throws Exception {
         return paysService.searchPageable2(agentFindDto);
     }
