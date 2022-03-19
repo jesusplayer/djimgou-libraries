@@ -1,5 +1,6 @@
 package com.act.security.service;
 
+import com.act.core.exception.NotFoundException;
 import com.act.security.core.UtilisateurDetails;
 import com.act.security.core.model.Utilisateur;
 import com.act.security.core.repo.UtilisateurBaseRepo;
@@ -37,11 +38,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     // @Autowired
     // BCryptPasswordEncoder bCryptPasswordEncoder;
 
+
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         Optional<Utilisateur> optionalUser = getRepo().findValidatedUsername(userName);
         if (optionalUser.isPresent()) {
             Utilisateur user = optionalUser.get();
+            if (!user.getEnabled()) {
+                throw new UsernameNotFoundException("Cet utilisateur est inactif. Activez le");
+            }
             return new UtilisateurDetails(user);
         } else {
             throw new UsernameNotFoundException("Cet utilisateur n'existe pas");

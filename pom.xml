@@ -32,6 +32,8 @@
         <module>session</module>
         <module>session-jdbc</module>
         <module>security-core</module>
+        <module>sms</module>
+        <module>sms-web</module>
         <!--        <module>appsepla</module>-->
 <!--        <module>apprayaleauto</module>-->
     </modules>
