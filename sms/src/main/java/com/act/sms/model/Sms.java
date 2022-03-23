@@ -25,14 +25,14 @@ import javax.persistence.Lob;
 @EntityListeners({EntityListener.class})
 public class Sms extends BaseBdEntity {
 
-    @Column(name = "from", nullable = false)
+    @Column(name = "sender", nullable = false)
     private String from;
 
-    @Column(name = "to", nullable = false)
+    @Column(name = "receiver", nullable = false)
     private String to;
 
     @Lob
-    @Column(name = "text")
+    @Column(name = "content")
     private String text;
 
 
