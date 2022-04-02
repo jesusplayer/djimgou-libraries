@@ -7,6 +7,7 @@ import com.act.filestorage.exception.FichierNotFoundException;
 import com.act.filestorage.model.Fichier;
 import com.act.filestorage.repository.FichierRepo;
 import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -21,7 +22,7 @@ import java.util.UUID;
 
 import static com.act.core.util.AppUtils.has;
 
-
+@Log4j2
 @Getter
 @Service
 public class FichierService {

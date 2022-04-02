@@ -59,14 +59,14 @@ public class Fichier extends BaseBdEntity {
     }
 
     public Fichier(String dossier, String nom, String type) {
-        this.nom = nom;
         this.dossier = dossier;
+        this.nom = nom;
         this.type = type;
         buildUrl();
     }
 
     public Fichier(String dossier, String nom, String type, String customData) {
-        this(nom, dossier, type);
+        this(dossier, nom, type);
         this.customData = customData;
     }
 
