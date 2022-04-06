@@ -108,7 +108,12 @@ public class FichierController {
     public void delete(@PathVariable("fichierId") UUID fichierId) throws FichierNotFoundException, AppException, IOException {
         fichierService.deleteById(fichierId);
     }
+    @DeleteMapping("supprimerParCustomData/{customData}")
+    public void deleteimageByCustomData(@PathVariable("customData") String customData) throws FichierNotFoundException, AppException, IOException {
+        fichierService.deleteByCustomData(customData);
+    }
 /*
+
     @DeleteMapping("/supprimerTout")
     @ResponseStatus(HttpStatus.OK)
     public void delete() throws Exception {

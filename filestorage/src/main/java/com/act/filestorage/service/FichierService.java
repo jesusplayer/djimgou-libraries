@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 import static com.act.core.util.AppUtils.has;
@@ -95,13 +96,25 @@ public class FichierService {
     @Transactional
     public void deleteById(UUID uuid) throws FichierNotFoundException, AppException, IOException {
         Fichier fichier = findbyId(uuid);
+        deleteFileInLocalStorage(fichier);
+        repo.deleteById(uuid);
+    }
+
+    public void deleteFileInLocalStorage(Fichier fichier) throws AppException, IOException {
         FileStorage fs = new FileStorage(fichier.getDossier(), fichier.getFichier1());
         fs.deleteFile();
         fs = new FileStorage(fichier.getDossier(), fichier.getFichier2());
         fs.deleteFile();
         fs = new FileStorage(fichier.getDossier(), fichier.getFichier3());
         fs.deleteFile();
-        repo.deleteById(uuid);
+    }
+
+    @Transactional
+    public void deleteByCustomData(String customData) throws FichierNotFoundException, AppException, IOException {
+        List<Fichier> fichiers = repo.findByCustomData(customData);
+        for (Fichier fichier : fichiers) {
+            deleteById(fichier.getId());
+        }
     }
 
     public void deleteAll() throws Exception {
