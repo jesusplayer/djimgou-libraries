@@ -33,22 +33,65 @@ public class Fichier extends BaseBdEntity {
     String type;
     String customData;
 
+    /**
+     * Utile pour des traitements hors servlet comme les test
+     * On a besoin de l'adresse du fichier sans avoir besoin de requête
+     */
+    /*@Transient
+    String f1OldUrl;*/
+
+    /**
+     * Utile pour des traitements hors servlet comme les test
+     * On a besoin de l'adresse du fichier sans avoir besoin de requête
+     */
+  /*  @Transient
+    String f2Url;
+*/
+    /**
+     * Utile pour des traitements hors servlet comme les test
+     * On a besoin de l'adresse du fichier sans avoir besoin de requête
+     */
+ /*   @Transient
+    String f3Url;*/
+
+    /**
+     * Chemin complet d'accès au fichier1. Il est généré à la demande
+     * @return
+     */
     @Transient
     public String getFichier1Url() {
         if (!has(fichier1)) return null;
-        return FileStorage.downloadUrl(dossier, getFichier1());
+        String f1 = FileStorage.downloadUrl(dossier, getFichier1());
+       /* if (!has(f1OldUrl)) {
+            setF1OldUrl(f1);
+        }*/
+        return f1;
     }
-
+    /**
+     * Chemin complet d'accès au fichier2. Il est généré à la demande
+     * @return
+     */
     @Transient
     public String getFichier2Url() {
         if (!has(fichier2)) return null;
-        return FileStorage.downloadUrl(dossier, getFichier2());
+        String f2 = FileStorage.downloadUrl(dossier, getFichier2());
+       /* if (!has(f2Url)) {
+            setF1OldUrl(f2);
+        }*/
+        return f2;
     }
-
+    /**
+     * Chemin complet d'accès au fichier3. Il est généré à la demande
+     * @return
+     */
     @Transient
     public String getFichier3Url() {
         if (!has(fichier3)) return null;
-        return FileStorage.downloadUrl(dossier, getFichier3());
+        String f3 = FileStorage.downloadUrl(dossier, getFichier3());
+      /*  if (!has(f3Url)) {
+            setF1OldUrl(f3);
+        }*/
+        return f3;
     }
 
     public Fichier(String dossier, String type) {

@@ -25,7 +25,7 @@ import static com.act.core.util.AppUtils.has;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 public class FileStorage {
-    public static String ROOT_FOLDER = "." + File.separator + "filesStore" + File.separator;
+    public static String ROOT_FOLDER = ("." + File.separator + "filesStore" + File.separator);
     public static final String DEFAULT_FOLDER = "store";
     String dossier;
     String name;
@@ -103,7 +103,7 @@ public class FileStorage {
     }
 
     public String dossier() {
-        return ROOT_FOLDER + this.dossier + File.separator;
+        return ROOT_FOLDER + File.separator + this.dossier + File.separator;
     }
 
     public String storeInFolder(MultipartFile file) throws AppException, FichierInvalidNameException {

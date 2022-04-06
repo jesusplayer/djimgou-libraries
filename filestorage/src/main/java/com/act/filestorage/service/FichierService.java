@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -39,7 +40,7 @@ public class FichierService {
 
     @PostConstruct
     void init() throws Exception {
-        FileStorage.ROOT_FOLDER = has(filesStoreDir)?filesStoreDir:FileStorage.ROOT_FOLDER;
+        FileStorage.ROOT_FOLDER = has(filesStoreDir) ? filesStoreDir.replace("/", File.separator) + File.separator : FileStorage.ROOT_FOLDER;
         FileStorage.creerDossier(FileStorage.ROOT_FOLDER);
     }
 
