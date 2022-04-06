@@ -76,7 +76,7 @@ public class Utilisateur extends SecurityBaseEntity {
     )
     Set<Role> authorities;
 
-    @JsonManagedReference(value = "utilisateur-token")
+    //@JsonManagedReference(value = "utilisateur-token")
     @OneToOne(orphanRemoval = true)
     ConfirmationToken confirmationToken;
 
