@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 import com.act.audit.service.AuditBdService;
 
 import javax.persistence.*;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * @author djimgou
@@ -25,7 +27,7 @@ public class EntityListener {
      * Dans le cas d'un SuiviEntité, on passe la variable globale notationManager
      *
      * @param entity entite
-     * @param <T> parametre
+     * @param <T>    parametre
      */
     @PrePersist
     public <T extends AbstractBaseEntity> void prePersist(T entity) {
@@ -36,26 +38,31 @@ public class EntityListener {
      * Ici on a la certitude que l'entité a été modifiée
      *
      * @param entity entite
-     * @param <T> parametre
+     * @param <T>    parametre
      */
     @PreUpdate// @PreUpdate
     public <T extends AbstractBaseEntity> void preUpdate(T entity) {
-
         prePersist(entity);
     }
 
     @PostPersist
     public <T extends AbstractBaseEntity> void creation(T entity) {
-        EntityListener.auditBdService.add(entity, AuditAction.CREATION);
+        nonNull(() -> EntityListener.auditBdService.add(entity, AuditAction.CREATION));
     }
 
     @PostUpdate
     public <T extends AbstractBaseEntity> void modification(T entity) {
-        EntityListener.auditBdService.add(entity, AuditAction.MODIFICATION);
+        nonNull(() -> EntityListener.auditBdService.add(entity, AuditAction.MODIFICATION));
     }
 
     @PostRemove
     public <T extends AbstractBaseEntity> void suppression(T entity) {
-        EntityListener.auditBdService.add(entity, AuditAction.SUPPRESSION);
+        nonNull(() -> EntityListener.auditBdService.add(entity, AuditAction.SUPPRESSION));
+    }
+
+    void nonNull(Supplier fn) {
+        if (EntityListener.auditBdService != null) {
+            fn.get();
+        }
     }
 }
