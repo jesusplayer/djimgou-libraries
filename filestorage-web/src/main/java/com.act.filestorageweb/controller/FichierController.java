@@ -83,8 +83,8 @@ public class FichierController {
     @GetMapping("/afficherDansDossier/{fileName:.+}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, @RequestParam("dossier") @Null String dossier, HttpServletRequest request) throws IOException, AppException {
         // Load file as Resource
-        Resource resource = FileStorage.loadFileAsResource(FileStorage.storePath(dossier), fileName);
-
+        FileStorage inst = fichierService.getFsFactory().getInstance();
+        Resource resource = inst.loadFileAsResource(inst.storePath(dossier), fileName);
         // Try to determine file's content type
         String contentType = new MimetypesFileTypeMap().getContentType(resource.getFilename());
         // Fallback to the default content type if type could not be determined

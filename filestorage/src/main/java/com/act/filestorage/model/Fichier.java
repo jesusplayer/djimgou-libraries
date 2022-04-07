@@ -24,6 +24,13 @@ import static com.act.core.util.AppUtils.has;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Fichier extends BaseBdEntity {
+    /**
+     * Cette variable est fournie pour permettre le téléchargement facile du fichier
+     * Quand bien meme on change de serveur. Elle est initialisée lors de la création
+     * du service de fichier, dans le constructeur FichierService
+     */
+    public static FileStorage fs;
+
     @FullTextField
     String nom;
     String fichier1;
@@ -56,38 +63,43 @@ public class Fichier extends BaseBdEntity {
 
     /**
      * Chemin complet d'accès au fichier1. Il est généré à la demande
+     *
      * @return
      */
     @Transient
     public String getFichier1Url() {
         if (!has(fichier1)) return null;
-        String f1 = FileStorage.downloadUrl(dossier, getFichier1());
+        String f1 = fs.downloadUrl(dossier, getFichier1());
        /* if (!has(f1OldUrl)) {
             setF1OldUrl(f1);
         }*/
         return f1;
     }
+
     /**
      * Chemin complet d'accès au fichier2. Il est généré à la demande
+     *
      * @return
      */
     @Transient
     public String getFichier2Url() {
         if (!has(fichier2)) return null;
-        String f2 = FileStorage.downloadUrl(dossier, getFichier2());
+        String f2 = fs.downloadUrl(dossier, getFichier2());
        /* if (!has(f2Url)) {
             setF1OldUrl(f2);
         }*/
         return f2;
     }
+
     /**
      * Chemin complet d'accès au fichier3. Il est généré à la demande
+     *
      * @return
      */
     @Transient
     public String getFichier3Url() {
         if (!has(fichier3)) return null;
-        String f3 = FileStorage.downloadUrl(dossier, getFichier3());
+        String f3 = fs.downloadUrl(dossier, getFichier3());
       /*  if (!has(f3Url)) {
             setF1OldUrl(f3);
         }*/

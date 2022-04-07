@@ -2,6 +2,7 @@ package com.act.reporting.model;
 
 import com.act.audit.model.EntityListener;
 import com.act.core.model.BaseBdEntity;
+import com.act.filestorage.model.Fichier;
 import com.act.filestorage.service.FileStorage;
 import lombok.Data;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
@@ -45,13 +46,13 @@ public class Report extends BaseBdEntity {
     @Transient
     public String getFichier1Url() {
         if (!has(fichier1)) return null;
-        return FileStorage.downloadUrl(dossier, getFichier1());
+        return Fichier.fs.downloadUrl(dossier, getFichier1());
     }
 
     @Transient
     public String getFichier2Url() {
         if (!has(fichier2)) return null;
-        return FileStorage.downloadUrl(dossier, getFichier2());
+        return Fichier.fs.downloadUrl(dossier, getFichier2());
     }
 
     public Report(String dossier, String type) {

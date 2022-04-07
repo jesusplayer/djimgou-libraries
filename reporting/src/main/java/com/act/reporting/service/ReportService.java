@@ -7,7 +7,9 @@ import com.act.core.infra.CustomPageable;
 import com.act.core.service.AbstractDomainService;
 import com.act.filestorage.exception.FichierInvalidNameException;
 import com.act.filestorage.exception.FichierNotFoundException;
+import com.act.filestorage.service.FichierService;
 import com.act.filestorage.service.FileStorage;
+import com.act.filestorage.service.FileStorageFactory;
 import com.act.reporting.ReportBuilder;
 import com.act.reporting.model.QReport;
 import com.act.reporting.model.Report;
@@ -41,17 +43,21 @@ import static com.act.core.util.AppUtils.has;
 @Getter
 @Service
 public class ReportService extends AbstractDomainService<Report, ReportFindDto, ReportFilterDto> {
+    private final FileStorageFactory fsFactory;
 
-    @Autowired
-    ReportRepo repo;
+
     @PersistenceContext
     EntityManager em;
 
-    @Autowired
-    ReportBuilder reportBuilder;
+    private ReportRepo repo;
 
-    public ReportService() {
-        super();
+    private ReportBuilder reportBuilder;
+
+
+    public ReportService(ReportRepo repo, ReportBuilder reportBuilder, FichierService fichierService) {
+        this.repo = repo;
+        this.reportBuilder = reportBuilder;
+        this.fsFactory = fichierService.getFsFactory();
     }
 
     @Override
@@ -67,7 +73,7 @@ public class ReportService extends AbstractDomainService<Report, ReportFindDto, 
 
     @PostConstruct
     void init() throws Exception {
-        FileStorage.creerDossier(FileStorage.ROOT_FOLDER);
+        //reportBuilder.getFs().creerDossier(FileStorage.ROOT_FOLDER);
     }
 
     public Resource getHtml(UUID reportId, Map params) throws NotFoundException {
@@ -82,8 +88,8 @@ public class ReportService extends AbstractDomainService<Report, ReportFindDto, 
         Report r = findById(reportId).orElseThrow(NotFoundException::new);
         Resource resource = reportBuilder.toPDF(r.getFichier1(), r.getDossier(), params2);
         return resource;
-    } 
-    
+    }
+
     public Resource getXlsx(UUID reportId, Map params) throws NotFoundException {
         Map params2 = new HashMap(params);
         Report r = findById(reportId).orElseThrow(NotFoundException::new);
@@ -103,7 +109,7 @@ public class ReportService extends AbstractDomainService<Report, ReportFindDto, 
         if (!"jasper".equalsIgnoreCase(fileExt(multipartFile.getOriginalFilename()))) {
             throw new FichierInvalidNameException("Vous devez fournir un fichier .jasper");
         }
-        FileStorage fsService = new FileStorage(multipartFile, fichier.getDossier(), fichier.getNom());
+        FileStorage fsService = fsFactory.newInstance(multipartFile, fichier.getDossier(), fichier.getNom());
         String url = fsService.storeFile();
         fichier.setFichier1(url);
         fichier.setDossier(fsService.getDossier());
@@ -117,7 +123,7 @@ public class ReportService extends AbstractDomainService<Report, ReportFindDto, 
         }
         deleteFsFile(reportId);
         Report fichier = findbyId(reportId);
-        FileStorage fsService = new FileStorage(multipartFile, fichier.getDossier(), multipartFile.getOriginalFilename());
+        FileStorage fsService = fsFactory.newInstance(multipartFile, fichier.getDossier(), multipartFile.getOriginalFilename());
         String url = fsService.storeFile();
         fichier.setFichier1(url);
         fichier.setDossier(fsService.getDossier());
@@ -130,13 +136,13 @@ public class ReportService extends AbstractDomainService<Report, ReportFindDto, 
             throw new BadRequestException("Impossible d'enregistrer plus de 2 fichiers dans ce com.act.audit.service");
         }
         if (multipartFiles.length > 0) {
-            FileStorage fsService = new FileStorage(multipartFiles[0], fichier.getDossier(), fichier.getFichier1());
+            FileStorage fsService = fsFactory.newInstance(multipartFiles[0], fichier.getDossier(), fichier.getFichier1());
             String url = fsService.storeFile();
             fichier.setFichier1(url);
             fichier.setDossier(fsService.getDossier());
         }
         if (multipartFiles.length > 1) {
-            FileStorage fsService = new FileStorage(multipartFiles[1], fichier.getDossier(), fichier.getFichier2());
+            FileStorage fsService = fsFactory.newInstance(multipartFiles[1], fichier.getDossier(), fichier.getFichier2());
             String url = fsService.storeFile();
             fichier.setFichier2(url);
             fichier.setDossier(fsService.getDossier());
@@ -163,9 +169,9 @@ public class ReportService extends AbstractDomainService<Report, ReportFindDto, 
 
     void deleteFsFile(UUID uuid) throws AppException, FichierNotFoundException, IOException {
         Report fichier = findbyId(uuid);
-        FileStorage fs = new FileStorage(fichier.getDossier(), fichier.getFichier1());
+        FileStorage fs = fsFactory.newInstance(fichier.getDossier(), fichier.getFichier1());
         fs.deleteFile();
-        fs = new FileStorage(fichier.getDossier(), fichier.getFichier2());
+        fs = fsFactory.newInstance(fichier.getDossier(), fichier.getFichier2());
         fs.deleteFile();
     }
 

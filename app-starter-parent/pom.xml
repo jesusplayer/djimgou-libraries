@@ -45,12 +45,7 @@
             <version>0.0.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.act</groupId>
-            <artifactId>filestorage-web</artifactId>
-            <version>0.0.2-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
+
         <dependency>
             <groupId>com.act</groupId>
             <artifactId>mail</artifactId>
@@ -63,6 +58,13 @@
             <version>0.0.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+        <!-- reporting-xeb contient FileStorage-web
+        <dependency>
+           <groupId>com.act</groupId>
+           <artifactId>filestorage-web</artifactId>
+           <version>0.0.2-SNAPSHOT</version>
+           <scope>compile</scope>
+       </dependency>-->
         <dependency>
             <groupId>com.act</groupId>
             <artifactId>security-web</artifactId>

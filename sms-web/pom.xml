@@ -38,11 +38,11 @@
             <version>0.0.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
+       <!-- <dependency>
             <groupId>com.act</groupId>
             <artifactId>filestorage</artifactId>
             <version>0.0.2-SNAPSHOT</version>
             <scope>compile</scope>
-        </dependency>
+        </dependency>-->
     </dependencies>
 </project>

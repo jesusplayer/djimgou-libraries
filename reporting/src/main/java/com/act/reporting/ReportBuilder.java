@@ -1,7 +1,9 @@
 package com.act.reporting;
 
 import com.act.core.exception.AppException;
+import com.act.filestorage.service.FichierService;
 import com.act.filestorage.service.FileStorage;
+import lombok.Getter;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -33,10 +35,19 @@ import static com.act.core.util.AppUtils.has;
  */
 @Service
 public class ReportBuilder {
-    @Autowired
+
     DataSource dataSource;
 
     public static String REPORT_DIR = "./Reports";
+
+    @Getter
+    private final FileStorage fs;
+
+    @Autowired
+    public ReportBuilder(FichierService fichierService, DataSource dataSource) {
+        this.dataSource = dataSource;
+        this.fs = fichierService.getFsFactory().getInstance();
+    }
 
     /**
      * @param jasperFileName
@@ -48,10 +59,11 @@ public class ReportBuilder {
         parameters.put("title", "Employee Report");
         parameters.put("minSalary", 15000.0);
         parameters.put("condition", " LAST_NAME ='Smith' ORDER BY FIRST_NAME");*/
-        String store = FileStorage.storePath(has(reportDir) ? reportDir : REPORT_DIR);
-        String fileOutName = "report-" + UUID.randomUUID().toString()+".html";
+
+        String store = fs.storePath(has(reportDir) ? reportDir : REPORT_DIR);
+        String fileOutName = "report-" + UUID.randomUUID().toString() + ".html";
         try {
-            Resource r = FileStorage.loadFileAsResource(store, jasperFileName);
+            Resource r = fs.loadFileAsResource(store, jasperFileName);
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(r.getInputStream(), parameters, dataSource.getConnection());
 
@@ -62,7 +74,7 @@ public class ReportBuilder {
             JasperExportManager.exportReportToHtmlFile(jasperPrint, url);
 
 
-            Resource res = FileStorage.loadFileAsResource(store, fileOutName);
+            Resource res = fs.loadFileAsResource(store, fileOutName);
 
             /*FileInputStream fis = new FileInputStream("src/test/resources/fileTest.txt");
             String data = IOUtils.toString(fis, "UTF-8");*/
@@ -81,10 +93,10 @@ public class ReportBuilder {
 
 
     public Resource toPDF(String jasperFileName, String reportDir, Map<String, Object> parameters) {
-        String store = FileStorage.storePath(has(reportDir) ? reportDir : REPORT_DIR);
-        String fileOutName = "report-pdf-" + UUID.randomUUID().toString()+".pdf";
+        String store = fs.storePath(has(reportDir) ? reportDir : REPORT_DIR);
+        String fileOutName = "report-pdf-" + UUID.randomUUID().toString() + ".pdf";
         try {
-            Resource r = FileStorage.loadFileAsResource(store, jasperFileName);
+            Resource r = fs.loadFileAsResource(store, jasperFileName);
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(r.getInputStream(), parameters, dataSource.getConnection());
 
@@ -113,7 +125,7 @@ public class ReportBuilder {
 
             exporter.exportReport();
 
-            Resource res = FileStorage.loadFileAsResource(store, fileOutName);
+            Resource res = fs.loadFileAsResource(store, fileOutName);
             return res;
         } catch (FileNotFoundException | SQLException e) {
             e.printStackTrace();
@@ -128,10 +140,10 @@ public class ReportBuilder {
     }
 
     public Resource toXSX(String jasperFileName, String reportDir, Map<String, Object> parameters) {
-        String store = FileStorage.storePath(has(reportDir) ? reportDir : REPORT_DIR);
-        String fileOutName = "report-xlsx-" + UUID.randomUUID().toString()+".xlsx";
+        String store = fs.storePath(has(reportDir) ? reportDir : REPORT_DIR);
+        String fileOutName = "report-xlsx-" + UUID.randomUUID().toString() + ".xlsx";
         try {
-            Resource r = FileStorage.loadFileAsResource(store, jasperFileName);
+            Resource r = fs.loadFileAsResource(store, jasperFileName);
             JasperPrint jasperPrint = JasperFillManager.fillReport(r.getInputStream(), parameters, dataSource.getConnection());
 
             JRXlsxExporter exporter = new JRXlsxExporter();
@@ -151,7 +163,7 @@ public class ReportBuilder {
                     new SimpleOutputStreamExporterOutput(url));
 
             exporter.exportReport();
-            Resource res = FileStorage.loadFileAsResource(store, fileOutName);
+            Resource res = fs.loadFileAsResource(store, fileOutName);
             return res;
         } catch (FileNotFoundException | SQLException e) {
             e.printStackTrace();
@@ -164,11 +176,12 @@ public class ReportBuilder {
         }
         return null;
     }
+
     public Resource toDocx(String jasperFileName, String reportDir, Map<String, Object> parameters) {
-        String store = FileStorage.storePath(has(reportDir) ? reportDir : REPORT_DIR);
-        String fileOutName = "report-doc-" + UUID.randomUUID().toString()+".docx";
+        String store = fs.storePath(has(reportDir) ? reportDir : REPORT_DIR);
+        String fileOutName = "report-doc-" + UUID.randomUUID().toString() + ".docx";
         try {
-            Resource r = FileStorage.loadFileAsResource(store, jasperFileName);
+            Resource r = fs.loadFileAsResource(store, jasperFileName);
             JasperPrint jasperPrint = JasperFillManager.fillReport(r.getInputStream(), parameters, dataSource.getConnection());
 
             JRDocxExporter exporter = new JRDocxExporter();
@@ -190,7 +203,7 @@ public class ReportBuilder {
                     new SimpleOutputStreamExporterOutput(url));
 
             exporter.exportReport();
-            Resource res = FileStorage.loadFileAsResource(store, fileOutName);
+            Resource res = fs.loadFileAsResource(store, fileOutName);
             return res;
         } catch (FileNotFoundException | SQLException e) {
             e.printStackTrace();

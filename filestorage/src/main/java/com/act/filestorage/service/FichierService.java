@@ -24,6 +24,10 @@ import java.util.UUID;
 
 import static com.act.core.util.AppUtils.has;
 
+/**
+ * @author DJIMGOU NKENNNE
+ * Manipule les fichiers quels que soit le provider: local ou Amzo
+ */
 @Log4j2
 @Getter
 @Service
@@ -31,23 +35,22 @@ public class FichierService {
 
     private FichierRepo repo;
 
+    private FileStorageFactory fsFactory;
 
-    private String filesStoreDir;
+    /**
+     * local
+     * aws
+     */
 
-    public FichierService(FichierRepo repo, @Value("${filestore.directory}") String filesStoreDir) {
+    public FichierService(FichierRepo repo, FileStorageFactory fsFactory) throws AppException {
         this.repo = repo;
-        this.filesStoreDir = filesStoreDir;
-    }
-
-    @PostConstruct
-    void init() throws Exception {
-        FileStorage.ROOT_FOLDER = has(filesStoreDir) ? filesStoreDir.replace("/", File.separator) + File.separator : FileStorage.ROOT_FOLDER;
-        FileStorage.creerDossier(FileStorage.ROOT_FOLDER);
+        this.fsFactory = fsFactory;
+        Fichier.fs = this.fsFactory.getInstance();
     }
 
     @Transactional
     public Fichier save(MultipartFile multipartFile, Fichier fichier) throws AppException, FichierInvalidNameException {
-        FileStorage fsService = new FileStorage(multipartFile, fichier.getDossier(), fichier.getNom());
+        FileStorage fsService = fsFactory.newInstance(multipartFile, fichier.getDossier(), fichier.getNom());
         String url = fsService.storeFile();
         fichier.setFichier1(url);
         fichier.setDossier(fsService.getDossier());
@@ -60,13 +63,13 @@ public class FichierService {
             throw new BadRequestException("Impossible d'enregistrer plus de 3 fichiers dans ce com.act.audit.service");
         }
         if (multipartFiles.length > 0) {
-            FileStorage fsService = new FileStorage(multipartFiles[0], fichier.getDossier(), fichier.getFichier1());
+            FileStorage fsService = fsFactory.newInstance(multipartFiles[0], fichier.getDossier(), fichier.getFichier1());
             String url = fsService.storeFile();
             fichier.setFichier1(url);
             fichier.setDossier(fsService.getDossier());
         }
         if (multipartFiles.length > 1) {
-            FileStorage fsService = new FileStorage(multipartFiles[1], fichier.getDossier(), fichier.getFichier2());
+            FileStorage fsService = fsFactory.newInstance(multipartFiles[1], fichier.getDossier(), fichier.getFichier2());
             String url = fsService.storeFile();
             fichier.setFichier2(url);
             fichier.setDossier(fsService.getDossier());
@@ -75,7 +78,7 @@ public class FichierService {
             fichier.setFichier3(null);
         }
         if (multipartFiles.length > 2) {
-            FileStorage fsService = new FileStorage(multipartFiles[2], fichier.getDossier(), fichier.getFichier3());
+            FileStorage fsService = fsFactory.newInstance(multipartFiles[2], fichier.getDossier(), fichier.getFichier3());
             String url = fsService.storeFile();
             fichier.setFichier3(url);
             fichier.setDossier(fsService.getDossier());
@@ -101,11 +104,11 @@ public class FichierService {
     }
 
     public void deleteFileInLocalStorage(Fichier fichier) throws AppException, IOException {
-        FileStorage fs = new FileStorage(fichier.getDossier(), fichier.getFichier1());
+        FileStorage fs = fsFactory.newInstance(fichier.getDossier(), fichier.getFichier1());
         fs.deleteFile();
-        fs = new FileStorage(fichier.getDossier(), fichier.getFichier2());
+        fs = fsFactory.newInstance(fichier.getDossier(), fichier.getFichier2());
         fs.deleteFile();
-        fs = new FileStorage(fichier.getDossier(), fichier.getFichier3());
+        fs = fsFactory.newInstance(fichier.getDossier(), fichier.getFichier3());
         fs.deleteFile();
     }
 
