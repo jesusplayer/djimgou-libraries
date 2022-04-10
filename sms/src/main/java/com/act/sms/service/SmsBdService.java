@@ -5,9 +5,9 @@ import com.act.core.service.AbstractDomainService;
 import com.act.sms.exceptions.SmsNotFoundException;
 import com.act.sms.model.QSms;
 import com.act.sms.model.Sms;
-import com.act.sms.model.dto.ville.SmsDto;
-import com.act.sms.model.dto.ville.SmsFilterDto;
-import com.act.sms.model.dto.ville.SmsFindDto;
+import com.act.sms.model.dto.sms.SmsDto;
+import com.act.sms.model.dto.sms.SmsFilterDto;
+import com.act.sms.model.dto.sms.SmsFindDto;
 import com.act.sms.repo.SmsRepo;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAQueryBase;
@@ -28,7 +28,8 @@ import java.util.UUID;
 import static com.act.core.util.AppUtils.has;
 
 /**
- * @author djimgou
+ * @author DJIMGOU NKENNE DANY MARC
+ * 04/2022
  */
 @Service
 public class SmsBdService extends AbstractDomainService<Sms, SmsFindDto, SmsFilterDto> {

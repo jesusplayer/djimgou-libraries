@@ -4,6 +4,7 @@ import com.act.core.exception.AppException;
 import com.act.core.exception.AppExceptionHandler;
 import com.act.core.exception.ConflitException;
 import com.act.core.exception.NotFoundException;
+import com.act.sms.exceptions.NoSmsServiceProvider;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ public class GlobalSmsWebExceptionHandler extends AppExceptionHandler {
 
     @ExceptionHandler({
             ConversionFailedException.class,
+            NoSmsServiceProvider.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<String> handleConnversion(Exception ex) {

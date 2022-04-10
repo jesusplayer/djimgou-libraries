@@ -1,12 +1,14 @@
-package com.act.sms.model.dto.ville;
+package com.act.sms.model.dto.sms;
 
 import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import java.util.UUID;
 
+/**
+ * @author DJIMGOU NKENNE DANY MARC
+ * 04/2022
+ */
 @Data
 @Builder
 public class SmsDto {

@@ -23,7 +23,7 @@ import javax.persistence.Lob;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(value = {"enfants"})
 @EntityListeners({EntityListener.class})
-public class Sms extends BaseBdEntity {
+public class Sms extends BaseBdEntity{
 
     @Column(name = "sender", nullable = false)
     private String from;

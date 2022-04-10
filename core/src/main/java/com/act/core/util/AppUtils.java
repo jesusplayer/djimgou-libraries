@@ -257,6 +257,7 @@ public class AppUtils {
         cal.set(Calendar.DAY_OF_MONTH, r);
         return cal.getTime();
     }
+
     public static Date endOfMonth() {
         return endOfMonth(Calendar.getInstance().getTime());
     }
@@ -984,6 +985,13 @@ public class AppUtils {
         return list != null && !list.isEmpty();
     }
 
+    public static boolean has(Set<?> list) {
+        return list != null && !list.isEmpty();
+    }
+    public static boolean has(Collection<?> list) {
+        return list != null && !list.isEmpty();
+    }
+
     /**
      * Retourne vrai si tous les objets passé en paramètre ne sont pas null
      *
@@ -1028,13 +1036,15 @@ public class AppUtils {
         }
         return newItems;
     }
-    public static String fileExt(String fileName){
+
+    public static String fileExt(String fileName) {
         String fName = fileName;
         return Optional.ofNullable(fName)
                 .filter(s -> s.contains("."))
-                .map(s -> s.substring(fName.lastIndexOf(".")+1)).orElse("");
+                .map(s -> s.substring(fName.lastIndexOf(".") + 1)).orElse("");
 
     }
+
     /**
      * Execute la fonction maxTries  de fois tantqu'il ya une exception
      *
