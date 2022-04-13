@@ -1,6 +1,8 @@
 package com.act.security.core.model.dto.role;
 
+import com.act.core.model.IEntityDto;
 import com.act.security.core.model.Privilege;
+import com.act.security.core.model.Role;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,18 +12,23 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class RoleDto {
+public class RoleDto implements IEntityDto {
 
-	// String name;
+    // String name;
 
-	String description;
+    String description;
 
-	UUID parentId;
+    UUID parentId;
 
-	String name;
+    String name;
 
-	Set<Privilege> privileges;
+    Set<Privilege> privileges;
 
-	public RoleDto(String code, String url) {
-	}
+    public RoleDto(String code, String url) {
+    }
+
+    @Override
+    public Class<Role> originalClass() {
+        return Role.class;
+    }
 }

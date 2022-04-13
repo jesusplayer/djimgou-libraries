@@ -1,5 +1,6 @@
 package com.act.core.infra;
 
+import com.act.core.model.IDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +9,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public abstract class BasePageableDto {
+public abstract class BasePageableDto  implements IDto {
     public static final String[] IGNORE = new String[]{
           "searchText"  ,"page","size","sort"
     };

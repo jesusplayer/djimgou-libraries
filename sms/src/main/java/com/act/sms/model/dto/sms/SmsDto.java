@@ -1,5 +1,7 @@
 package com.act.sms.model.dto.sms;
 
+import com.act.core.model.IEntityDto;
+import com.act.sms.model.Sms;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,7 +13,7 @@ import javax.validation.constraints.NotBlank;
  */
 @Data
 @Builder
-public class SmsDto {
+public class SmsDto implements IEntityDto {
     @NotBlank()
     String from;
 
@@ -21,4 +23,8 @@ public class SmsDto {
     @NotBlank()
     String text;
 
+    @Override
+    public Class<Sms> originalClass() {
+        return Sms.class;
+    }
 }

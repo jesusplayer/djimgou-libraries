@@ -1,5 +1,6 @@
 package com.act.security.core.model.dto.utilisateur;
 
+import com.act.core.model.IDto;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -10,7 +11,7 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserNameChangeDto {
+public class UserNameChangeDto  implements IDto {
     @NotNull @NotBlank @NotEmpty
     String username;
 

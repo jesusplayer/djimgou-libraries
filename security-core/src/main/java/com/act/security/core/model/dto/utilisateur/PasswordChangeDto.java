@@ -1,5 +1,6 @@
 package com.act.security.core.model.dto.utilisateur;
 
+import com.act.core.model.IDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -11,7 +12,7 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class PasswordChangeDto {
+public class PasswordChangeDto implements IDto {
     @NotNull @NotBlank @NotEmpty
     String username;
 

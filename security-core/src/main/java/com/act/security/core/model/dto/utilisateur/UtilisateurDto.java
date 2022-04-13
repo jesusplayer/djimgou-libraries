@@ -1,6 +1,8 @@
 package com.act.security.core.model.dto.utilisateur;
 
+import com.act.core.model.IEntityDto;
 import com.act.security.core.model.Role;
+import com.act.security.core.model.Utilisateur;
 import com.act.security.core.model.dto.role.IdDto;
 import com.act.tenantmanager.model.Tenant;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -15,7 +17,7 @@ import java.util.Set;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UtilisateurDto  extends ModifierProfilDto{
+public class UtilisateurDto  extends ModifierProfilDto implements IEntityDto {
     @NotNull @NotBlank @NotEmpty
     String password;
     @NotNull @NotBlank @NotEmpty
@@ -27,4 +29,9 @@ public class UtilisateurDto  extends ModifierProfilDto{
     Set<IdDto> tenants;
     @JsonIgnore
     private String encodedPasswd;
+
+    @Override
+    public Class<Utilisateur> originalClass() {
+        return Utilisateur.class;
+    }
 }
