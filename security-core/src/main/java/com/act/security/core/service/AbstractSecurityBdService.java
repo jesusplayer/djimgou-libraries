@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
@@ -25,7 +26,13 @@ public abstract class AbstractSecurityBdService<T extends SecurityBaseEntity, S 
         extends AbstractDomainService<T, S, F> {
 
     @Autowired(/*required = false*/)
-    SessionService httpSession;
+    private SessionService httpSession;
+
+
+    public AbstractSecurityBdService(JpaRepository<T, UUID> repo/*, SessionService httpSession*/) {
+        super(repo);
+        //this.httpSession = httpSession;
+    }
 
     public UUID currentUserId() {
 
@@ -64,7 +71,6 @@ public abstract class AbstractSecurityBdService<T extends SecurityBaseEntity, S 
         T ent = searchById(entity.getId());
         return this.save(ent);
     }
-
 
 
     /**

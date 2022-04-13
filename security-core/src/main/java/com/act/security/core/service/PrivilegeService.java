@@ -46,13 +46,9 @@ public class PrivilegeService extends AbstractSecurityBdService<Privilege, Privi
 
     @Autowired
     public PrivilegeService(PrivilegeRepo repo) {
-        super();
+        super(repo);
         this.repo = repo;
-    }
 
-    @Override
-    public PrivilegeRepo getRepo() {
-        return repo;
     }
 
     @Transactional
@@ -89,15 +85,15 @@ public class PrivilegeService extends AbstractSecurityBdService<Privilege, Privi
     }
 
     @Override
-    public Page<Privilege> findBy(PrivilegeFilterDto filter) throws Exception {
-        CustomPageable cpg = new CustomPageable(filter);
+    public Page<Privilege> findBy(PrivilegeFilterDto baseFilter) throws Exception {
+        CustomPageable cpg = new CustomPageable(baseFilter);
         if (cpg.getSort().isUnsorted()) {
             cpg.setSort(Sort.by(Sort.Order.asc("nom")));
         }
         Page<Privilege> page;
-        String name = filter.getName();
-        String code = filter.getCode();
-        UUID parentId = filter.getParentId();
+        String name = baseFilter.getName();
+        String code = baseFilter.getCode();
+        UUID parentId = baseFilter.getParentId();
 
         QPrivilege qDevise = QPrivilege.privilege;
 

@@ -55,16 +55,11 @@ public class ReportService extends AbstractDomainService<Report, ReportFindDto, 
 
 
     public ReportService(ReportRepo repo, ReportBuilder reportBuilder, FichierService fichierService) {
+        super(repo);
         this.repo = repo;
         this.reportBuilder = reportBuilder;
         this.fsFactory = fichierService.getFsFactory();
     }
-
-    @Override
-    public ReportRepo getRepo() {
-        return repo;
-    }
-
 
     public Page<Report> findBySearchText(String text, Pageable pg) {
         Page<Report> page = repo.findBySearchText(text, pg);
@@ -204,15 +199,15 @@ public class ReportService extends AbstractDomainService<Report, ReportFindDto, 
         return super.searchPageable(findDto);
     }
 
-    public Page<Report> findBy(ReportFilterDto filter) throws Exception {
-        CustomPageable cpg = new CustomPageable(filter);
+    public Page<Report> findBy(ReportFilterDto baseFilter) throws Exception {
+        CustomPageable cpg = new CustomPageable(baseFilter);
         if (cpg.getSort().isUnsorted()) {
             cpg.setSort(Sort.by(Sort.Order.asc("position")));
         }
         Page<Report> page;
 
-        String name = filter.getNom();
-        String fichier = filter.getFichier1();
+        String name = baseFilter.getNom();
+        String fichier = baseFilter.getFichier1();
 
         QReport qDevise = QReport.report;
 

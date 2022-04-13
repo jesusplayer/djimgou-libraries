@@ -1,5 +1,6 @@
 package com.act.core.util;
 
+import com.querydsl.core.util.ReflectionUtils;
 import lombok.extern.log4j.Log4j2;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.Entity;
 import java.io.File;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -566,6 +568,13 @@ public class AppUtils {
         return dayDiff(start, end);
     }
 
+    /**
+     * L'objet doit disposer des getters
+     *
+     * @param name
+     * @param o
+     * @return
+     */
     public static Object getField(String name, Object o) {
         for (Method m : o.getClass().getMethods()) {
             if (m.getName().startsWith("get") && (name.length() + 3) == m.getName().length()) {
@@ -581,6 +590,33 @@ public class AppUtils {
             }
         }
         return null;
+    }
+
+    public static boolean hasField(Class clsse, String name) {
+        return !getFields(clsse, field -> Objects.equals(field.getName(), name))
+                .isEmpty();
+    }
+
+    /**
+     * L'objet doit disposer des settter
+     *
+     * @param name
+     * @param o
+     */
+    public static void setField(String name, Object o, Object value) {
+        for (Method m : o.getClass().getMethods()) {
+            if (m.getName().startsWith("set") && (name.length() + 3) == m.getName().length()) {
+                if (m.getName().toLowerCase().endsWith(name.toLowerCase())) {
+                    try {
+                        m.invoke(o, value);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
     public static List<Class> getClasses(String packageName, Class annotation) {
@@ -977,19 +1013,24 @@ public class AppUtils {
         return object != null;
     }
 
-    public static boolean has(String object) {
-        return object != null && !object.isEmpty();
+    public static boolean has(Map map) {
+        return map != null && !map.isEmpty();
+    }
+
+    public static boolean has(String string) {
+        return string != null && !string.isEmpty();
     }
 
     public static boolean has(List<?> list) {
         return list != null && !list.isEmpty();
     }
 
-    public static boolean has(Set<?> list) {
-        return list != null && !list.isEmpty();
+    public static boolean has(Set<?> set) {
+        return set != null && !set.isEmpty();
     }
-    public static boolean has(Collection<?> list) {
-        return list != null && !list.isEmpty();
+
+    public static boolean has(Collection<?> collection) {
+        return collection != null && !collection.isEmpty();
     }
 
     /**
@@ -1119,5 +1160,21 @@ public class AppUtils {
         final int end = Math.min((start + pageable.getPageSize()), totalAmount);
         final Page<T> page = new PageImpl<>(newContent.subList(start, end), pageable, totalAmount);
         return page;
+    }
+
+    /**
+     * @param clazz
+     * @param predicate
+     * @return
+     */
+   /* public static List<Field> getFields(Class classe, Predicate<Field> predicate) {
+        final List<Field> fields = Arrays.asList(classe.getDeclaredFields());
+        fields.addAll(Arrays.asList(classe.getSuperclass().getDeclaredFields()));
+        return fields.stream().filter(predicate::test)
+                .collect(Collectors.toList());
+    }*/
+    public static List<Field> getFields(Class clazz, Predicate<Field> predicate) {
+        return ReflectionUtils.getFields(clazz).stream().filter(predicate)
+                .collect(Collectors.toList());
     }
 }

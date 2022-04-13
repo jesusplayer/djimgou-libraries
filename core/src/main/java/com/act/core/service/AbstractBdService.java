@@ -41,6 +41,8 @@ public abstract class AbstractBdService<T extends AbstractBaseEntity> implements
     @Autowired
     AppUtils appUtils;
 
+    @Getter
+    private JpaRepository<T, UUID> repo;
 
     /**
      * Permet d'enregister la premiere page chargée de requetes pour eviter le
@@ -51,6 +53,10 @@ public abstract class AbstractBdService<T extends AbstractBaseEntity> implements
     Page<T> pageFetched = null;
 
     public AbstractBdService() {
+    }
+
+    public AbstractBdService(JpaRepository<T, UUID> repo) {
+        this.repo = repo;
     }
 
     /**
@@ -134,7 +140,7 @@ public abstract class AbstractBdService<T extends AbstractBaseEntity> implements
             if (AppUtils.has(entity)) {
                 e.printStackTrace();
                 MessageService.errorMessage("Erreur d'enregistrement de l'objet " + e.getMessage(), log);
-            }else {
+            } else {
                 e.printStackTrace();
             }
         }
@@ -193,7 +199,7 @@ public abstract class AbstractBdService<T extends AbstractBaseEntity> implements
         });
     }
 
-    public abstract JpaRepository<T, UUID> getRepo();
+    //public abstract JpaRepository<T, UUID> getRepo();
 
     public UUID fromIdString(String id) {
         return id == null ? null : UUID.fromString(id);

@@ -47,27 +47,22 @@ public class RoleService extends AbstractSecurityBdService<Role, RoleFindDto, Ro
     private PrivilegeRepo privilegeRepo;
 
     public RoleService(RoleRepo repo, SessionManager sessionManager, PrivilegeRepo privilegeRepo) {
-        super();
+        super(repo);
         this.repo = repo;
         this.sessionManager = sessionManager;
         this.privilegeRepo = privilegeRepo;
     }
 
     @Override
-    public RoleRepo getRepo() {
-        return repo;
-    }
-
-    @Override
-    public Page<Role> findBy(RoleFilterDto filter) throws Exception {
-        CustomPageable cpg = new CustomPageable(filter);
+    public Page<Role> findBy(RoleFilterDto baseFilter) throws Exception {
+        CustomPageable cpg = new CustomPageable(baseFilter);
         if (cpg.getSort().isUnsorted()) {
             cpg.setSort(Sort.by(Sort.Order.asc("nom")));
         }
         Page<Role> page;
-        String name = filter.getName();
-        String desc = filter.getDescription();
-        UUID parentId = filter.getParentId();
+        String name = baseFilter.getName();
+        String desc = baseFilter.getDescription();
+        UUID parentId = baseFilter.getParentId();
 
         QRole qRole = QRole.role;
 

@@ -21,6 +21,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +30,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.*;
 
-import static com.act.core.util.AppUtils.has;
+import static com.act.core.util.AppUtils.*;
 
 
 /**
@@ -41,36 +42,28 @@ public class AuditBdService extends AbstractDomainService<Audit, AuditFindDto, A
     @PersistenceContext
     EntityManager em;
 
-    @Autowired
-    AppUtils appUtils;
+    private SessionService sessionService;
 
+    private AuditRepo repo;
 
-    @Autowired
-    SessionService sessionService;
-
-    @Autowired
-    AuditRepo repo;
-
-    public AuditBdService() {
-        super();
+    public AuditBdService(AuditRepo repo, SessionService sessionService) {
+        super(repo);
+        this.sessionService = sessionService;
+        this.repo = repo;
     }
 
-    @Override
-    public AuditRepo getRepo() {
-        return repo;
-    }
 
     @Override
-    public Page<Audit> findBy(AuditFilterDto dto) throws Exception {
-        CustomPageable cpg = new CustomPageable(dto);
+    public Page<Audit> findBy(AuditFilterDto baseFilter) throws Exception {
+        CustomPageable cpg = new CustomPageable(baseFilter);
         cpg.setSort(Sort.by(Sort.Order.desc("date")));
 
-        Date dateDebut = dto.getDateDebut();
-        Date dateFin = dto.getDateFin();
-        AuditAction action = dto.getAction();
-        UUID userId = dto.getUtilisateurId();
-        String nomEntite = dto.getNomEntite();
-        String username = dto.getUsername();
+        Date dateDebut = baseFilter.getDateDebut();
+        Date dateFin = baseFilter.getDateFin();
+        AuditAction action = baseFilter.getAction();
+        UUID userId = baseFilter.getUtilisateurId();
+        String nomEntite = baseFilter.getNomEntite();
+        String username = baseFilter.getUsername();
         QAudit audit = QAudit.audit;
 
         //HibernateQuery<?>  query = new HibernateQuery<>(sessionFactory.getCurrentSession());
@@ -82,10 +75,10 @@ public class AuditBdService extends AbstractDomainService<Audit, AuditFindDto, A
 
         List<BooleanExpression> expressionList = new ArrayList<>();
         if (AppUtils.has(dateDebut)) {
-            expressionList.add(audit.date.goe(appUtils.startOfDay(dateDebut)));
+            expressionList.add(audit.date.goe(startOfTheDay(dateDebut)));
         }
         if (AppUtils.has(dateDebut)) {
-            expressionList.add(audit.date.loe(appUtils.endOfDay(dateFin)));
+            expressionList.add(audit.date.loe(endOfTheDay(dateFin)));
         }
         if (AppUtils.has(action)) {
             expressionList.add(audit.action.eq(action));
@@ -146,7 +139,7 @@ public class AuditBdService extends AbstractDomainService<Audit, AuditFindDto, A
             return super.save(audit);
         } catch (JsonProcessingException | NullPointerException e) {
             log.error("Erreur d'enregistrement de l'audit :" + e.getMessage(), audit);
-           // log.error(entity);
+            // log.error(entity);
             //log.error("AUDIT="+audit);
         }
         return null;

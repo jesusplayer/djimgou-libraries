@@ -5,6 +5,8 @@ import com.act.core.infra.BaseFindDto;
 import com.act.core.infra.CustomPageable;
 import com.act.core.infra.Filter;
 import com.act.core.model.AbstractBaseEntity;
+import com.act.core.model.IEntityDetailDto;
+import com.act.core.model.IEntityDto;
 import com.act.core.util.AppUtils;
 import lombok.extern.log4j.Log4j2;
 import org.hibernate.search.engine.search.query.SearchResult;
@@ -14,16 +16,17 @@ import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsSt
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.act.core.util.AppUtils.has;
-import static com.act.core.util.AppUtils.toPage;
 
 
 /**
@@ -34,7 +37,12 @@ import static com.act.core.util.AppUtils.toPage;
  */
 
 @Log4j2
-public abstract class AbstractDomainService<T extends AbstractBaseEntity, S extends BaseFindDto, F extends BaseFilterDto> extends AbstractBdService<T> {
+public abstract class AbstractDomainService<T extends AbstractBaseEntity, FIND_DTO extends BaseFindDto, F extends BaseFilterDto> extends AbstractBdService<T> {
+    /**
+     *      * T=0, DTO=1 , DETAIL_DTO=2 , FIND_DTO=3 , FILTER_DTO=4
+     * @param pos
+     * @return
+     */
     public Class getFilterDtoClass(int pos) {
         ParameterizedType pt = (ParameterizedType) this.getClass().getGenericSuperclass();
         Class cc = null;
@@ -42,6 +50,10 @@ public abstract class AbstractDomainService<T extends AbstractBaseEntity, S exte
             cc = (Class) pt.getActualTypeArguments()[pos];
         }
         return cc;
+    }
+
+    public AbstractDomainService(JpaRepository<T, UUID> repo) {
+        super(repo);
     }
 
     /**
@@ -55,7 +67,7 @@ public abstract class AbstractDomainService<T extends AbstractBaseEntity, S exte
      * @param findDto
      * @return
      */
-    public Page<T> searchPageable(S findDto) {
+    public Page<T> searchPageable(FIND_DTO findDto) {
         // long totalHitCount = result.total().hitCount();
         SearchResult<T> res = search(findDto);
         Page<T> p = AppUtils.toPage(new CustomPageable(findDto), res.hits(), (int) res.total().hitCount());
@@ -64,11 +76,18 @@ public abstract class AbstractDomainService<T extends AbstractBaseEntity, S exte
 
     /**
      * https://www.baeldung.com/hibernate-search
+     *
      * @param findDto
      * @return
      */
-    public SearchResult<T> search(S findDto) {
+    public SearchResult<T> search(FIND_DTO findDto) {
         String[] fieldsSplit;
+        /**
+         * F=4
+         * T=0
+         * DTO=1
+         * DETAIL_DTO = 2
+         */
         final Class filterDtoClass = getFilterDtoClass(2);
         final Class<T> entityClass = getFilterDtoClass(0);
         final Class findDtoClass = getFilterDtoClass(1);
@@ -99,8 +118,8 @@ public abstract class AbstractDomainService<T extends AbstractBaseEntity, S exte
         return result;
     }
 
-    public abstract Page<T> findBy(F factureFilterDto) throws Exception;
-    
+    public abstract Page<T> findBy(F baseFilter) throws Exception;
+
     public Page<T> searchBy(Filter<T> filter, Pageable pg) throws Exception {
         return Page.empty();
     }

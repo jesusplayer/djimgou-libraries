@@ -63,6 +63,7 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
             @Qualifier("appDefaultUtilisateurRepo") UtilisateurBaseRepo<Utilisateur, UUID> repo,
             ApplicationContext appContext,
             TenantRepo tenantRepo, RoleRepo roleRepo, SecuritySessionService sessionService) {
+        super(repo);
         this.repo = repo;
         this.tenantRepo = tenantRepo;
         this.roleRepo = roleRepo;
@@ -292,18 +293,18 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
 
     @Transactional
     @Override
-    public Page<Utilisateur> findBy(UtilisateurFilterDto filter) throws Exception {
-        CustomPageable cpg = new CustomPageable(filter);
+    public Page<Utilisateur> findBy(UtilisateurFilterDto baseFilter) throws Exception {
+        CustomPageable cpg = new CustomPageable(baseFilter);
         if (cpg.getSort().isUnsorted()) {
             cpg.setSort(Sort.by(Sort.Order.asc("nom")));
         }
         Page<Utilisateur> page;
-        String name = filter.getNom();
-        String prenom = filter.getPrenom();
-        String username = filter.getUsername();
-        String tel = filter.getTelephone();
-        String email = filter.getEmail();
-        String roleName = filter.getRoleName();
+        String name = baseFilter.getNom();
+        String prenom = baseFilter.getPrenom();
+        String username = baseFilter.getUsername();
+        String tel = baseFilter.getTelephone();
+        String email = baseFilter.getEmail();
+        String roleName = baseFilter.getRoleName();
 
         QUtilisateur qUser = QUtilisateur.utilisateur;
 

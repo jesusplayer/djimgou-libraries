@@ -41,14 +41,9 @@ public class SmsBdService extends AbstractDomainService<Sms, SmsFindDto, SmsFilt
 
 
     public SmsBdService(SmsRepo repo) {
+        super(repo);
         this.repo = repo;
     }
-
-    @Override
-    public SmsRepo getRepo() {
-        return repo;
-    }
-
 
     @Transactional(/*propagation = Propagation.NESTED*/)
     public Sms saveSms(UUID id, SmsDto SmsDto) throws SmsNotFoundException {
@@ -69,19 +64,19 @@ public class SmsBdService extends AbstractDomainService<Sms, SmsFindDto, SmsFilt
     /**
      * Recherche avec pagination et filtre
      *
-     * @param filter
+     * @param baseFilter
      * @return
      * @throws Exception
      */
-    public Page<Sms> findBy(SmsFilterDto filter) throws Exception {
-        CustomPageable cpg = new CustomPageable(filter);
+    public Page<Sms> findBy(SmsFilterDto baseFilter) throws Exception {
+        CustomPageable cpg = new CustomPageable(baseFilter);
         if (cpg.getSort().isUnsorted()) {
             cpg.setSort(Sort.by(Sort.Order.desc("createdDate")));
         }
         Page<Sms> page;
-        String name = filter.getFrom();
-        String code = filter.getTo();
-        String text = filter.getText();
+        String name = baseFilter.getFrom();
+        String code = baseFilter.getTo();
+        String text = baseFilter.getText();
 
         QSms qDevise = QSms.sms;
 

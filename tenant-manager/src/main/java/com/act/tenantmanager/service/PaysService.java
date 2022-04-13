@@ -39,15 +39,9 @@ public class PaysService extends AbstractDomainService<Pays, PaysFindDto, PaysFi
 
     @Autowired
     public PaysService(PaysRepo repo) {
-        super();
+        super(repo);
         this.repo = repo;
     }
-
-    @Override
-    public PaysRepo getRepo() {
-        return repo;
-    }
-
 
     public Page<Pays> findBySearchText(String text, Pageable pg) {
         return repo.findBySearchText(text, pg);
@@ -75,15 +69,15 @@ public class PaysService extends AbstractDomainService<Pays, PaysFindDto, PaysFi
         return super.searchPageable(findDto);
     }
 
-    public Page<Pays> findBy(PaysFilterDto filter) throws Exception {
-        CustomPageable cpg = new CustomPageable(filter);
+    public Page<Pays> findBy(PaysFilterDto baseFilter) throws Exception {
+        CustomPageable cpg = new CustomPageable(baseFilter);
         if (cpg.getSort().isUnsorted()) {
             cpg.setSort(Sort.by(Sort.Order.asc("nom")));
         }
         Page<Pays> page;
 
-        String name = filter.getNom();
-        String code = filter.getCode();
+        String name = baseFilter.getNom();
+        String code = baseFilter.getCode();
 
         QPays qDevise = QPays.pays;
 
