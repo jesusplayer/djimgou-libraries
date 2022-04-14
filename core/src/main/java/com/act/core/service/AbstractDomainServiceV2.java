@@ -2,13 +2,13 @@ package com.act.core.service;
 
 import com.act.core.exception.DtoChildFieldNotFound;
 import com.act.core.exception.NotFoundException;
-import com.act.core.exception.RepoChildNotFound;
 import com.act.core.infra.BaseFilterDto;
 import com.act.core.infra.BaseFindDto;
 import com.act.core.model.BaseBdEntity;
 import com.act.core.model.IEntityDetailDto;
 import com.act.core.model.IEntityDto;
 import com.act.core.util.AppUtils;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -36,6 +36,7 @@ public abstract class AbstractDomainServiceV2<T extends BaseBdEntity, FIND_DTO e
 
         extends AbstractDomainService<T, FIND_DTO, FILTER_DTO> {
 
+    @Getter
     @PersistenceContext
     private EntityManager em;
 
@@ -56,7 +57,6 @@ public abstract class AbstractDomainServiceV2<T extends BaseBdEntity, FIND_DTO e
      *
      * @param produitDto
      * @return
-     * @throws RepoChildNotFound     indique que les repository dépendant n'ont pas été renseignés
      * @throws NotFoundException
      * @throws DtoChildFieldNotFound indique que les id des clés étrangères n'ont pas été renseignés bien écrites.
      *                               Bien vouloir respecter la convention
@@ -68,7 +68,7 @@ public abstract class AbstractDomainServiceV2<T extends BaseBdEntity, FIND_DTO e
      * UUID entiteentiteParentId;
      * }
      */
-    public T create(DTO produitDto) throws RepoChildNotFound, NotFoundException, DtoChildFieldNotFound {
+    public T create(DTO produitDto) throws NotFoundException, DtoChildFieldNotFound {
         return save(null, produitDto);
     }
 
@@ -85,7 +85,6 @@ public abstract class AbstractDomainServiceV2<T extends BaseBdEntity, FIND_DTO e
      *
      * @param produitDto
      * @return
-     * @throws RepoChildNotFound     indique que les repository dépendant n'ont pas été renseignés
      * @throws NotFoundException
      * @throws DtoChildFieldNotFound indique que les id des clés étrangères n'ont pas été renseignés bien écrites.
      *                               Bien vouloir respecter la convention
@@ -97,7 +96,7 @@ public abstract class AbstractDomainServiceV2<T extends BaseBdEntity, FIND_DTO e
      * UUID entiteentiteParentId;
      * }
      */
-    public T update(UUID id, DTO produitDto) throws RepoChildNotFound, NotFoundException, DtoChildFieldNotFound {
+    public T update(UUID id, DTO produitDto) throws NotFoundException, DtoChildFieldNotFound {
         return save(id, produitDto);
     }
 
@@ -116,7 +115,6 @@ public abstract class AbstractDomainServiceV2<T extends BaseBdEntity, FIND_DTO e
      *
      * @param id
      * @param entityDto
-     * @throws RepoChildNotFound     indique que les repository dépendant n'ont pas été renseignés
      * @throws NotFoundException
      * @throws DtoChildFieldNotFound indique que les id des clés étrangères n'ont pas été renseignés bien écrites.
      *                               Bien vouloir respecter la convention
@@ -129,7 +127,7 @@ public abstract class AbstractDomainServiceV2<T extends BaseBdEntity, FIND_DTO e
      * }
      */
     @Transactional(/*propagation = Propagation.NESTED*/)
-    public T save(UUID id, DTO entityDto) throws NotFoundException, DtoChildFieldNotFound, RepoChildNotFound {
+    public T save(UUID id, DTO entityDto) throws NotFoundException, DtoChildFieldNotFound {
         T entity = ReflectionUtils.createInstanceIfPresent(getFilterDtoClass(0).getName(), null);
         if (has(id)) {
             entity = getRepo().findById(id).orElseThrow(() ->
