@@ -5,21 +5,21 @@ import com.act.core.exception.NotFoundException;
 import com.act.core.exception.RepoChildNotFound;
 import com.act.core.infra.BaseFilterDto;
 import com.act.core.infra.BaseFindDto;
-import com.act.core.model.AbstractBaseEntity;
 import com.act.core.model.BaseBdEntity;
 import com.act.core.model.IEntityDetailDto;
 import com.act.core.model.IEntityDto;
 import com.act.core.util.AppUtils;
-import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.util.ReflectionUtils;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.stream.Stream;
+import java.util.function.Predicate;
 
 import static com.act.core.util.AppUtils.has;
 
@@ -36,12 +36,11 @@ public abstract class AbstractDomainServiceV2<T extends BaseBdEntity, FIND_DTO e
 
         extends AbstractDomainService<T, FIND_DTO, FILTER_DTO> {
 
-    @Getter
-    private Map<Class, JpaRepository<? extends AbstractBaseEntity, UUID>> childrenRepoMap;
+    @PersistenceContext
+    private EntityManager em;
 
-    public AbstractDomainServiceV2(JpaRepository<T, UUID> repo, Map<Class, JpaRepository<? extends AbstractBaseEntity, UUID>> childrenRepoMap) {
+    public AbstractDomainServiceV2(JpaRepository<T, UUID> repo) {
         super(repo);
-        this.childrenRepoMap = childrenRepoMap;
     }
 
     /**
@@ -54,6 +53,13 @@ public abstract class AbstractDomainServiceV2<T extends BaseBdEntity, FIND_DTO e
      * <p>
      * class Entite {
      * String unChamp;
+     *
+     * @param produitDto
+     * @return
+     * @throws RepoChildNotFound     indique que les repository dépendant n'ont pas été renseignés
+     * @throws NotFoundException
+     * @throws DtoChildFieldNotFound indique que les id des clés étrangères n'ont pas été renseignés bien écrites.
+     *                               Bien vouloir respecter la convention
      * @ManyToOne() EntiteParent entiteParent;
      * }
      * <p>
@@ -61,13 +67,6 @@ public abstract class AbstractDomainServiceV2<T extends BaseBdEntity, FIND_DTO e
      * String unChamp;
      * UUID entiteentiteParentId;
      * }
-     * @param produitDto
-     * @return
-     * @throws RepoChildNotFound indique que les repository dépendant n'ont pas été renseignés
-     * @throws NotFoundException
-     * @throws DtoChildFieldNotFound indique que les id des clés étrangères n'ont pas été renseignés bien écrites.
-     * Bien vouloir respecter la convention
-
      */
     public T create(DTO produitDto) throws RepoChildNotFound, NotFoundException, DtoChildFieldNotFound {
         return save(null, produitDto);
@@ -83,6 +82,13 @@ public abstract class AbstractDomainServiceV2<T extends BaseBdEntity, FIND_DTO e
      * <p>
      * class Entite {
      * String unChamp;
+     *
+     * @param produitDto
+     * @return
+     * @throws RepoChildNotFound     indique que les repository dépendant n'ont pas été renseignés
+     * @throws NotFoundException
+     * @throws DtoChildFieldNotFound indique que les id des clés étrangères n'ont pas été renseignés bien écrites.
+     *                               Bien vouloir respecter la convention
      * @ManyToOne() EntiteParent entiteParent;
      * }
      * <p>
@@ -90,20 +96,15 @@ public abstract class AbstractDomainServiceV2<T extends BaseBdEntity, FIND_DTO e
      * String unChamp;
      * UUID entiteentiteParentId;
      * }
-     *
-     * @param produitDto
-     * @return
-     * @throws RepoChildNotFound indique que les repository dépendant n'ont pas été renseignés
-     * @throws NotFoundException
-     * @throws DtoChildFieldNotFound indique que les id des clés étrangères n'ont pas été renseignés bien écrites.
-     * Bien vouloir respecter la convention
      */
     public T update(UUID id, DTO produitDto) throws RepoChildNotFound, NotFoundException, DtoChildFieldNotFound {
         return save(id, produitDto);
     }
 
     /**
-     * Crée automatiquement une nouvelle entité en BD à partir de son DTO
+     * Crée/modifie automatiquement une nouvelle entité en BD à partir de son DTO
+     * La fonction va faire le mapping entre les Id du DTO avec les entités correspondantes
+     * et va enregistrer le tout en BD. Contrairement à persist(id,entity) qui fait un enregistrement simple
      * Ne pas oublier de respecter la convention de nomage
      * class EntiteParent{
      * UUID id;
@@ -112,6 +113,13 @@ public abstract class AbstractDomainServiceV2<T extends BaseBdEntity, FIND_DTO e
      * <p>
      * class Entite {
      * String unChamp;
+     *
+     * @param id
+     * @param entityDto
+     * @throws RepoChildNotFound     indique que les repository dépendant n'ont pas été renseignés
+     * @throws NotFoundException
+     * @throws DtoChildFieldNotFound indique que les id des clés étrangères n'ont pas été renseignés bien écrites.
+     *                               Bien vouloir respecter la convention
      * @ManyToOne() EntiteParent entiteParent;
      * }
      * <p>
@@ -119,16 +127,9 @@ public abstract class AbstractDomainServiceV2<T extends BaseBdEntity, FIND_DTO e
      * String unChamp;
      * UUID entiteentiteParentId;
      * }
-     *
-     * @param id
-     * @param produitDto
-     * @throws RepoChildNotFound indique que les repository dépendant n'ont pas été renseignés
-     * @throws NotFoundException
-     * @throws DtoChildFieldNotFound indique que les id des clés étrangères n'ont pas été renseignés bien écrites.
-     * Bien vouloir respecter la convention
      */
     @Transactional(/*propagation = Propagation.NESTED*/)
-    public T save(UUID id, DTO produitDto) throws NotFoundException, DtoChildFieldNotFound, RepoChildNotFound {
+    public T save(UUID id, DTO entityDto) throws NotFoundException, DtoChildFieldNotFound, RepoChildNotFound {
         T entity = ReflectionUtils.createInstanceIfPresent(getFilterDtoClass(0).getName(), null);
         if (has(id)) {
             entity = getRepo().findById(id).orElseThrow(() ->
@@ -136,17 +137,61 @@ public abstract class AbstractDomainServiceV2<T extends BaseBdEntity, FIND_DTO e
             );
         }
 
-        entity.fromDto(produitDto);
+        entity.fromDto(entityDto);
 
+        injectReferencedField(id, entityDto, entity);
+        T saved = persist(id, entity);
+        return saved;
+    }
+
+    /**
+     * Enregiistre simplement une entité
+     *
+     * @param id
+     * @param entity
+     * @return
+     */
+    public final T persist(UUID id, T entity) {
+        if (this instanceof IBeforeSave) {
+            entity = ((IBeforeSave<T>) this).beforeSave(id, entity);
+        }
+        T saved = save(entity);
+        if (this instanceof IAfterSave) {
+            saved = ((IAfterSave<T>) this).afterSave(id, saved);
+        }
+        return saved;
+    }
+
+    public final void injectReferencedField(UUID id, IEntityDto entityDto, T entity) throws NotFoundException, DtoChildFieldNotFound {
+        injectReferencedField(id, entityDto, entity, null);
+    }
+
+    /**
+     * Injecte dynamiquement les entité des clés étrangères présentent dans le DTO entityDto
+     * dans la nouvelle entité entity
+     * à enregistrer
+     *
+     * @param id
+     * @param entityDto
+     * @param entity
+     * @param fieldFilter filtre sur les champs
+     * @throws NotFoundException
+     * @throws DtoChildFieldNotFound
+     */
+    public final void injectReferencedField(UUID id, IEntityDto entityDto, T entity, Predicate<Field> fieldFilter) throws NotFoundException, DtoChildFieldNotFound {
+        if (!has(fieldFilter)) {
+            fieldFilter = (t) -> true;
+        }
         List<Field> dtoIdFields = AppUtils.getFields(
-                produitDto.getClass(),
-                f -> Objects.equals(f.getType().getName(), UUID.class.getName())
+                entityDto.getClass(), fieldFilter.and(f -> Objects.equals(f.getType().getName(), UUID.class.getName())
                         && !Objects.equals("id", f.getName())
                         && f.getName().endsWith("Id")
+                )
+
         );
 
         for (Field field : dtoIdFields) {
-            UUID dtoId = (UUID) AppUtils.getField(field.getName(), produitDto);
+            UUID dtoId = (UUID) AppUtils.getField(field.getName(), entityDto);
 
             String objName1 = field.getName();
             String objName2 = field.getName().substring(0, field.getName().length() - 2);
@@ -176,35 +221,24 @@ public abstract class AbstractDomainServiceV2<T extends BaseBdEntity, FIND_DTO e
                 }
                 final boolean existChildId = has(id) && Objects.equals(childObId, dtoId);
                 if (!existChildId) {
-
                     Field childObjField = AppUtils.getFields(entity.getClass(), field1 ->
                                     Objects.equals(finalChoosedKey, field1.getName()))
                             .stream().findFirst().orElse(null);
 
                     Class key = childObjField.getType();
-                    if (has(getChildrenRepoMap()) && getChildrenRepoMap().containsKey(key)) {
-                        JpaRepository<? extends AbstractBaseEntity, UUID> repository = getChildrenRepoMap().get(key);
-
-                        Object childDbValue = repository.findById(dtoId).orElseThrow(() ->
-                                new NotFoundException(childObj.getClass().getSimpleName() + "#" +
-                                        id + " N'existe pas"
-                                )
+                    Object childDbValue = em.find(key, dtoId);
+                    if (childDbValue == null) {
+                        throw new NotFoundException(key.getSimpleName() + "#" +
+                                id + " N'existe pas"
                         );
-
-                        AppUtils.setField(choosedKey, entity, childDbValue);
-                    } else {
-                        throw new RepoChildNotFound(produitDto, entity, field);
                     }
-
+                    AppUtils.setField(choosedKey, entity, childDbValue);
                 }
             } else {
-                throw new DtoChildFieldNotFound(produitDto, entity, field);
+                throw new DtoChildFieldNotFound(entityDto, entity, field);
             }
 
         }
-
-        final T saved = save(entity);
-        return saved;
     }
 
     @Override

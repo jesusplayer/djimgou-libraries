@@ -1,12 +1,11 @@
 package com.act.audit.model;
 
+import com.act.audit.service.AuditBdService;
 import com.act.core.model.AbstractBaseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import com.act.audit.service.AuditBdService;
 
 import javax.persistence.*;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**

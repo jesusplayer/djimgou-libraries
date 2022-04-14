@@ -2,12 +2,14 @@ package com.act.filestorage.model;
 
 import com.act.core.model.BaseBdEntity;
 import com.act.filestorage.service.FileStorage;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.Entity;
 import javax.persistence.Transient;
@@ -39,6 +41,10 @@ public class Fichier extends BaseBdEntity {
     String dossier;
     String type;
     String customData;
+
+    @JsonIgnore
+    @Transient
+    MultipartFile[] multipartFiles;
 
     /**
      * Utile pour des traitements hors servlet comme les test
@@ -106,29 +112,45 @@ public class Fichier extends BaseBdEntity {
         return f3;
     }
 
-    public Fichier(String dossier, String type) {
+    public Fichier(String dossier, String type, MultipartFile[] multipartFiles) {
         this.nom = getId().toString();
         this.dossier = dossier;
         this.type = type;
+        this.multipartFiles = multipartFiles;
         buildUrl();
     }
 
-    public Fichier(String dossier, String nom, String type) {
+    public Fichier(String dossier, String nom, String type, MultipartFile[] multipartFiles) {
         this.dossier = dossier;
         this.nom = nom;
         this.type = type;
+        this.multipartFiles = multipartFiles;
         buildUrl();
     }
 
-    public Fichier(String dossier, String nom, String type, String customData) {
-        this(dossier, nom, type);
+    public Fichier(String dossier, String nom, String type, String customData, MultipartFile[] multipartFiles) {
+        this(dossier, nom, type, multipartFiles);
         this.customData = customData;
     }
 
     public void buildUrl() {
-        this.fichier1 = String.format("%s-1-%s"/*, dossier, File.separator*/, getId().toString(), nom);
-        this.fichier2 = String.format("%s-2-%s"/*, dossier, File.separator*/, getId().toString(), nom);
-        this.fichier3 = String.format("%s-3-%s"/*, dossier, File.separator*/, getId().toString(), nom);
+        String nom1 = this.nom;
+        String nom2 = this.nom;
+        String nom3 = this.nom;
+        if (has(multipartFiles)) {
+            if (multipartFiles.length > 0) {
+                nom1 = multipartFiles[0].getOriginalFilename();
+            }
+            if (multipartFiles.length > 1) {
+                nom1 = multipartFiles[1].getOriginalFilename();
+            }
+            if (multipartFiles.length > 2) {
+                nom3 = multipartFiles[2].getOriginalFilename();
+            }
+        }
+        this.fichier1 = String.format("%s-1-%s"/*, dossier, File.separator*/, getId().toString(), nom1);
+        this.fichier2 = String.format("%s-2-%s"/*, dossier, File.separator*/, getId().toString(), nom2);
+        this.fichier3 = String.format("%s-3-%s"/*, dossier, File.separator*/, getId().toString(), nom3);
     }
 
     public String generateUniqUrl() {
