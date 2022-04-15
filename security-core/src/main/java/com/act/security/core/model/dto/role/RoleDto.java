@@ -26,9 +26,4 @@ public class RoleDto implements IEntityDto {
 
     public RoleDto(String code, String url) {
     }
-
-    @Override
-    public Class<Role> originalClass() {
-        return Role.class;
-    }
 }

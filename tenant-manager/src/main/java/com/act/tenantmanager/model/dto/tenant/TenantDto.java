@@ -20,9 +20,4 @@ public class TenantDto implements IEntityDto {
 
     @NotBlank()
     UUID paysId;
-
-    @Override
-    public Class<Tenant> originalClass() {
-        return Tenant.class;
-    }
 }

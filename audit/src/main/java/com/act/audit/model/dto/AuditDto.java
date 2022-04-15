@@ -18,9 +18,4 @@ public class AuditDto implements IEntityDto {
     UUID utilisateurId;
     String name;
     String username;
-
-    @Override
-    public Class<Audit> originalClass() {
-        return Audit.class;
-    }
 }

@@ -12,9 +12,4 @@ public class PaysDto implements IEntityDto {
     String code;
     @NotBlank()
     String nom;
-
-    @Override
-    public Class<Pays> originalClass() {
-        return Pays.class;
-    }
 }

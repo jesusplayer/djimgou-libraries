@@ -65,3 +65,7 @@ filesStore/
 
 app-rayale-auto/
 app-sepla/
+
+./core/AppIndexes/
+./core/AppIndexes/*
+core/AppIndexes/

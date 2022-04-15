@@ -5,5 +5,5 @@ package com.act.core.model;
  * Il est la projection de l'objet réeel
  */
 public interface IDtoOfEntity {
-    Class originalClass();
+    //Class originalClass();
 }

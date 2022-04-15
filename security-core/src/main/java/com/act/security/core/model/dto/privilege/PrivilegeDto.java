@@ -21,8 +21,4 @@ public class PrivilegeDto implements IEntityDto {
 
     UUID parentId;
 
-    @Override
-    public Class<Privilege> originalClass() {
-        return Privilege.class;
-    }
 }

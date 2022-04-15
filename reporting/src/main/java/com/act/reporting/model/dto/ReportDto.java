@@ -16,9 +16,4 @@ public class ReportDto implements IEntityDto {
 
     @Min(0)
     Integer position;
-
-    @Override
-    public Class<Report> originalClass() {
-        return Report.class;
-    }
 }

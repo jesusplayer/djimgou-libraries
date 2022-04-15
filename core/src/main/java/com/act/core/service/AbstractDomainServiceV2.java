@@ -1,6 +1,8 @@
 package com.act.core.service;
 
+import com.act.core.dto.DtoSerializerService;
 import com.act.core.exception.DtoChildFieldNotFound;
+import com.act.core.exception.DtoMappingException;
 import com.act.core.exception.NotFoundException;
 import com.act.core.infra.BaseFilterDto;
 import com.act.core.infra.BaseFindDto;
@@ -10,6 +12,7 @@ import com.act.core.model.IEntityDto;
 import com.act.core.util.AppUtils;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.util.ReflectionUtils;
@@ -40,6 +43,9 @@ public abstract class AbstractDomainServiceV2<T extends BaseBdEntity, FIND_DTO e
     @PersistenceContext
     private EntityManager em;
 
+    @Autowired
+    private DtoSerializerService dtoSerializer;
+
     public AbstractDomainServiceV2(JpaRepository<T, UUID> repo) {
         super(repo);
     }
@@ -68,7 +74,7 @@ public abstract class AbstractDomainServiceV2<T extends BaseBdEntity, FIND_DTO e
      * UUID entiteentiteParentId;
      * }
      */
-    public T create(DTO produitDto) throws NotFoundException, DtoChildFieldNotFound {
+    public T create(DTO produitDto) throws NotFoundException, DtoMappingException {
         return save(null, produitDto);
     }
 
@@ -96,7 +102,7 @@ public abstract class AbstractDomainServiceV2<T extends BaseBdEntity, FIND_DTO e
      * UUID entiteentiteParentId;
      * }
      */
-    public T update(UUID id, DTO produitDto) throws NotFoundException, DtoChildFieldNotFound {
+    public T update(UUID id, DTO produitDto) throws NotFoundException, DtoMappingException {
         return save(id, produitDto);
     }
 
@@ -127,17 +133,19 @@ public abstract class AbstractDomainServiceV2<T extends BaseBdEntity, FIND_DTO e
      * }
      */
     @Transactional(/*propagation = Propagation.NESTED*/)
-    public T save(UUID id, DTO entityDto) throws NotFoundException, DtoChildFieldNotFound {
+    public T save(UUID id, DTO entityDto) throws NotFoundException, DtoMappingException {
         T entity = ReflectionUtils.createInstanceIfPresent(getFilterDtoClass(0).getName(), null);
         if (has(id)) {
             entity = getRepo().findById(id).orElseThrow(() ->
                     new NotFoundException(getFilterDtoClass(0).getSimpleName() + "#" + id + " N'existe pas")
             );
         }
-
+/*
         entity.fromDto(entityDto);
 
-        injectReferencedField(id, entityDto, entity);
+        injectReferencedField(id, entityDto, entity);*/
+        dtoSerializer.serialize(entityDto, entity);
+
         T saved = persist(id, entity);
         return saved;
     }

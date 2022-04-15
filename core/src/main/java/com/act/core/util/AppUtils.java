@@ -2,6 +2,7 @@ package com.act.core.util;
 
 import com.querydsl.core.util.ReflectionUtils;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -21,6 +22,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -33,6 +35,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @Service
 @Log4j2
@@ -592,32 +595,29 @@ public class AppUtils {
         return null;
     }
 
-    public static boolean hasField(Class clsse, String name) {
-        return !getFields(clsse, field -> Objects.equals(field.getName(), name))
+    public static boolean hasField(Class aClass, String name) {
+        return !getFields(aClass, field -> Objects.equals(field.getName(), name))
                 .isEmpty();
     }
 
-    /**
-     * L'objet doit disposer des settter
-     *
-     * @param name
-     * @param o
-     */
-    public static void setField(String name, Object o, Object value) {
-        for (Method m : o.getClass().getMethods()) {
-            if (m.getName().startsWith("set") && (name.length() + 3) == m.getName().length()) {
-                if (m.getName().toLowerCase().endsWith(name.toLowerCase())) {
-                    try {
-                        m.invoke(o, value);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+    public static boolean hasField(Object object, String path) {
+        PropertyUtilsBean utilsBean = new PropertyUtilsBean();
+        boolean value = true;
+        try {
+            utilsBean.getProperty(object, path);
+        } catch (IllegalAccessException e) {
+            value = false;
+            //e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            value = false;
+            //e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            //e.printStackTrace();
+            value = false;
         }
+        return value;
     }
+
 
     public static List<Class> getClasses(String packageName, Class annotation) {
         return getClasses(packageName, annotation, a -> true);
@@ -1174,7 +1174,90 @@ public class AppUtils {
                 .collect(Collectors.toList());
     }*/
     public static List<Field> getFields(Class clazz, Predicate<Field> predicate) {
-        return ReflectionUtils.getFields(clazz).stream().filter(predicate)
+        return getFieldsAsStream(clazz, predicate)
                 .collect(Collectors.toList());
     }
+
+    public static Stream<Field> getFieldsAsStream(Class clazz, Predicate<Field> predicate) {
+        return ReflectionUtils.getFields(clazz).stream()
+                .peek(field -> field.setAccessible(true))
+                .filter(predicate);
+    }
+
+    /**
+     * L'objet doit disposer des settter
+     *
+     * @param name
+     * @param o
+     */
+    public static void setField(String name, Object o, Object value) {
+        for (Method m : o.getClass().getMethods()) {
+            if (m.getName().startsWith("set") && (name.length() + 3) == m.getName().length()) {
+                if (m.getName().toLowerCase().endsWith(name.toLowerCase())) {
+                    try {
+                        m.invoke(o, value);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    public static Class getDeepPropertyType(Object entity, String path) {
+        PropertyUtilsBean utilsBean = new PropertyUtilsBean();
+        Class<?> type = null;
+        try {
+            type = utilsBean.getPropertyType(entity, path);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return type;
+    }
+
+    public static Object getDeepProperty(Object entity, String path) {
+        PropertyUtilsBean utilsBean = new PropertyUtilsBean();
+        Object value = null;
+        try {
+            value = utilsBean.getProperty(entity, path);
+        } catch (IllegalAccessException e) {
+            //e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            //e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            //e.printStackTrace();
+        }
+        return value;
+    }
+
+    public static void setDeepProperty(Object entity, String path, Object value) {
+        PropertyUtilsBean utilsBean = new PropertyUtilsBean();
+        try {
+            utilsBean.setProperty(entity, path, value);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String uuid() throws NoSuchAlgorithmException {
+        SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
+        String shunk = Integer.toString(Math.abs(secureRandom.nextInt()));
+        SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
+        Date now = Calendar.getInstance().getTime();
+        String prefix = sdf.format(now);
+        //MessageDigest disgest = MessageDigest.getInstance("SHA-256");
+        //byte[] shunkByte = disgest.digest(shunk.getBytes());
+        return prefix + shunk;
+    }
+
 }

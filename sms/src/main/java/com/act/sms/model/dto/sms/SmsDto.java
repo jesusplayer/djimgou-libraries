@@ -22,9 +22,4 @@ public class SmsDto implements IEntityDto {
 
     @NotBlank()
     String text;
-
-    @Override
-    public Class<Sms> originalClass() {
-        return Sms.class;
-    }
 }

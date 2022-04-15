@@ -5,7 +5,7 @@ import com.act.core.model.IEntityDto;
 
 import java.lang.reflect.Field;
 
-public class DtoChildFieldNotFound extends Exception {
+public class DtoChildFieldNotFound extends DtoMappingException {
     public DtoChildFieldNotFound(String message) {
         super(message);
     }

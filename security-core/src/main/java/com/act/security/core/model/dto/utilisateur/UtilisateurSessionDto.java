@@ -10,9 +10,4 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UtilisateurSessionDto extends Utilisateur implements IEntityDto {
    String token;
-
-   @Override
-   public Class<Utilisateur> originalClass() {
-      return Utilisateur.class;
-   }
 }

@@ -29,9 +29,4 @@ public class UtilisateurDto  extends ModifierProfilDto implements IEntityDto {
     Set<IdDto> tenants;
     @JsonIgnore
     private String encodedPasswd;
-
-    @Override
-    public Class<Utilisateur> originalClass() {
-        return Utilisateur.class;
-    }
 }
