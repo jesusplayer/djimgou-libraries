@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="SePlaSpringBootApplication" type="Application" factoryName="Application">
-    <option name="MAIN_CLASS_NAME" value="com.act.SePlanSpringBootApplication" />
+    <option name="MAIN_CLASS_NAME" value="com.djimgou.SePlanSpringBootApplication" />
     <module name="act-library-starter" />
     <option name="PROGRAM_PARAMETERS" value="-Dspring-boot.run.arguments=--spring.profiles.active=devDany" />
     <extension name="coverage">
