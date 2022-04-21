@@ -14,8 +14,8 @@
     </developers>
     <parent>
         <artifactId>act-library-starter</artifactId>
-        <groupId>com.act</groupId>
-        <version>0.0.2-SNAPSHOT</version>
+        <groupId>com.djimgou</groupId>
+        <version>0.0.3-SNAPSHOT</version>
     </parent>
    <!-- <parent>
         <groupId>org.springframework.boot</groupId>
@@ -46,15 +46,15 @@
     </dependencyManagement>
     <dependencies>
         <dependency>
-            <groupId>com.act</groupId>
+            <groupId>com.djimgou</groupId>
             <artifactId>core</artifactId>
-            <version>0.0.2-SNAPSHOT</version>
+            <version>0.0.3-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.act</groupId>
+            <groupId>com.djimgou</groupId>
             <artifactId>session-jdbc</artifactId>
-            <version>0.0.2-SNAPSHOT</version>
+            <version>0.0.3-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -62,17 +62,17 @@
             <artifactId>spring-kafka</artifactId>
         </dependency>
 <!--        <dependency>
-            <groupId>com.act</groupId>
+            <groupId>com.djimgoumgou</groupId>
             <artifactId>audit</artifactId>
-            <version>0.0.2-SNAPSHOT</version>
+            <version>0.0.3-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>-->
 <!--        Pour le moment on fait qu'il dépende de jdbc session-->
 
         <dependency>
-            <groupId>com.act</groupId>
+            <groupId>com.djimgou</groupId>
             <artifactId>tenant-manager</artifactId>
-            <version>0.0.2-SNAPSHOT</version>
+            <version>0.0.3-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

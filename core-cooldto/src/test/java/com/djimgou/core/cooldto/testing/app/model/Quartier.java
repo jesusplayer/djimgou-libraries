@@ -1,0 +1,32 @@
+package com.djimgou.core.cooldto.testing.app.model;
+
+import com.djimgou.core.util.model.BaseBdEntity;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.querydsl.core.annotations.QueryEntity;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.experimental.FieldDefaults;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+
+@Data
+@QueryEntity
+@Entity
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@JsonIgnoreProperties({"createdDate","lastModifiedDate","utilisateur1Id","utilisateur2Id","historique"})
+public class Quartier extends BaseBdEntity {
+
+    @Column(unique = true)
+    String code;
+
+    @Column(unique = true, nullable = false)
+    String nom;
+
+    @ManyToOne(optional = false)
+    Ville ville;
+
+    /*@OneToMany(mappedBy = "region")
+    Collection<Produit> produits;*/
+}

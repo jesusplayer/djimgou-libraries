@@ -18,6 +18,9 @@
         <module>app-starter-parent</module>
         <module>core</module>
         <module>audit</module>
+        <module>core-util</module>
+        <module>core-test</module>
+        <module>core-cooldto</module>
         <module>security</module>
         <module>reporting</module>
         <module>filestorage</module>
@@ -43,9 +46,9 @@
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.5.0</version>
     </parent>
-    <groupId>com.act</groupId>
+    <groupId>com.djimgou</groupId>
     <artifactId>act-library-starter</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.3-SNAPSHOT</version>
     <name>act-library-starter</name>
 
     <properties>
