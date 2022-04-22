@@ -9,6 +9,10 @@ public class NotFoundException extends Exception {
         super(c.getSimpleName() + " inexistant");
     }
 
+    public NotFoundException(Class c, Object id) {
+        super(c.getSimpleName() + "#" + id + " inexistant");
+    }
+
     public NotFoundException(String message) {
         super(message);
     }

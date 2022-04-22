@@ -33,6 +33,12 @@ public class LocalFileStorage implements FileStorage {
     private String name;
     private MultipartFile multipartFile;
 
+    @Override
+    public String normilizePath(String path) {
+        return has(path) ? path.replace("/", File.separator).replace("\\", File.separator) : path;
+    }
+
+
     public String storePath(String dossier) {
         return rootFolder + (has(dossier) ? dossier : defaultFolder);
     }

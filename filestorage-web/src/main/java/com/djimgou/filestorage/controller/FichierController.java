@@ -51,9 +51,12 @@ public class FichierController {
     }*/
 
     @PostMapping(value = "/upload3Fichiers", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public Fichier uploadMultipleFiles(@RequestPart("fichiers") @NotEmpty @NotNull MultipartFile[] files, @RequestParam("customData") String customData) throws BadRequestException, AppException, FichierInvalidNameException {
+    public Fichier uploadMultipleFiles(@RequestPart("fichiers") @NotEmpty @NotNull MultipartFile[] files, @RequestParam("dossier") String dossier
+            , @RequestParam("customData") String customData
+            , @RequestParam("description") String description
+    ) throws BadRequestException, AppException, FichierInvalidNameException {
         Fichier fichier = new Fichier(
-                null, files[0].getOriginalFilename(), files[0].getContentType(), customData, files);
+                dossier, files[0].getOriginalFilename(), files[0].getContentType(), customData, files, description);
         return fichierService.save3Files(files, fichier);
     }
 

@@ -55,6 +55,7 @@ public class FileStorageFactory {
         instance.setMultipartFile(multipartFile);
         instance.setDossier(dossier);
         instance.setName(nom);
+        instance.normilizePath();
         instance.creerDossier();
         return instance;
     }

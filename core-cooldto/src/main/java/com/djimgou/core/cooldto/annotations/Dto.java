@@ -1,15 +1,13 @@
 package com.djimgou.core.cooldto.annotations;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Annotation qui permet de faire le mapping automatique
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
+@Documented
 public @interface Dto {
     /**
      * L'entité dans laquelle depent le Dto.

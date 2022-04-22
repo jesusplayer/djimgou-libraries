@@ -41,10 +41,36 @@ public class Fichier extends BaseBdEntity {
     String dossier;
     String type;
     String customData;
+    String description;
 
     @JsonIgnore
     @Transient
     MultipartFile[] multipartFiles;
+
+    public Fichier(String dossier, String type, MultipartFile[] multipartFiles) {
+        this.nom = getId().toString();
+        this.dossier = dossier;
+        this.type = type;
+        this.multipartFiles = multipartFiles;
+        //this(dossier,getId().toString(),type,multipartFiles);
+        buildUrl();
+    }
+
+    public Fichier(String dossier, String nom, String type, MultipartFile[] multipartFiles) {
+        this(dossier, type, multipartFiles);
+        setNom(nom);
+        buildUrl();
+    }
+
+    public Fichier(String dossier, String nom, String type, String customData, MultipartFile[] multipartFiles) {
+        this(dossier, nom, type, multipartFiles);
+        this.customData = customData;
+    }
+
+    public Fichier(String dossier, String nom, String type, String customData, MultipartFile[] multipartFiles, String description) {
+        this(dossier, nom, type, customData, multipartFiles);
+        this.description = description;
+    }
 
     /**
      * Utile pour des traitements hors servlet comme les test
@@ -110,27 +136,6 @@ public class Fichier extends BaseBdEntity {
             setF1OldUrl(f3);
         }*/
         return f3;
-    }
-
-    public Fichier(String dossier, String type, MultipartFile[] multipartFiles) {
-        this.nom = getId().toString();
-        this.dossier = dossier;
-        this.type = type;
-        this.multipartFiles = multipartFiles;
-        buildUrl();
-    }
-
-    public Fichier(String dossier, String nom, String type, MultipartFile[] multipartFiles) {
-        this.dossier = dossier;
-        this.nom = nom;
-        this.type = type;
-        this.multipartFiles = multipartFiles;
-        buildUrl();
-    }
-
-    public Fichier(String dossier, String nom, String type, String customData, MultipartFile[] multipartFiles) {
-        this(dossier, nom, type, multipartFiles);
-        this.customData = customData;
     }
 
     public void buildUrl() {

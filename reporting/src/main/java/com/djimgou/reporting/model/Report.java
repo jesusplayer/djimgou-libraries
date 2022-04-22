@@ -35,6 +35,7 @@ public class Report extends BaseBdEntity {
     String type;
     // Url d'accès du report dans l'application cliente
     String clientRouteUrl;
+    String description;
 
     Integer position;
     public static final String FOLDER = "Reports";
@@ -65,6 +66,12 @@ public class Report extends BaseBdEntity {
         this.nom = nom;
         this.dossier = dossier;
         this.type = type;
+        buildUrl();
+    }
+
+    public Report(String dossier, String nom, String type, String description) {
+        this(dossier, nom, type);
+        this.description = description;
         buildUrl();
     }
 

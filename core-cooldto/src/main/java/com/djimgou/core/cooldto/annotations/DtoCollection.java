@@ -1,9 +1,6 @@
 package com.djimgou.core.cooldto.annotations;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Indique une propriété à mapper de type Array. Dans ce cas, on ne fera
@@ -11,7 +8,8 @@ import java.lang.annotation.Target;
  * n'est pas null. Dans ce cas il faudra le créé
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
+@Target(ElementType.FIELD)@Documented
+
 public @interface DtoCollection {
     /**
      * Indique la cle de l'entité cible dans laquelle on va mettre la donnée.

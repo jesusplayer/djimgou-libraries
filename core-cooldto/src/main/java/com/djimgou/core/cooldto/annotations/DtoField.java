@@ -1,9 +1,6 @@
 package com.djimgou.core.cooldto.annotations;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * NB: Ne pas le mettre sur une propiété de type tableau
@@ -20,6 +17,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
+@Documented
 public @interface DtoField {
     /**
      * Indique la cle de l'entité cible dans laquelle on va mettre la donnée.

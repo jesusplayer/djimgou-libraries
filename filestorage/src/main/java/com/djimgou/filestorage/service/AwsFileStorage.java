@@ -33,6 +33,11 @@ public class AwsFileStorage implements FileStorage {
     }*/
 
     @Override
+    public String normilizePath(String path) {
+        return null;
+    }
+
+    @Override
     public String getName() {
         return null;
     }
