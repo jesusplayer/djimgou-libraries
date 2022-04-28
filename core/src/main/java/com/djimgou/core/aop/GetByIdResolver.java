@@ -31,13 +31,14 @@ public class GetByIdResolver implements HandlerMethodArgumentResolver {
 
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest,
                                   WebDataBinderFactory binderFactory) throws Exception {
-        GetById attr = parameter.getParameterAnnotation(GetById.class);
+        GetById an = parameter.getParameterAnnotation(GetById.class);
         final Map pathVar = (Map) ((ServletWebRequest) webRequest).getRequest().getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
         final Class<?> type = parameter.getParameter().getType();
-        String value = has(attr.value()) ? attr.value()[0] : er.getIdKey(type);
+        String value = has(an.value()) ? an.value()[0] : er.getIdKey(type);
         Object id = pathVar.get(value);
         if (!has(id)) {
-            throw new NotFoundException("L'identifiant ne peux pas être nul");
+            throw new NotFoundException("La valeur de L'identifiant " +value+
+                    " ne peux pas être nul");
         }
         Type idType = er.getIdType(type);
         Object newId;

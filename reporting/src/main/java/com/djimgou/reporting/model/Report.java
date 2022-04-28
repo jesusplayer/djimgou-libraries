@@ -3,6 +3,7 @@ package com.djimgou.reporting.model;
 import com.djimgou.audit.model.EntityListener;
 import com.djimgou.core.util.model.BaseBdEntity;
 import com.djimgou.filestorage.model.Fichier;
+import com.querydsl.core.annotations.QueryEntity;
 import lombok.Data;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -20,6 +21,7 @@ import static com.djimgou.core.util.AppUtils.has;
 @Data
 @Entity
 @Indexed
+@QueryEntity
 //@FieldDefaults(level = AccessLevel.PRIVATE)
 @EntityListeners(EntityListener.class)
 public class Report extends BaseBdEntity {

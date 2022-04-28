@@ -1,17 +1,16 @@
 package com.djimgou.core.testing.app.controller;
 
-import com.djimgou.core.cooldto.exception.DtoChildFieldNotFound;
+import com.djimgou.core.exception.DbIntegrityException;
 import com.djimgou.core.exception.NotFoundException;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import javax.validation.UnexpectedTypeException;
-import java.io.FileNotFoundException;
 import java.lang.reflect.UndeclaredThrowableException;
 
 @Log4j2
@@ -46,6 +45,7 @@ public class GlobalControllerExceptionHandler {
 
     @ExceptionHandler({
             UnexpectedTypeException.class,
+            DataIntegrityViolationException.class,
             org.springframework.http.converter.HttpMessageNotReadableException.class,
             org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class,
             org.springframework.web.bind.MissingServletRequestParameterException.class,
@@ -57,6 +57,15 @@ public class GlobalControllerExceptionHandler {
     public ResponseEntity<String> handleForbiddenExceptions(Exception ex) {
         log.error(ex.getMessage());
         return handleException(ex, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({
+            DbIntegrityException.class,
+    })
+    @ResponseStatus(HttpStatus.LOCKED)
+    public ResponseEntity<String> handleDataIntegr(Exception ex) {
+        log.error(ex.getMessage());
+        return handleException(ex, HttpStatus.LOCKED);
     }
 
 

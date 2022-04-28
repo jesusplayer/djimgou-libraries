@@ -17,16 +17,28 @@ public class CoreTestController {
         return categorie;
     }
 
+    @GetMapping("/categorieRename/{idCategorie}")
+    public Categorie getByIdRename(@GetById("idCategorie") Categorie categorie) {
+        return categorie;
+    }
+
     @GetMapping("/noIdCategorie/{id}")
     public Categorie getByIdNocat(@GetById Categorie categorie) {
         return categorie;
     }
 
+    @GetMapping("/badIdCategorie/{badId}")
+    public Categorie getByBadIdNocat(@GetById Categorie categorie) {
+        return categorie;
+    }
+
     @DeleteMapping("/categorie/{id}")
+    @SuppressWarnings({"unused"})
     public void deleteById(@DeleteById("id") Categorie categorie) {
     }
 
     @DeleteMapping("/noIdCategorie/{id}")
+    @SuppressWarnings({"unused"})
     public void deleteByIdNocat(@DeleteById Categorie categorie) {
     }
 }

@@ -1,10 +1,12 @@
 package com.djimgou.core.aop;
 
 import com.djimgou.core.annotations.DeleteById;
+import com.djimgou.core.exception.DbIntegrityException;
 import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.core.util.EntityRepository;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.springframework.core.MethodParameter;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -48,7 +50,10 @@ public class DeleteByIdResolver implements HandlerMethodArgumentResolver {
         }
         try {
             er.deleteById(type, newId);
+        } catch (DataIntegrityViolationException e) {
+            throw new DbIntegrityException(e.getMessage(), e);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new NotFoundException(type, id);
         }
         return null;

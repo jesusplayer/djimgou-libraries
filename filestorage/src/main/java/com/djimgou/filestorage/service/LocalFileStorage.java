@@ -128,11 +128,12 @@ public class LocalFileStorage implements FileStorage {
     }
 
     public void deleteFile() throws IOException {
-        Path path = Paths.get(dossier())
-                .toAbsolutePath().normalize().resolve(name);
+        if (has(name)) {
+            Path path = Paths.get(dossier())
+                    .toAbsolutePath().normalize().resolve(name);
 
-        Files.deleteIfExists(path);
-
+            Files.deleteIfExists(path);
+        }
     }
 
     public Resource loadFileAsResource() throws FileNotFoundException, AppException {

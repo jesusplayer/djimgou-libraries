@@ -38,7 +38,7 @@ public class ReportBuilder {
 
     DataSource dataSource;
 
-    public static String REPORT_DIR = "./Reports";
+    public static String REPORT_DIR = "Reports";
 
     @Getter
     private final FileStorage fs;

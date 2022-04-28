@@ -18,7 +18,9 @@ public interface ReportRepo extends JpaRepository<Report, UUID>, QuerydslPredica
     Page<Report> findBySearchText(@Param("searchText") String searchText, Pageable pageRequest);
 
 
-    Page<Report> findByNomContaining(String code, Pageable pageRequest);
+    Page<Report> findByNom(String nom, Pageable pageRequest);
+
+    Page<Report> findByFichier1(String fichier1, Pageable pageRequest);
 
     Page<Report> findAll(Specification<Report> spec, Pageable pageRequest);
     /**

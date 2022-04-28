@@ -60,7 +60,7 @@ public class FilterMetadataSource implements FilterInvocationSecurityMetadataSou
 		}
 		List<AuthorityDto> userRoleDto = null;
 		try {
-			userRoleDto = cacheManager.getAuthorities().get(url);
+			userRoleDto = cacheManager.getAuthoritie(url);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

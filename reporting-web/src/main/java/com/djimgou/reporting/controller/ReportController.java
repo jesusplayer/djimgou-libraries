@@ -3,7 +3,6 @@ package com.djimgou.reporting.controller;
 import com.djimgou.core.exception.AppException;
 import com.djimgou.core.exception.BadRequestException;
 import com.djimgou.core.exception.NotFoundException;
-import com.djimgou.core.infra.DeleteAfterReadResource;
 import com.djimgou.filestorage.exception.FichierInvalidNameException;
 import com.djimgou.filestorage.exception.FichierNotFoundException;
 import com.djimgou.reporting.model.Report;
@@ -18,19 +17,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -85,7 +80,7 @@ public class ReportController {
     @GetMapping("/genererHtml/{reportId}")
     public ResponseEntity<String> genererHtml(@PathVariable("reportId") UUID reportId,
                                               HttpServletRequest request) throws NotFoundException, IOException {
-        Resource resource = reportService.getHtml(reportId, request.getParameterMap());
+        Resource resource = reportService.getHtml(reportId, getParameters(request));
         // Try to determine file's content type
         String content = Files.readAllLines(resource.getFile().toPath())
                 .stream().collect(Collectors.joining(""));
@@ -97,46 +92,32 @@ public class ReportController {
 
     @GetMapping("/genererPdf/{reportId}")
     public ResponseEntity<Resource> genererPdf(@PathVariable("reportId") UUID reportId,
-                                               WebRequest webRequest,
                                                HttpServletRequest request) throws IOException, NotFoundException {
 
-        Resource resource = reportService.getPdf(reportId, request.getParameterMap());
-        // Try to determine file's content type
-        return downloadBlob(resource);
+        return reportService.downloadPdf(reportId, getParameters(request));
     }
 
+    Map<String, Object> getParameters(HttpServletRequest request) {
+        Map<String, Object> p = new HashMap();
+        Enumeration<String> e = request.getParameterNames();
+        Collections.list(e).forEach(el -> {
+            p.put(el, request.getParameter(el));
+        });
+        return p;
+    }
 
     @GetMapping("/genererXlsx/{reportId}")
     public ResponseEntity<Resource> genererXlsx(@PathVariable("reportId") UUID reportId,
                                                 HttpServletRequest request) throws NotFoundException, IOException {
-        Resource resource = reportService.getXlsx(reportId, request.getParameterMap());
         // Try to determine file's content type
-        return downloadBlob(resource);
+        return reportService.downloadXlsx(reportId, getParameters(request));
     }
 
     @GetMapping("/genererDocx/{reportId}")
     public ResponseEntity<Resource> genererDocx(@PathVariable("reportId") UUID reportId,
                                                 HttpServletRequest request) throws NotFoundException, IOException {
-        Resource resource = reportService.getDocx(reportId, request.getParameterMap());
         // Try to determine file's content type
-        return downloadBlob(resource);
-    }
-
-    public ResponseEntity<Resource> downloadBlob(Resource resource) throws IOException {
-        String contentType = new MimetypesFileTypeMap().getContentType(resource.getFilename());
-        // Fallback to the default content type if type could not be determined
-        if (contentType == null) {
-            contentType = "application/octet-stream";
-        }
-        resource = new DeleteAfterReadResource(resource);
-        // IOUtils.getInstance().copyStreams();
-        //resource = new InputStreamResource(new DeleteAfterReadResource(resource.getFile()));
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .contentLength(resource.contentLength())
-                //.header(HttpHeaders.)
-                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment().filename(resource.getFilename()).build().toString())
-                .body(resource);
+        return reportService.downloadDocx(reportId, getParameters(request));
     }
 
     @GetMapping("/")

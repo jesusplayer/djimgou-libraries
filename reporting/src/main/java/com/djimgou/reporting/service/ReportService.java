@@ -4,6 +4,7 @@ import com.djimgou.core.exception.AppException;
 import com.djimgou.core.exception.BadRequestException;
 import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.core.infra.CustomPageable;
+import com.djimgou.core.infra.DeleteAfterReadResource;
 import com.djimgou.core.service.AbstractDomainService;
 import com.djimgou.filestorage.exception.FichierInvalidNameException;
 import com.djimgou.filestorage.exception.FichierNotFoundException;
@@ -25,10 +26,15 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.activation.MimetypesFileTypeMap;
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -68,6 +74,18 @@ public class ReportService extends AbstractDomainService<Report, ReportFindDto, 
     @PostConstruct
     void init() throws Exception {
         //reportBuilder.getFs().creerDossier(FileStorage.ROOT_FOLDER);
+    }
+
+    public ResponseEntity<Resource> downloadPdf(UUID reportId, Map params) throws NotFoundException, IOException {
+        return downloadBlob(getPdf(reportId, params));
+    }
+
+    public ResponseEntity<Resource> downloadXlsx(UUID reportId, Map params) throws NotFoundException, IOException {
+        return downloadBlob(getXlsx(reportId, params));
+    }
+
+    public ResponseEntity<Resource> downloadDocx(UUID reportId, Map params) throws NotFoundException, IOException {
+        return downloadBlob(getDocx(reportId, params));
     }
 
     public Resource getHtml(UUID reportId, Map params) throws NotFoundException {
@@ -198,6 +216,22 @@ public class ReportService extends AbstractDomainService<Report, ReportFindDto, 
         return super.searchPageable(findDto);
     }
 
+    public Optional<Report> findByNom(String nom) {
+        Page<Report> p = repo.findByNom(nom, Pageable.unpaged());
+        if (p.hasContent()) {
+            return Optional.of(p.getContent().get(0));
+        }
+        return Optional.empty();
+    }
+
+    public Optional<Report> findByFichier1(String fichier1) {
+        Page<Report> p = repo.findByFichier1(fichier1, Pageable.unpaged());
+        if (p.hasContent()) {
+            return Optional.of(p.getContent().get(0));
+        }
+        return Optional.empty();
+    }
+
     public Page<Report> findBy(ReportFilterDto baseFilter) throws Exception {
         CustomPageable cpg = new CustomPageable(baseFilter);
         if (cpg.getSort().isUnsorted()) {
@@ -215,7 +249,7 @@ public class ReportService extends AbstractDomainService<Report, ReportFindDto, 
         List<BooleanExpression> expressionList = new ArrayList<>();
 
         /*if (has(name)) {
-            expressionList.add(qDevise.nom.containsIgnoreCase(name));
+            expressionList.add(qDevise.n.containsIgnoreCase(name));
         }
         if (has(fichier)) {
             expressionList.add(qDevise.fichier1.containsIgnoreCase(fichier));
@@ -234,4 +268,20 @@ public class ReportService extends AbstractDomainService<Report, ReportFindDto, 
         return page;
     }
 
+    public ResponseEntity<Resource> downloadBlob(Resource resource) throws IOException {
+        String contentType = new MimetypesFileTypeMap().getContentType(resource.getFilename());
+        // Fallback to the default content type if type could not be determined
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+        resource = new DeleteAfterReadResource(resource);
+        // IOUtils.getInstance().copyStreams();
+        //resource = new InputStreamResource(new DeleteAfterReadResource(resource.getFile()));
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .contentLength(resource.contentLength())
+                //.header(HttpHeaders.)
+                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment().filename(resource.getFilename()).build().toString())
+                .body(resource);
+    }
 }

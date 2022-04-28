@@ -9,6 +9,7 @@ import org.springframework.context.ApplicationListener;
 import java.util.List;
 import java.util.Map;
 
+import static com.djimgou.core.util.AppUtils.has;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
@@ -22,7 +23,10 @@ public class CacheManager implements ApplicationListener<CacheEventMessage> {
     }
 
     public List<AuthorityDto> getAuthoritie(String key) {
-        return authorities.get(key);
+        if (has(authorities) && authorities.containsKey(key)) {
+            return authorities.get(key);
+        }
+        return null;
     }
 
     @Override

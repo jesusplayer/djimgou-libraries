@@ -4,6 +4,7 @@ import com.djimgou.core.test.initilizer.GenericDbManager;
 import com.djimgou.core.test.util.FakeBuilder;
 import com.djimgou.core.testing.app.MaincoreTestApplication;
 import com.djimgou.core.testing.app.model.Categorie;
+import com.djimgou.core.testing.app.model.CategorieDto;
 import com.djimgou.core.util.EntityRepository;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
@@ -81,6 +82,21 @@ public class CoreTest {
     }
 
     @SneakyThrows
+    @DisplayName("Get By idCategorie")
+    @Test
+    public void testGetCatrename() {
+        Categorie cat = GenericDbManager.get(Categorie.class);
+        ResponseEntity<Categorie> catResp = restTemplate.getForEntity(rootUrl +
+                "/api/categorieRename/" + cat.getId(), Categorie.class);
+
+        assertNotNull(catResp);
+        assertEquals(HttpStatus.OK, catResp.getStatusCode());
+        Categorie newcat = catResp.getBody();
+        assertEquals(cat.getCode(), newcat.getCode());
+        assertEquals(cat.getNom(), newcat.getNom());
+    }
+
+    @SneakyThrows
     @DisplayName("Get By Id with null keyId name ")
     @Test
     public void testFieldE() {
@@ -93,6 +109,19 @@ public class CoreTest {
         Categorie newcat = catResp.getBody();
         assertEquals(cat.getCode(), newcat.getCode());
         assertEquals(cat.getNom(), newcat.getNom());
+    }
+
+    @SneakyThrows
+    @DisplayName("Get Bad Id Path By Id with null keyId name ")
+    @Test
+    public void badIdpath() {
+        Categorie cat = GenericDbManager.get(Categorie.class);
+        ResponseEntity<String> catResp = restTemplate.getForEntity(rootUrl +
+                "/api/badIdCategorie/" + cat.getId(), String.class);
+
+        assertNotNull(catResp);
+        assertEquals(HttpStatus.NOT_FOUND, catResp.getStatusCode());
+
     }
 
     @SneakyThrows
@@ -125,6 +154,22 @@ public class CoreTest {
         er.save(cat);
         //Categorie cat = dbManager.deepCreate(Categorie.class);;
         restTemplate.delete(apiurl + "/" + cat.getId());
+
+        ResponseEntity<String> catResp = restTemplate.getForEntity(apiurl +
+                "/" + cat.getId(), String.class);
+
+        assertEquals(HttpStatus.NOT_FOUND, catResp.getStatusCode());
+
+    }
+
+    @SneakyThrows
+    @DisplayName("Suppression avec un Id inexistant")
+    @Test
+    public void testDeleteByidNoId() {
+        Categorie cat = FakeBuilder.fake(Categorie.class);
+        er.save(cat);
+        //Categorie cat = dbManager.deepCreate(Categorie.class);;
+        restTemplate.delete(rootUrl + "/api/noIdCategorie/" + cat.getId());
 
         ResponseEntity<String> catResp = restTemplate.getForEntity(apiurl +
                 "/" + cat.getId(), String.class);
