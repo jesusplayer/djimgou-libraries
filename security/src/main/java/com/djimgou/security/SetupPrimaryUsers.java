@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -251,7 +252,7 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
         } else {
             String en = bCryptPasswordEncoder.encode(utilisateur.getPassword());
             utilisateur.setPassword(*/
-/*"{bcrypt}"+*//*
+    /*"{bcrypt}"+*//*
 en);
             utilisateur.setEnabled(true);
             user = userRepository.save(utilisateur);
@@ -295,7 +296,7 @@ en);
     @Transactional
     Privilege createPrivilegeIfNotFound(Privilege priv) {
         Optional<Privilege> opt = privilegeRepository.findByCode(priv.getCode());
-        Privilege privilege;
+        Privilege privilege = null;
         if (opt.isPresent()) {
             Privilege oldPriv = opt.get();
             if (!Objects.equals(oldPriv.getDescription(), priv.getDescription())) {
@@ -309,8 +310,12 @@ en);
             privilege = oldPriv;
         } else {
             priv.setReadonlyValue(true);
-            privilege = privilegeRepository.save(priv);
-            log.info("PrivilegeCréé "+ privilege.getUrl());
+            try {
+                privilege = privilegeRepository.save(priv);
+                log.info("PrivilegeCréé " + privilege.getUrl());
+            } catch (DataIntegrityViolationException e) {
+
+            }
 
         }
         return privilege;
