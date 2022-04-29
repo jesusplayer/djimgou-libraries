@@ -91,7 +91,6 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
         return AppUtils.has(customBdService) ? (UtilisateurBdServiceBase<Utilisateur, UtilisateurFindDto, UtilisateurFilterDto, UtilisateurDto, ModifierProfilDto>) customBdService : utilisateurBdService;
     }
 
-    @Transactional
     public void initDefaultPriv2() {
         endPointsRegistry.endPoints().stream().map(endPoint -> {
             Privilege fullAccess = new Privilege();
