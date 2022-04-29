@@ -83,6 +83,11 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
         return saveUtilisateur(null, utilisateurDto);
     }
 
+    @Override
+    public Utilisateur createUtilisateurGeneric(UtilisateurDto utilisateurDto) throws BadConfirmPasswordException, ConflitException, NotFoundException {
+        return saveUtilisateur(null, utilisateurDto);
+    }
+
     @Transactional
     public Utilisateur createCompteUtilisateur(UtilisateurDto utilisateurDto) throws BadConfirmPasswordException, ConflitException, UtilisateurNotFoundException {
         return saveUtilisateur(null, utilisateurDto);

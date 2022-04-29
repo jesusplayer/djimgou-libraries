@@ -42,6 +42,8 @@ public interface UtilisateurBdServiceBase<U extends Utilisateur, D extends Utili
 
     U createUtilisateur(T utilisateurDto) throws BadConfirmPasswordException, ConflitException, NotFoundException;
 
+    Utilisateur createUtilisateurGeneric(UtilisateurDto utilisateurDto) throws BadConfirmPasswordException, ConflitException, NotFoundException;
+
     U createCompteUtilisateur(T utilisateurDto) throws BadConfirmPasswordException, ConflitException, NotFoundException;
 
     UtilisateurBaseRepo<U, UUID> getRepo();

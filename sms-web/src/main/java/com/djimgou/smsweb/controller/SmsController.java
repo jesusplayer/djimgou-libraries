@@ -21,6 +21,7 @@ public class SmsController {
     }
 
     @PostMapping("/envoyerMsgTest")
+    //@Endpoint("Envoyer un SMS")
     public void sendSms(@RequestBody @Valid SmsSimpleMassageDto smsMassageDto) throws NoSmsServiceProvider {
         getSender().send(smsMassageDto);
     }

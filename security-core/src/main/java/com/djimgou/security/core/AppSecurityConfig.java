@@ -11,8 +11,11 @@ import java.util.stream.Stream;
  * Interface implémenté par chaque applications qui utilise le module de sécurité
  */
 public interface AppSecurityConfig {
+    boolean permitAll();
+
     /**
      * permet d'obtenir toutes les URL autorisées
+     *
      * @return
      */
     List<String> authorizedUrls();
@@ -22,19 +25,22 @@ public interface AppSecurityConfig {
      * set trouve les entités métier de l'application
      * Ceci permettra de générer automatiquement les privilèges par
      * défaut de chaque com.djimgou.audit.service
+     *
      * @return
      */
     String businessEntityPackage();
 
     /**
      * Si on souhaite configuger la sécurité de manière plus personnelle
+     *
      * @param http
      * @throws Exception
      */
-    void configure(HttpSecurity http)throws Exception;
+    void configure(HttpSecurity http) throws Exception;
 
     /**
      * Fonction qui teste si une Url Match
+     *
      * @param authorizedUrls
      * @param url
      * @return

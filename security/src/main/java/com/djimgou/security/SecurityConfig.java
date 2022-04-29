@@ -1,16 +1,16 @@
 package com.djimgou.security;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.djimgou.security.core.AppSecurityConfig;
+import com.djimgou.security.core.model.Role;
 import com.djimgou.security.core.model.UrlsAuthorized;
-import com.djimgou.security.core.tracking.authentication.dao.ResourceRepository;
 import com.djimgou.security.core.service.MyVoter;
+import com.djimgou.security.core.tracking.authentication.dao.ResourceRepository;
+import com.djimgou.security.enpoints.EndPointsRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
@@ -34,10 +34,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.session.SessionManagementFilter;
-//import org.springframework.session.web.http.SessionRepositoryFilter;
 
 import javax.servlet.Filter;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+//import org.springframework.session.web.http.SessionRepositoryFilter;
 
 //import scx.beac.etransfert.tracking.authentication.dao.ResourceRepository;
 //import scx.beac.etransfert.tracking.authentication.security.com.djimgou.audit.service.myVoter;
@@ -88,9 +93,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private ResourceRepository roleResourceRepository;
 
+    @Autowired
+    EndPointsRegistry endPointsRegistry;
+
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
         http.csrf().disable();
 
 
@@ -103,21 +111,39 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .filterSecurityInterceptorOncePerRequest(true)
 
         };
+
+        endPointsRegistry.getEndpointsMap().values().forEach(endPoint -> {
+            final ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl authorizedUrl =
+                    rule[0].antMatchers(endPoint.getHttpMethod(), endPoint.toSecurityUrl());
+            if (appSecurityConfig.permitAll()) {
+                authorizedUrl.permitAll();
+            } else {
+                authorizedUrl.hasAuthority(endPoint.getName());
+                if (endPoint.isGet()) {
+                    rule[0].antMatchers(HttpMethod.GET, endPoint.toSecurityUrl()).hasRole(Role.ROLE_READONLY);
+                }
+            }
+        });
         for (String url : appSecurityConfig.authorizedUrls()) {
             rule[0] = rule[0].antMatchers(url).permitAll();
         }
+
+        for (UrlsAuthorized url : UrlsAuthorized.values()) {
+            rule[0] = rule[0].antMatchers(url.toString()).permitAll();
+        }
+
         rule[0].anyRequest().authenticated()
                 .and()
+
                 //
                 // Add Filter 1 - JWTLoginFilter
                 //
                 .addFilterBefore(new CorsFilter(), ChannelProcessingFilter.class)
-                .addFilterBefore(new JWTLoginFilter(UrlsAuthorized.LOGIN.toString(), authenticationManager()),
+                /*.addFilterBefore(new JWTLoginFilter(UrlsAuthorized.LOGIN.toString(), authenticationManager()),
                         UsernamePasswordAuthenticationFilter.class)
-                //
-                // Add Filter 2 - JWTAuthenticationFilter
-                //
-                .addFilterBefore(new JWTAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JWTAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)*/
+
+
                 //.addFilterAfter(expiredSessionFilter(), SessionManagementFilter.class)
                 .exceptionHandling()
                 .accessDeniedHandler(accessDeniedHandler())
@@ -143,9 +169,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutSuccessHandler(authLogoutSuccessHandler)
                 .clearAuthentication(true)
                 .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID")
-                .and()
-                .addFilter(filterSecurityInterceptor());
+                .deleteCookies("JSESSIONID");
+               /* .and()
+                .addFilter(filterSecurityInterceptor());*/
         appSecurityConfig.configure(http);
     }
 
@@ -199,6 +225,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
+
     private Filter expiredSessionFilter() {
         SessionManagementFilter smf = new SessionManagementFilter(new HttpSessionSecurityContextRepository());
         smf.setInvalidSessionStrategy((request, response) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Votre session a expiré"));

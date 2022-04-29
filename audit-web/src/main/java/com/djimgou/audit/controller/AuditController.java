@@ -9,6 +9,7 @@ import com.djimgou.audit.model.Audit;
 import com.djimgou.audit.model.dto.AuditFilterDto;
 import com.djimgou.audit.model.dto.AuditFindDto;
 import com.djimgou.audit.service.AuditBdService;
+import com.djimgou.core.annotations.Endpoint;
 import com.djimgou.core.exception.NotFoundException;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,39 +39,46 @@ public class AuditController {
 
 
     @GetMapping("/detail/{auditId}")
+    @Endpoint("Afficher le détail d'un audit")
     public Audit findById(@PathVariable("auditId") UUID id) throws NotFoundException {
         return auditService.findById(id)
                 .orElseThrow(AuditNotFoundException::new);
     }
 
     @DeleteMapping("supprimer/{auditId}")
+    @Endpoint("Supprimer un audit")
     public void delete(@PathVariable("auditId") UUID auditId) throws Exception {
         auditService.deleteById(auditId);
     }
 
     @GetMapping("/")
+    @Endpoint("Lister tous les audits")
     public Collection<Audit> findAudits() {
         return auditService.findAll();
     }
 
     @GetMapping("/list")
+    @Endpoint("Lister les audits avec pagination")
     public Page<Audit> listAudits(Pageable pageable) {
         return auditService.findAll(pageable);
     }
 
     @GetMapping("/filter")
+    @Endpoint("Filtrer les audits avec pagination")
     public Page<Audit> filterAudits(AuditFilterDto auditFilterDto) throws Exception {
         //auditService.findByDto()
         return auditService.findBy(auditFilterDto);
     }
 
     @GetMapping("/search")
+    @Endpoint("Recherche sur les audits")
     public List<Audit> searchAudits(AuditFindDto auditFindDto) throws Exception {
         //auditService.findByDto()
         return auditService.search(auditFindDto).hits();
     }
 
     @GetMapping("/find")
+    @Endpoint("Recherche sur les audits avec pagination")
     public Page<Audit> findAudits(AuditFindDto auditFindDto) throws Exception {
         //auditService.findByDto()
         return auditService.searchPageable(auditFindDto);

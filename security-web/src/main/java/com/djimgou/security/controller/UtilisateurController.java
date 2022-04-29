@@ -7,6 +7,7 @@ package com.djimgou.security.controller;
 import com.djimgou.core.exception.ConflitException;
 import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.core.util.AppUtils;
+import com.djimgou.core.annotations.Endpoint;
 import com.djimgou.security.core.exceptions.BadConfirmPasswordException;
 import com.djimgou.security.core.exceptions.UtilisateurNotFoundException;
 import com.djimgou.security.core.model.Utilisateur;
@@ -75,6 +76,7 @@ public class UtilisateurController {
 
     //@FieldFilterSetting(className = Utilisateur.class, fields = {"password"})
     @PostMapping("/creer")
+    @Endpoint("Créer un utilisateur")
     public Utilisateur create(@RequestBody @Valid UtilisateurDto utilisateurDto) throws ConflitException, BadConfirmPasswordException, NotFoundException {
         //return  getService().createUtilisateur(utilisateurDto);
         utilisateurDto.setEncodedPasswd(bCryptPasswordEncoder.encode(utilisateurDto.getPasswordConfirm()));
@@ -82,65 +84,77 @@ public class UtilisateurController {
     }
 
     @PutMapping("/modifier/{utilisateurId}")
+    @Endpoint("Modifier un utilisateur")
     public Utilisateur update(
             @PathVariable("utilisateurId") final UUID id, @RequestBody @Valid final UtilisateurDto utilisateurDto) throws ConflitException, BadConfirmPasswordException, NotFoundException {
         return getService().saveUtilisateur(id, utilisateurDto);
     }
 
     @PostMapping("/activer/{utilisateurId}")
+    @Endpoint("Activer un utilisateur")
     public void activateProfil(@PathVariable("utilisateurId") final UUID utilisateurId) {
         getService().activer(utilisateurId);
     }
 
     @PostMapping("/desactiver/{utilisateurId}")
+    @Endpoint("Désactiver un utilisateur")
     public void desactivateProfil(@PathVariable("utilisateurId") final UUID utilisateurId) {
         getService().desactiver(utilisateurId);
     }
 
     @PutMapping("/ajouterTenant/{utilisateurId}")
+    @Endpoint("Ajouter un utilisateur à un tenant")
     public Utilisateur addTenant(
             @PathVariable("utilisateurId") final UUID id, @RequestParam("tenantId") UUID tenantId) throws UtilisateurNotFoundException, TenantNotFoundException {
         return getService().addTenant(id, tenantId);
     }
 
     @GetMapping("/detail/{utilisateurId}")
+    @Endpoint("Afficher le détail d'un utilisateur")
     public Utilisateur findById(@PathVariable("utilisateurId") UUID id) throws NotFoundException {
         return getService().findById(id)
                 .orElseThrow(UtilisateurNotFoundException::new);
     }
 
     @GetMapping("/actifs")
+    @Endpoint("Liste paginée des utilisateurs actifs")
     public Page<Utilisateur> displayActifs(Pageable pageable) {
         return getService().getRepo().findByEnabledTrue(pageable);
     }
 
     @GetMapping("/inactifs")
+    @Endpoint("Liste paginée des utilisateurs inactifs")
     public Page<Utilisateur> displayIActifs(Pageable pageable) {
         return getService().getRepo().findByEnabledFalse(pageable);
     }
 
     @GetMapping("/")
+    @Endpoint("Lister tous les utilisateurs")
     public Collection<Utilisateur> findUtilisateurs() {
         return getService().findAll();
     }
 
     @GetMapping("/list")
+    @Endpoint("Lister les utilisateurs avec pagination")
     public Page<Utilisateur> listUtilisateurs(Pageable pageable) {
         return getService().findAll(pageable);
     }
 
     @GetMapping("/filter")
+    @Endpoint("Filtrer les utilisateurs avec pagination")
     public Page<Utilisateur> filterUtilisateurs(UtilisateurFilterDto utilisateurFilterDto) throws Exception {
         //utilisateurService.findByDto()
         return getService().findBy(utilisateurFilterDto);
     }
 
     @GetMapping("/search")
+    @Endpoint("Recherche sur les utilisateurs")
     public List<Utilisateur> searchUtilisateurs(UtilisateurFindDto utilisateurFindDto) throws Exception {
         return getService().search(utilisateurFindDto).hits();
     }
 
     @GetMapping("/find")
+    @Endpoint("Recherche sur les utilisateurs avec pagination")
     public Page<Utilisateur> findUtilisateurs(UtilisateurFindDto utilisateurFindDto) throws Exception {
         return getService().searchPageable2(utilisateurFindDto);
     }

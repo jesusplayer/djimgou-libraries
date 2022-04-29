@@ -1,5 +1,6 @@
 package com.djimgou.filestorage.controller;
 
+import com.djimgou.core.annotations.Endpoint;
 import com.djimgou.core.exception.AppException;
 import com.djimgou.core.exception.BadRequestException;
 import com.djimgou.filestorage.exception.FichierInvalidNameException;
@@ -37,6 +38,7 @@ public class FichierController {
     }
 
     @PostMapping(value = "/uploadFichier", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @Endpoint("Uplaoder un nouveu fichier")
     public Fichier uploadFile(@RequestPart("fichier") @NotNull MultipartFile file/*, @RequestParam("dossier") String dossier, @RequestParam("nomFichier") String nomFichier*/, @RequestParam("customData") String customData) throws Exception {
         Fichier fichier = new Fichier(null, file.getOriginalFilename(), file.getContentType(), customData, new MultipartFile[]{file});
         return fichierService.save(file, fichier);
@@ -51,6 +53,7 @@ public class FichierController {
     }*/
 
     @PostMapping(value = "/upload3Fichiers", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @Endpoint("Uplaoder un des fichier en groupe de 3")
     public Fichier uploadMultipleFiles(@RequestPart("fichiers") @NotEmpty @NotNull MultipartFile[] files, @RequestParam("dossier") String dossier
             , @RequestParam("customData") String customData
             , @RequestParam("description") String description
@@ -61,12 +64,14 @@ public class FichierController {
     }
 
     @GetMapping("/detail/{fichierId}")
+    @Endpoint("Affichier le détail des informations d'un fichier")
     public Fichier detail(@PathVariable("fichierId") UUID fichierId) throws FichierNotFoundException {
         // Load file as Resource
         return fichierService.findbyId(fichierId);
     }
 
     @GetMapping("/afficher/{fileName:.+}")
+    @Endpoint("Télécharger le un fichier")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, HttpServletRequest request) throws IOException, AppException {
         // Load file as Resource
         return downloadFile(fileName, null, request);
@@ -82,6 +87,7 @@ public class FichierController {
      * @throws IOException
      */
     @GetMapping("/afficherDansDossier/{fileName:.+}")
+    @Endpoint("Télécharger un fichier situé dans un dossier")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, @RequestParam("dossier") @Null String dossier, HttpServletRequest request) throws IOException, AppException {
         // Load file as Resource
         FileStorage inst = fichierService.getFsFactory().getInstance();
@@ -101,16 +107,19 @@ public class FichierController {
     }
 
     @GetMapping("/list")
+    @Endpoint("Lister les fichiers avec pagination")
     public Page<Fichier> listPartenaires(Pageable pageable) {
         return fichierService.findAll(pageable);
     }
 
     @DeleteMapping("supprimer/{fichierId}")
+    @Endpoint("Supprimer un fichier")
     public void delete(@PathVariable("fichierId") UUID fichierId) throws FichierNotFoundException, AppException, IOException {
         fichierService.deleteById(fichierId);
     }
 
     @DeleteMapping("supprimerParCustomData/{customData}")
+    @Endpoint("Supprimer un fichier via son customData")
     public void deleteimageByCustomData(@PathVariable("customData") String customData) throws FichierNotFoundException, AppException, IOException {
         fichierService.deleteByCustomData(customData);
     }

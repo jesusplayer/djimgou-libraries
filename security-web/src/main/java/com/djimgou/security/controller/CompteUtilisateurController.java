@@ -6,6 +6,7 @@ package com.djimgou.security.controller;
 
 import com.djimgou.core.exception.ConflitException;
 import com.djimgou.core.exception.NotFoundException;
+import com.djimgou.core.annotations.Endpoint;
 import com.djimgou.security.core.exceptions.*;
 import com.djimgou.security.core.model.Utilisateur;
 import com.djimgou.security.core.model.dto.utilisateur.*;
@@ -51,12 +52,14 @@ public class CompteUtilisateurController {
 
 
     @PutMapping("/profil/modifier")
+    @Endpoint("Modifier un profil utilisateur")
     public Utilisateur update(@RequestBody @Valid final ModifierProfilDto utilisateurDto) throws ConflitException, UnautorizedException, NotFoundException {
         return utilisateurBdService.modifierProfil(utilisateurDto);
     }
 
 
     @PostMapping("/profil/creer")
+    @Endpoint("Créer un profil utilisateur")
     public Utilisateur updateProfil(@RequestBody @Valid final UtilisateurDto utilisateurDto) throws UtilisateurConfiltException, ConflitException, BadConfirmPasswordException, NotFoundException {
         utilisateurDto.setEncodedPasswd(bCryptPasswordEncoder.encode(utilisateurDto.getPasswordConfirm()));
         Utilisateur user = utilisateurBdService.createCompteUtilisateur(utilisateurDto);
@@ -65,11 +68,13 @@ public class CompteUtilisateurController {
     }
 
     @PutMapping("/changerNomUtilisateur")
+    @Endpoint("Changer le nom d'utilisateur")
     public void changeusername(@RequestBody @Valid UserNameChangeDto logininfo) throws NotFoundException, UnautorizedException, ConflitException {
         authenticationService.changeUsername(logininfo);
     }
 
     @PutMapping("/changerMotDePasse")
+    @Endpoint("Changer le mot de passe")
     public void changePassword(@RequestBody @Valid PasswordChangeDto logininfo) throws NotFoundException, BadConfirmPasswordException, UnautorizedException {
         authenticationService.changePassword(logininfo);
     }
@@ -83,6 +88,7 @@ public class CompteUtilisateurController {
 
 
     @PostMapping("/inviter/{utilisateurId}")
+    @Endpoint("Inviter un utilisateur par son Id")
     public void invite(@PathVariable("utilisateurId") final UUID id) throws UtilisateurNotFoundException, UtilisateurConfiltException {
         Utilisateur user = utilisateurBdService.getRepo().
                 findById(id).orElseThrow(UtilisateurNotFoundException::new);
@@ -91,6 +97,7 @@ public class CompteUtilisateurController {
 
 
     @PostMapping("/inviterParEmail/{utilisateurEmail}")
+    @Endpoint("Inviter un utilisateur par son email")
     public void inviteByEmail(@PathVariable("utilisateurEmail") final String utilisateurEmail) throws UtilisateurConfiltException, UtilisateurNotFoundException {
         Utilisateur user = utilisateurBdService.getRepo().
                 findOneByEmail(utilisateurEmail).orElseThrow(UtilisateurNotFoundException::new);
@@ -99,6 +106,7 @@ public class CompteUtilisateurController {
 
 
     @GetMapping("/confirmerInvitation/{token}")
+    @Endpoint("Confirmer l'invitation d'un utilisateur par son token")
     public void confirmInvitaion(@PathVariable("token") final String token, @RequestParam(value = "password", required = false) String password) throws BadInvitationLinkException, NotFoundException {
         String encPassword = null;
         if(has(password)){

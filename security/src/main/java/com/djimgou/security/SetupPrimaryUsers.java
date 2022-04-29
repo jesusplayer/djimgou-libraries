@@ -2,15 +2,25 @@ package com.djimgou.security;
 
 import com.djimgou.security.core.AppSecurityConfig;
 import com.djimgou.security.core.model.*;
+import com.djimgou.security.core.model.dto.role.IdDto;
+import com.djimgou.security.core.model.dto.utilisateur.ModifierProfilDto;
+import com.djimgou.security.core.model.dto.utilisateur.UtilisateurDto;
+import com.djimgou.security.core.model.dto.utilisateur.UtilisateurFilterDto;
+import com.djimgou.security.core.model.dto.utilisateur.UtilisateurFindDto;
 import com.djimgou.security.core.repo.ConfirmationTokenRepo;
 import com.djimgou.security.core.repo.PrivilegeRepo;
 import com.djimgou.security.core.repo.RoleRepo;
 import com.djimgou.security.core.repo.UtilisateurRepo;
 import com.djimgou.core.util.AppUtils;
+import com.djimgou.security.core.service.UtilisateurBdServiceBase;
+import com.djimgou.security.enpoints.EndPointsRegistry;
+import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.SetUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,6 +31,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static com.djimgou.core.util.AppUtils.has;
 
@@ -32,7 +43,7 @@ import static com.djimgou.core.util.AppUtils.has;
 @Log4j2
 @Component
 class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
-
+    public static final String APP_UTILISATEUR_SERVICE = "appUtilisateurService";
     boolean alreadySetup = false;
 
     @Value("${auth.defaultPrivilegesCreation:}")
@@ -59,7 +70,45 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    @Autowired
+    EndPointsRegistry endPointsRegistry;
+
+    @Autowired
+    UtilisateurBdServiceBase<Utilisateur, UtilisateurFindDto, UtilisateurFilterDto, UtilisateurDto, ModifierProfilDto> utilisateurBdService;
+
+    @Qualifier(APP_UTILISATEUR_SERVICE)
+    @Autowired(required = false)
+    UtilisateurBdServiceBase<? extends Utilisateur, UtilisateurFindDto, UtilisateurFilterDto, UtilisateurDto, ModifierProfilDto> customBdService;
+
+    @Autowired
+    ApplicationContext appContext;
+
+    public UtilisateurBdServiceBase<Utilisateur, UtilisateurFindDto, UtilisateurFilterDto, UtilisateurDto, ModifierProfilDto>
+    getService() {
+        if (appContext.containsBean(APP_UTILISATEUR_SERVICE) && !has(customBdService)) {
+            customBdService = appContext.getBean(APP_UTILISATEUR_SERVICE, UtilisateurBdServiceBase.class);
+        }
+        return AppUtils.has(customBdService) ? (UtilisateurBdServiceBase<Utilisateur, UtilisateurFindDto, UtilisateurFilterDto, UtilisateurDto, ModifierProfilDto>) customBdService : utilisateurBdService;
+    }
+
     @Transactional
+    public void initDefaultPriv2() {
+        endPointsRegistry.endPoints().stream().map(endPoint -> {
+            Privilege fullAccess = new Privilege();
+            fullAccess.setCode(endPoint.getName());
+            fullAccess.setName(endPoint.getName());
+            fullAccess.setUrl(endPoint.toSecurityUrl());
+            fullAccess.setDescription(endPoint.getDescription());
+            return fullAccess;
+        }).forEach(this::createPrivilegeIfNotFound);
+        Privilege fullAccess = new Privilege();
+        fullAccess.setCode(PrivileEvaluator.FULL_ACCESS);
+        fullAccess.setName("Avoir tous les droits");
+        fullAccess.setDescription("Privilège qui permet d'avoir tous les droits dans l'application");
+        createPrivilegeIfNotFound(fullAccess);
+    }
+
+   /* @Transactional
     public void initDefaultPriv() {
         // pour filter
         Function<Class, Predicate<Class>> filterFn = (target) -> (c) -> {
@@ -90,11 +139,6 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
             //pev.delete.setParent(parent);
             Privilege dl = createPrivilegeIfNotFound(pev.delete);
 
-
-
-            //parent.setEnfants(SetUtils.hashSet(rd, cr, up, dl/*, vl*/));
-            //privilegeRepository.save(parent);
-
         });
 
         Privilege fullAccess = new Privilege();
@@ -102,20 +146,14 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
         fullAccess.setName("Avoir tous les droits");
         fullAccess.setDescription("Privilège qui permet d'avoir tous les droits dans l'application");
         createPrivilegeIfNotFound(fullAccess);
-        /*
-        String packageName = DeviseListMB.class.getPackage().getName();
-        String packageSecName = UtilisateurFormMB.class.getPackage().getName();
-        // recuperation des modules de liste
 
-        entitesList.addAll(appUtils.getClasses(packageName, Named.class, filterFn.apply(AbstractListMB.class)));
-        entitesList.addAll(appUtils.getClasses(packageSecName, Named.class,filterFn.apply(AbstractListMB.class)));*/
+    }*/
 
-        // Création des privillèges action
-    }
 
     @Override
     @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
+
         if (alreadySetup)
             return;
 
@@ -124,7 +162,7 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
             // privilegeRepository.findAll().forEach(p->privilegeRepository.deleteById(p.getId()));
         }
         if (!has(defaultPrivilegesCreation) || (!defaultPrivilegesCreation.equals("disabled") || defaultPrivilegesCreation.isEmpty())) {
-            initDefaultPriv();
+            initDefaultPriv2();
 
             PrivileEvaluator pe = new PrivileEvaluator(Privilege.class);
             Privilege fullPrivilege
@@ -176,26 +214,52 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
         alreadySetup = true;
     }
 
+    @SneakyThrows
     @Transactional
     Utilisateur createUserIfNotFound(String nom, String prenom, String username, String password, Set<Role> authorities, Boolean enabled) {
-        Optional<Utilisateur> opt = userRepository.findByUsername(username);
+        Optional<Utilisateur> opt = getService().getRepo().findByUsername(username);
         Utilisateur user;
         if (opt.isPresent()) {
             user = opt.get();
         } else {
-            user = new Utilisateur();
-            user.setNom(nom);
-            user.setPrenom(prenom);
-            String en = bCryptPasswordEncoder.encode(password);
-            user.setPassword(/*"{bcrypt}"+*/en);
-            user.setUsername(username);
-            user.setEmail(username);
-            user.setAuthorities(authorities);
-            user.setEnabled(enabled);
-            user = userRepository.save(user);
+            UtilisateurDto userDto = new UtilisateurDto();
+
+            userDto.setNom(nom);
+            userDto.setPrenom(prenom);
+            userDto.setUsername(username);
+            userDto.setEmail(username);
+            userDto.setPassword(password);
+            userDto.setPasswordConfirm(password);
+            userDto.setAuthorities(authorities.stream().map(role -> {
+                IdDto is = new IdDto();
+                is.setId(role.getId());
+                return is;
+            }).collect(Collectors.toSet()));
+            userDto.setEncodedPasswd(bCryptPasswordEncoder.encode(password));
+            user = getService().createUtilisateurGeneric(userDto);
+            getService().activer(user.getId());
         }
         return user;
     }
+/*
+
+    @Transactional
+    Utilisateur createUserIfNotFound(Utilisateur utilisateur) {
+        Optional<Utilisateur> opt = userRepository.findByUsername(utilisateur.getUsername());
+        Utilisateur user;
+        if (opt.isPresent()) {
+            user = opt.get();
+        } else {
+            String en = bCryptPasswordEncoder.encode(utilisateur.getPassword());
+            utilisateur.setPassword(*/
+/*"{bcrypt}"+*//*
+en);
+            utilisateur.setEnabled(true);
+            user = userRepository.save(utilisateur);
+        }
+        return user;
+    }
+*/
 
     @Transactional
     Privilege createPrivilegeIfNotFound(String name) {
@@ -234,10 +298,21 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
         Optional<Privilege> opt = privilegeRepository.findByCode(priv.getCode());
         Privilege privilege;
         if (opt.isPresent()) {
-            privilege = opt.get();
+            Privilege oldPriv = opt.get();
+            if (!Objects.equals(oldPriv.getDescription(), priv.getDescription())) {
+                oldPriv.setDescription(priv.getDescription());
+                log.info("Modification de l'Url du priv: " + priv.getDescription());
+            }
+            if (!Objects.equals(oldPriv.getUrl(), priv.getUrl())) {
+                oldPriv.setUrl(priv.getUrl());
+                log.info("Modification de la description du priv: " + priv.getUrl());
+            }
+            privilege = oldPriv;
         } else {
             priv.setReadonlyValue(true);
             privilege = privilegeRepository.save(priv);
+            log.info("PrivilegeCréé "+ privilege.getUrl());
+
         }
         return privilege;
     }

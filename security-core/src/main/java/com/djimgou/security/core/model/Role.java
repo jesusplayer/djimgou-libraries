@@ -25,7 +25,7 @@ import static com.djimgou.core.util.AppUtils.has;
 @JsonIgnoreProperties(value = {"enfants", "utilisateurs",/* "privileges",*/ "allRoles"})
 @EntityListeners({EntityListener.class, AuthorityChangeListener.class})
 public class Role extends SecurityBaseEntity {
-
+    public static final String ROLE_READONLY = "ROLE_READONLY";
 
     @Column(name = "name", nullable = false, length = 128)
     private String name;

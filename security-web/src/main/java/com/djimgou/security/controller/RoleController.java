@@ -5,6 +5,7 @@
 package com.djimgou.security.controller;
 
 import com.djimgou.core.exception.NotFoundException;
+import com.djimgou.core.annotations.Endpoint;
 import com.djimgou.security.core.exceptions.RoleNotFoundException;
 import com.djimgou.security.core.model.Role;
 import com.djimgou.security.core.model.dto.role.RoleDto;
@@ -56,61 +57,73 @@ public class RoleController {
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
+
     @PostMapping("/creer")
+    @Endpoint("Créer un rôle")
     public Role create(@RequestBody @Valid RoleDto roleDto) throws NotFoundException {
         return roleService.createRole(roleDto);
     }
 
     @PutMapping("/modifier/{roleId}")
+    @Endpoint("Modifier un rôle")
     public Role update(
             @PathVariable("roleId") final UUID id, @RequestBody @Valid final RoleDto roleDto) throws NotFoundException {
         return roleService.saveRole(id, roleDto);
     }
 
     @PutMapping("/ajouterPrivilege/{roleId}")
+    @Endpoint("Ajouter un privilège pour sur rôle")
     public Role update(
             @PathVariable("roleId") final UUID roleId, @RequestBody() final UUID privilegeId) throws NotFoundException {
         return roleService.addPrivilege(roleId, privilegeId);
     }
 
     @PutMapping("/ajouterPrivileges/{roleId}")
+    @Endpoint("Ajouter plusieurs privilèges sur un rôle")
     public Role update(
             @PathVariable("roleId") final UUID roleId, @RequestBody() final List<UUID> privilegeIds) throws NotFoundException {
         return roleService.addPrivileges(roleId, privilegeIds);
     }
 
     @GetMapping("/detail/{roleId}")
+    @Endpoint("Afficher le détail d'un rôle")
     public Role findById(@PathVariable("roleId") UUID id) throws NotFoundException {
         return roleService.findById(id)
                 .orElseThrow(RoleNotFoundException::new);
     }
 
     @DeleteMapping("supprimer/{roleId}")
+    @Endpoint("supprimer d'un rôle")
     public void delete(@PathVariable("roleId") UUID roleId) throws Exception {
         roleService.deleteById(roleId);
     }
 
     @GetMapping("/")
+    @Endpoint("Lister tous les rôles")
     public Collection<Role> findRoles() {
         return roleService.findAll();
     }
 
     @GetMapping("/list")
+    @Endpoint("Lister les rôles avec pagination")
     public Page<Role> listRoles(Pageable pageable) {
         return roleService.findAll(pageable);
     }
 
     @GetMapping("/filter")
+    @Endpoint("Filtrer les rôles avec pagination")
     public Page<Role> filterRoles(RoleFilterDto roleFilterDto) throws Exception {
         return roleService.findBy(roleFilterDto);
     }
 
     @GetMapping("/search")
+    @Endpoint("Recherche sur les rôles")
     public List<Role> searchRoles(RoleFindDto roleFindDto) throws Exception {
         return roleService.search(roleFindDto).hits();
     }
 
     @GetMapping("/find")
+    @Endpoint("Recherche sur les rôles avec pagination")
     public Page<Role> findRoles(RoleFindDto roleFindDto) throws Exception {
         return roleService.searchPageable2(roleFindDto);
     }

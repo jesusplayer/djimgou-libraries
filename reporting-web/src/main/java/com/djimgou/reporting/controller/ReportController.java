@@ -1,5 +1,6 @@
 package com.djimgou.reporting.controller;
 
+import com.djimgou.core.annotations.Endpoint;
 import com.djimgou.core.exception.AppException;
 import com.djimgou.core.exception.BadRequestException;
 import com.djimgou.core.exception.NotFoundException;
@@ -38,17 +39,20 @@ public class ReportController {
     private ReportService reportService;
 
     @PostMapping(value = "/uploadJasperFile", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @Endpoint("Créer un nouveau report à partir de son fichier .Jasper")
     public Report uploadFile(@RequestPart("fichier") @NotNull MultipartFile file/*, @RequestParam("dossier") String dossier, @RequestParam("nomFichier") String nomFichier*/) throws Exception {
         Report fichier = new Report(Report.FOLDER, file.getOriginalFilename(), file.getContentType());
         return reportService.save(file, fichier);
     }
 
     @PostMapping(value = "/modifierUploadJasperFile/{reportId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @Endpoint("Modifier un fichier .Jasper d'un report existant")
     public Report editUploadFile(@RequestPart("fichier") @NotNull MultipartFile file, @PathVariable("reportId") UUID reportId/*, @RequestParam("dossier") String dossier, @RequestParam("nomFichier") String nomFichier*/) throws Exception {
         return reportService.update(file, reportId);
     }
 
     @PostMapping(value = "/uploadJasperJRXML", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @Endpoint("Créer un nouveau report à partir de son fichier JRXML")
     public Report uploadMultipleFiles(@RequestPart("fichiers") @NotEmpty @NotNull MultipartFile[] files) throws BadRequestException, FichierInvalidNameException, AppException {
         Report fichier = new Report(
                 Report.FOLDER, files[0].getOriginalFilename(), files[0].getContentType());
@@ -56,28 +60,33 @@ public class ReportController {
     }
 
     @DeleteMapping("supprimer/{reportId}")
+    @Endpoint("Supprimer un report")
     public void delete(@PathVariable("reportId") UUID fichierId) throws FichierNotFoundException, AppException, IOException {
         reportService.deleteWithId(fichierId);
     }
 
     @PostMapping("/creer")
+    @Endpoint("créer un report vide")
     public Report create(@RequestBody @Valid ReportDto clientDto) throws NotFoundException {
         return reportService.createReportTemplate(clientDto);
     }
 
     @PutMapping("/modifier/{reportId}")
+    @Endpoint("Modifier un report")
     public Report update(
             @PathVariable("reportId") final UUID reportId, @RequestBody @Valid final ReportDto reportDto) throws NotFoundException {
         return reportService.saveReportTemplate(reportId, reportDto);
     }
 
     @GetMapping("/detail/{reportId}")
+    @Endpoint("Afficher le détail d'un report")
     public Report findById(@PathVariable("reportId") UUID reportId) throws FichierNotFoundException {
         return reportService.getRepo().findById(reportId)
                 .orElseThrow(FichierNotFoundException::new);
     }
 
     @GetMapping("/genererHtml/{reportId}")
+    @Endpoint("Générer le contenu HTML d'un report")
     public ResponseEntity<String> genererHtml(@PathVariable("reportId") UUID reportId,
                                               HttpServletRequest request) throws NotFoundException, IOException {
         Resource resource = reportService.getHtml(reportId, getParameters(request));
@@ -91,6 +100,7 @@ public class ReportController {
     }
 
     @GetMapping("/genererPdf/{reportId}")
+    @Endpoint("Générer le fichier PDF d'un report")
     public ResponseEntity<Resource> genererPdf(@PathVariable("reportId") UUID reportId,
                                                HttpServletRequest request) throws IOException, NotFoundException {
 
@@ -107,6 +117,7 @@ public class ReportController {
     }
 
     @GetMapping("/genererXlsx/{reportId}")
+    @Endpoint("Générer le fichier EXCEL d'un report")
     public ResponseEntity<Resource> genererXlsx(@PathVariable("reportId") UUID reportId,
                                                 HttpServletRequest request) throws NotFoundException, IOException {
         // Try to determine file's content type
@@ -114,6 +125,7 @@ public class ReportController {
     }
 
     @GetMapping("/genererDocx/{reportId}")
+    @Endpoint("Générer le fichier WORD DOCX d'un report")
     public ResponseEntity<Resource> genererDocx(@PathVariable("reportId") UUID reportId,
                                                 HttpServletRequest request) throws NotFoundException, IOException {
         // Try to determine file's content type
@@ -121,21 +133,25 @@ public class ReportController {
     }
 
     @GetMapping("/")
+    @Endpoint("Lister tous les reports")
     public Collection<Report> findReportTemplates() {
         return reportService.findAll();
     }
 
     @GetMapping("/list")
+    @Endpoint("Lister les reports avec pagination")
     public Page<Report> listReportTemplates(@Valid Pageable pageable) {
         return reportService.findAll(pageable);
     }
 
     @GetMapping("/filter")
+    @Endpoint("Filtrer les reports avec pagination")
     public Page<Report> filterReportTemplates(@Valid ReportFilterDto reportFilterDto) throws Exception {
         return reportService.findBy(reportFilterDto);
     }
 
     @GetMapping("/search")
+    @Endpoint("Recherche sur les reports")
     public List<Report> searchReportTemplates(@Valid ReportFindDto reportFindDto) throws Exception {
         return reportService.search(reportFindDto).hits();
     }
