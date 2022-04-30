@@ -36,6 +36,8 @@ public interface UtilisateurBdServiceBase<U extends Utilisateur, D extends Utili
 
     Page<U> findBy(F filter) throws Exception;
 
+    Optional<U> findByUsername(String username);
+
     void checkDuplicate(UUID id, M dto) throws ConflitException;
 
     U addTenant(UUID utilisateurId, UUID tenantId) throws UtilisateurNotFoundException, TenantNotFoundException;

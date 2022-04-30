@@ -17,6 +17,7 @@ import com.djimgou.security.enpoints.EndPointsRegistry;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.SetUtils;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.ParameterizedType;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -217,8 +219,8 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
     @SneakyThrows
     @Transactional
     Utilisateur createUserIfNotFound(String nom, String prenom, String username, String password, Set<Role> authorities, Boolean enabled) {
-        Optional<Utilisateur> opt = getService().getRepo().findByUsername(username);
-        Utilisateur user;
+        Optional<Utilisateur> opt = getService().findByUsername(username);
+        Utilisateur user = null;
         if (opt.isPresent()) {
             user = opt.get();
         } else {
@@ -235,9 +237,13 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
                 is.setId(role.getId());
                 return is;
             }).collect(Collectors.toSet()));
-            userDto.setEncodedPasswd(bCryptPasswordEncoder.encode(password));
-            user = getService().createUtilisateurGeneric(userDto);
-            getService().activer(user.getId());
+            try {
+                userDto.setEncodedPasswd(bCryptPasswordEncoder.encode(password));
+                user = getService().createUtilisateurGeneric(userDto);
+                getService().activer(user.getId());
+            } catch (DataIntegrityViolationException | ConstraintViolationException e) {
+
+            }
         }
         return user;
     }
@@ -313,7 +319,7 @@ en);
             try {
                 privilege = privilegeRepository.save(priv);
                 log.info("PrivilegeCréé " + privilege.getUrl());
-            } catch (DataIntegrityViolationException e) {
+            } catch (DataIntegrityViolationException | ConstraintViolationException e) {
 
             }
 

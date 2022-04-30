@@ -349,6 +349,11 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
     }
 
     @Override
+    public Optional<Utilisateur> findByUsername(String username) {
+        return repo.findByUsername(username);
+    }
+
+    @Override
     public UtilisateurBaseRepo<Utilisateur, UUID> getRepo() {
         return has(customRepo) ? customRepo : repo;
     }
