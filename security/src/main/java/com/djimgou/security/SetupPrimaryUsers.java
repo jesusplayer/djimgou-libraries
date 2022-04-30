@@ -153,7 +153,7 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
 
 
     @Override
-    @Transactional
+    //@Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
 
         if (alreadySetup)
