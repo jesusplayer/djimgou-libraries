@@ -153,7 +153,7 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
 
 
     @Override
-    //@Transactional
+    @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
 
         if (alreadySetup)
@@ -220,9 +220,15 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
     @Transactional
     Utilisateur createUserIfNotFound(String nom, String prenom, String username, String password, Set<Role> authorities, Boolean enabled) {
         Optional<Utilisateur> opt = getService().findByUsername(username);
+        Optional<Utilisateur> opt2 = userRepository.findByUsername(username);
         Utilisateur user = null;
-        if (opt.isPresent()) {
-            user = opt.get();
+        if (opt.isPresent() || opt2.isPresent()) {
+            if (opt.isPresent()) {
+                user = opt.get();
+            }
+            if (opt2.isPresent()) {
+                user = opt2.get();
+            }
         } else {
             UtilisateurDto userDto = new UtilisateurDto();
 
