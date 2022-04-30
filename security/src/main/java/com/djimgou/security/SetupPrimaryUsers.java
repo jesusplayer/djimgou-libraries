@@ -1,5 +1,6 @@
 package com.djimgou.security;
 
+import com.djimgou.core.util.AppUtils;
 import com.djimgou.security.core.AppSecurityConfig;
 import com.djimgou.security.core.model.*;
 import com.djimgou.security.core.model.dto.role.IdDto;
@@ -11,7 +12,6 @@ import com.djimgou.security.core.repo.ConfirmationTokenRepo;
 import com.djimgou.security.core.repo.PrivilegeRepo;
 import com.djimgou.security.core.repo.RoleRepo;
 import com.djimgou.security.core.repo.UtilisateurRepo;
-import com.djimgou.core.util.AppUtils;
 import com.djimgou.security.core.service.UtilisateurBdServiceBase;
 import com.djimgou.security.enpoints.EndPointsRegistry;
 import lombok.SneakyThrows;
@@ -29,11 +29,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.ParameterizedType;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.djimgou.core.util.AppUtils.has;
@@ -223,10 +221,12 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
         Optional<Utilisateur> opt2 = userRepository.findByUsername(username);
         Utilisateur user = null;
         if (opt.isPresent() || opt2.isPresent()) {
+
             if (opt.isPresent()) {
                 user = opt.get();
             }
             if (opt2.isPresent()) {
+                log.info("Utilisateur déjà existant mais plutot dans le discriminateur Utilisateur." + username);
                 user = opt2.get();
             }
         } else {

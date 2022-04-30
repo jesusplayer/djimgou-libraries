@@ -92,6 +92,7 @@ public class TenantService {
      * @return
      * @throws Exception
      */
+    @Transactional
     public Page<Tenant> findBy(TenantFilterDto filter) throws Exception {
         CustomPageable cpg = new CustomPageable(filter);
         if (cpg.getSort().isUnsorted()) {
@@ -126,6 +127,7 @@ public class TenantService {
         }
         return page;
     }
+    @Transactional
     public SearchResult<Tenant> search(TenantFindDto findDto) {
         String[] fieldsSplit;
         final Class filterDtoClass = TenantFilterDto.class;
@@ -165,14 +167,17 @@ public class TenantService {
         repo.deleteById(tenantId);
     }
 
+    @Transactional
     public List<Tenant> findAll() {
         return repo.findAll();
     }
 
+    @Transactional
     public Page<Tenant> findAll(Pageable pageable) {
         return repo.findAll(pageable);
     }
 
+    @Transactional
     public Page<Tenant> searchPageable(TenantFindDto findDto) {
         // long totalHitCount = result.total().hitCount();
         if (!has(findDto.getSearchKeys())) {

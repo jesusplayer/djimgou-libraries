@@ -88,6 +88,7 @@ public class FichierService {
         return repo.findById(uuid).orElseThrow(FichierNotFoundException::new);
     }
 
+    @Transactional
     public Page<Fichier> findAll(Pageable pageable) {
         return repo.findAll(pageable);
     }

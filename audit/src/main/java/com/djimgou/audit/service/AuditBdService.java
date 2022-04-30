@@ -51,7 +51,7 @@ public class AuditBdService extends AbstractDomainService<Audit, AuditFindDto, A
         this.repo = repo;
     }
 
-
+    @Transactional
     @Override
     public Page<Audit> findBy(AuditFilterDto baseFilter) throws Exception {
         CustomPageable cpg = new CustomPageable(baseFilter);

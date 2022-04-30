@@ -61,6 +61,7 @@ public class PaysService extends AbstractDomainService<Pays, PaysFindDto, PaysFi
         return savePays(null, paysDto);
     }
 
+    @Transactional
     @Override
     public Page<Pays> searchPageable(PaysFindDto findDto) {
         if (!has(findDto.getSearchKeys())) {
@@ -69,6 +70,7 @@ public class PaysService extends AbstractDomainService<Pays, PaysFindDto, PaysFi
         return super.searchPageable(findDto);
     }
 
+    @Transactional
     public Page<Pays> findBy(PaysFilterDto baseFilter) throws Exception {
         CustomPageable cpg = new CustomPageable(baseFilter);
         if (cpg.getSort().isUnsorted()) {

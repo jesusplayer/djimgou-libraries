@@ -50,6 +50,7 @@ public class RoleService extends AbstractSecurityBdService<Role, RoleFindDto, Ro
         this.privilegeRepo = privilegeRepo;
     }
 
+    @Transactional
     @Override
     public Page<Role> findBy(RoleFilterDto baseFilter) throws Exception {
         CustomPageable cpg = new CustomPageable(baseFilter);

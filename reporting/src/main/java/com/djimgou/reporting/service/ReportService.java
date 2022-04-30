@@ -169,6 +169,7 @@ public class ReportService extends AbstractDomainService<Report, ReportFindDto, 
         return repo.findById(uuid).orElseThrow(FichierNotFoundException::new);
     }
 
+    @Transactional
     public Page<Report> findAll(Pageable pageable) {
         return repo.findAll(pageable);
     }
@@ -232,6 +233,7 @@ public class ReportService extends AbstractDomainService<Report, ReportFindDto, 
         return Optional.empty();
     }
 
+    @Transactional
     public Page<Report> findBy(ReportFilterDto baseFilter) throws Exception {
         CustomPageable cpg = new CustomPageable(baseFilter);
         if (cpg.getSort().isUnsorted()) {

@@ -82,6 +82,7 @@ public class PrivilegeService extends AbstractSecurityBdService<Privilege, Privi
         return page;
     }
 
+    @Transactional
     @Override
     public Page<Privilege> findBy(PrivilegeFilterDto baseFilter) throws Exception {
         CustomPageable cpg = new CustomPageable(baseFilter);

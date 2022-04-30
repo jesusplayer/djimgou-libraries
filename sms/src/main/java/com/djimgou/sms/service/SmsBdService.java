@@ -68,6 +68,7 @@ public class SmsBdService extends AbstractDomainService<Sms, SmsFindDto, SmsFilt
      * @return
      * @throws Exception
      */
+    @Transactional
     public Page<Sms> findBy(SmsFilterDto baseFilter) throws Exception {
         CustomPageable cpg = new CustomPageable(baseFilter);
         if (cpg.getSort().isUnsorted()) {
