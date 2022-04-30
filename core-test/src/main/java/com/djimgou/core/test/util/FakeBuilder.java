@@ -13,7 +13,6 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 import static org.joda.time.DateTime.now;
-import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 public class FakeBuilder {
     public static Faker faker = new Faker(new Locale("fr"));

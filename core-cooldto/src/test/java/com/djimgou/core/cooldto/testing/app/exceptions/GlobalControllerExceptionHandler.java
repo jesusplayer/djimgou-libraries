@@ -1,7 +1,6 @@
 package com.djimgou.core.cooldto.testing.app.exceptions;
 
 import com.djimgou.core.cooldto.exception.DtoChildFieldNotFound;
-
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

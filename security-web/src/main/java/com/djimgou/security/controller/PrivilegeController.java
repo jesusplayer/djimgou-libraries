@@ -5,8 +5,8 @@
 package com.djimgou.security.controller;
 
 
-import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.core.annotations.Endpoint;
+import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.security.core.exceptions.PrivilegeNotFoundException;
 import com.djimgou.security.core.exceptions.ReadOnlyException;
 import com.djimgou.security.core.model.Privilege;

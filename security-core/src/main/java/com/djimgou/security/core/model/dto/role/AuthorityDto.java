@@ -1,6 +1,8 @@
 package com.djimgou.security.core.model.dto.role;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 
 @Getter

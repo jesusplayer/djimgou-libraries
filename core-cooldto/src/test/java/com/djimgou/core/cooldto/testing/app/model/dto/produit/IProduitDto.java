@@ -5,10 +5,10 @@
 package com.djimgou.core.cooldto.testing.app.model.dto.produit;
 
 import com.djimgou.core.cooldto.annotations.DtoFkId;
+import com.djimgou.core.cooldto.model.IEntityDto;
 import com.djimgou.core.cooldto.testing.app.model.Reduction;
 import com.djimgou.core.cooldto.testing.app.model.enums.TypeDeBoite;
 import com.djimgou.core.cooldto.testing.app.model.enums.TypeEnergie;
-import com.djimgou.core.cooldto.model.IEntityDto;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -4,10 +4,10 @@
  */
 package com.djimgou.security.controller;
 
+import com.djimgou.core.annotations.Endpoint;
 import com.djimgou.core.exception.ConflitException;
 import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.core.util.AppUtils;
-import com.djimgou.core.annotations.Endpoint;
 import com.djimgou.security.core.exceptions.BadConfirmPasswordException;
 import com.djimgou.security.core.exceptions.UtilisateurNotFoundException;
 import com.djimgou.security.core.model.Utilisateur;
@@ -15,8 +15,8 @@ import com.djimgou.security.core.model.dto.utilisateur.ModifierProfilDto;
 import com.djimgou.security.core.model.dto.utilisateur.UtilisateurDto;
 import com.djimgou.security.core.model.dto.utilisateur.UtilisateurFilterDto;
 import com.djimgou.security.core.model.dto.utilisateur.UtilisateurFindDto;
-import com.djimgou.tenantmanager.exceptions.TenantNotFoundException;
 import com.djimgou.security.core.service.*;
+import com.djimgou.tenantmanager.exceptions.TenantNotFoundException;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;

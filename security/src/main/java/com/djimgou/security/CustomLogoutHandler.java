@@ -1,9 +1,9 @@
 package com.djimgou.security;
 
-import com.djimgou.session.enums.SessionKeys;
 import com.djimgou.security.core.UtilisateurDetails;
 import com.djimgou.security.core.service.SecuritySessionService;
 import com.djimgou.session.context.SessionContext;
+import com.djimgou.session.enums.SessionKeys;
 import com.djimgou.tenantmanager.aop.TenantContext;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

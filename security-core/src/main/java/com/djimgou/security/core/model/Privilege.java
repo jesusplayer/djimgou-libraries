@@ -1,8 +1,8 @@
 package com.djimgou.security.core.model;
 
 import com.djimgou.audit.model.EntityListener;
-import com.djimgou.security.core.model.dto.role.AuthorityDto;
 import com.djimgou.core.util.AppUtils;
+import com.djimgou.security.core.model.dto.role.AuthorityDto;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
@@ -13,8 +13,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static com.djimgou.core.util.AppUtils.has;
 
 /**
  * @author DJIMGOU NKENNE DANY MARC 08/2020

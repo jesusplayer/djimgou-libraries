@@ -2,14 +2,15 @@ package com.djimgou.security;
 
 
 import com.djimgou.audit.model.AuditAction;
+import com.djimgou.audit.service.AuditBdService;
+import com.djimgou.core.util.AppUtils;
 import com.djimgou.security.core.UtilisateurDetails;
 import com.djimgou.security.core.model.Utilisateur;
 import com.djimgou.security.core.model.dto.utilisateur.UtilisateurSessionDto;
-import com.djimgou.security.core.service.SecuritySessionService;
-import com.djimgou.session.enums.SessionKeys;
 import com.djimgou.security.core.service.MyVoter;
-import com.djimgou.core.util.AppUtils;
+import com.djimgou.security.core.service.SecuritySessionService;
 import com.djimgou.session.context.SessionContext;
+import com.djimgou.session.enums.SessionKeys;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -19,7 +20,6 @@ import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import com.djimgou.audit.service.AuditBdService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -27,8 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-
-import static com.djimgou.core.util.AppUtils.has;
 
 /**
  * @author DJIMGOU NKENNE DANY MARC 08/2020

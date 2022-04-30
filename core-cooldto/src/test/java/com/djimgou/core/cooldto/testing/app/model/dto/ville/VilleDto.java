@@ -2,8 +2,8 @@ package com.djimgou.core.cooldto.testing.app.model.dto.ville;
 
 import com.djimgou.core.cooldto.annotations.Dto;
 import com.djimgou.core.cooldto.annotations.DtoFkId;
-import com.djimgou.core.cooldto.testing.app.model.Ville;
 import com.djimgou.core.cooldto.model.IEntityDto;
+import com.djimgou.core.cooldto.testing.app.model.Ville;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;

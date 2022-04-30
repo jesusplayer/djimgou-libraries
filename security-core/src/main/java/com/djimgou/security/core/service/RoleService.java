@@ -1,5 +1,7 @@
 package com.djimgou.security.core.service;
 
+import com.djimgou.core.exception.NotFoundException;
+import com.djimgou.core.infra.CustomPageable;
 import com.djimgou.security.core.exceptions.PrivilegeNotFoundException;
 import com.djimgou.security.core.exceptions.RoleNotFoundException;
 import com.djimgou.security.core.model.Privilege;
@@ -9,8 +11,6 @@ import com.djimgou.security.core.model.dto.role.RoleDto;
 import com.djimgou.security.core.model.dto.role.RoleFilterDto;
 import com.djimgou.security.core.model.dto.role.RoleFindDto;
 import com.djimgou.security.core.repo.PrivilegeRepo;
-import com.djimgou.core.infra.CustomPageable;
-import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.security.core.repo.RoleRepo;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAQueryBase;

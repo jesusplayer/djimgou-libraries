@@ -1,9 +1,9 @@
 package com.djimgou.core.cooldto.processors;
 
+import com.djimgou.core.cooldto.annotations.DtoEntityField;
 import com.djimgou.core.cooldto.exception.DtoBadPropertyTypeException;
 import com.djimgou.core.cooldto.exception.DtoMappingException;
 import com.djimgou.core.cooldto.exception.DtoTargetEntityNotFound;
-import com.djimgou.core.cooldto.annotations.DtoEntityField;
 import com.djimgou.core.util.EntityRepository;
 import lombok.AccessLevel;
 import lombok.Getter;

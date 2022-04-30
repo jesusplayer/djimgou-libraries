@@ -19,7 +19,6 @@ import org.springframework.security.web.FilterInvocation;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-
 import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.stream.Collectors;

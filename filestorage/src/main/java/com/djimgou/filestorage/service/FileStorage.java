@@ -6,12 +6,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-
-import static com.djimgou.core.util.AppUtils.has;
 
 
 public interface FileStorage {

@@ -2,8 +2,6 @@ package com.djimgou.core.cooldto.exception;
 
 import java.lang.reflect.Field;
 
-import static com.djimgou.core.util.AppUtils.has;
-
 public class DtoBadPropertyValueException extends DtoMappingException {
     public DtoBadPropertyValueException(String message) {
         super(message);

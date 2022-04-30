@@ -3,7 +3,6 @@ package com.djimgou.security.core.tracking.authentication.security.service;
 import com.djimgou.security.core.model.dto.role.AuthorityDto;
 import com.djimgou.security.core.tracking.authentication.security.CacheEventMessage;
 import lombok.extern.log4j.Log4j2;
-
 import org.springframework.context.ApplicationListener;
 
 import java.util.List;

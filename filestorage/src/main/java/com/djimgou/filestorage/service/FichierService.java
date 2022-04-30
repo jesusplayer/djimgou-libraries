@@ -18,8 +18,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
-import static com.djimgou.core.util.AppUtils.has;
-
 /**
  * @author DJIMGOU NKENNNE
  * Manipule les fichiers quels que soit le provider: local ou Amzo

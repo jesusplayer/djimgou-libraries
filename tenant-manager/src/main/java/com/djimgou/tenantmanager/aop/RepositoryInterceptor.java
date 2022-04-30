@@ -1,9 +1,9 @@
 package com.djimgou.tenantmanager.aop;
 
+import com.djimgou.session.enums.SessionKeys;
 import com.djimgou.session.service.SessionService;
 import com.djimgou.tenantmanager.exceptions.TenantSessionNotFoundException;
 import com.djimgou.tenantmanager.model.Tenant;
-import com.djimgou.session.enums.SessionKeys;
 import com.djimgou.tenantmanager.repository.TenantRepo;
 import com.djimgou.tenantmanager.service.TenantSessionService;
 import lombok.extern.log4j.Log4j2;

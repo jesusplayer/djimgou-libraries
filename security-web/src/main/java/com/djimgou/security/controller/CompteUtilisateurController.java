@@ -4,9 +4,9 @@
  */
 package com.djimgou.security.controller;
 
+import com.djimgou.core.annotations.Endpoint;
 import com.djimgou.core.exception.ConflitException;
 import com.djimgou.core.exception.NotFoundException;
-import com.djimgou.core.annotations.Endpoint;
 import com.djimgou.security.core.exceptions.*;
 import com.djimgou.security.core.model.Utilisateur;
 import com.djimgou.security.core.model.dto.utilisateur.*;

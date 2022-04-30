@@ -1,8 +1,8 @@
 package com.djimgou.session.service;
 
+import javax.servlet.http.HttpSession;
 import java.util.Optional;
 import java.util.UUID;
-import javax.servlet.http.HttpSession;
 
 /**
  * Interface com.djimgou.audit.service.SessionService,

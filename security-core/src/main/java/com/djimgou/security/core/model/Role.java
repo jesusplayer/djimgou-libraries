@@ -1,15 +1,17 @@
 package com.djimgou.security.core.model;
 
 import com.djimgou.audit.model.EntityListener;
+import com.djimgou.core.util.AppUtils;
 import com.djimgou.security.core.listeners.AuthorityChangeListener;
 import com.djimgou.security.core.model.dto.role.AuthorityDto;
-import com.djimgou.core.util.AppUtils;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 import static com.djimgou.core.util.AppUtils.has;
 

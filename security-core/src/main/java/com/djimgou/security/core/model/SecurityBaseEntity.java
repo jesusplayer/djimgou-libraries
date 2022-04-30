@@ -4,7 +4,7 @@ import com.djimgou.core.util.model.BaseBdEntity;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.MappedSuperclass;
 
 
 /**

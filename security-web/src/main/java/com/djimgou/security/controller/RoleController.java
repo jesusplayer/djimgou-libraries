@@ -4,8 +4,8 @@
  */
 package com.djimgou.security.controller;
 
-import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.core.annotations.Endpoint;
+import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.security.core.exceptions.RoleNotFoundException;
 import com.djimgou.security.core.model.Role;
 import com.djimgou.security.core.model.dto.role.RoleDto;

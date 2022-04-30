@@ -1,8 +1,8 @@
 package com.djimgou.core.cooldto.processors;
 
+import com.djimgou.core.cooldto.annotations.DtoField;
 import com.djimgou.core.cooldto.exception.DtoMappingException;
 import com.djimgou.core.cooldto.exception.DtoTargetEntityNotFound;
-import com.djimgou.core.cooldto.annotations.DtoField;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;

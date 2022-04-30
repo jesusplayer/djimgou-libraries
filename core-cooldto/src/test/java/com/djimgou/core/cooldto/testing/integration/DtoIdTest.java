@@ -1,13 +1,13 @@
 package com.djimgou.core.cooldto.testing.integration;
 
 import com.djimgou.core.cooldto.annotations.Dto;
+import com.djimgou.core.cooldto.annotations.DtoFieldIdStrategyType;
 import com.djimgou.core.cooldto.annotations.DtoId;
 import com.djimgou.core.cooldto.exception.DtoBadPropertyValueException;
 import com.djimgou.core.cooldto.exception.DtoFieldNotFoundException;
 import com.djimgou.core.cooldto.service.DtoSerializerService;
 import com.djimgou.core.cooldto.testing.app.CoreCoolDtoTestApplication;
 import com.djimgou.core.cooldto.testing.app.model.Marque;
-import com.djimgou.core.cooldto.annotations.DtoFieldIdStrategyType;
 import com.djimgou.core.test.initilizer.GenericDbManager;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -20,9 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-import java.util.*;
-
-import static com.djimgou.core.util.AppUtils.has;
+import java.util.UUID;
 
 
 /**

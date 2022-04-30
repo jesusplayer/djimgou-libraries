@@ -7,7 +7,6 @@ import com.djimgou.tenantmanager.model.Pays;
 import com.djimgou.tenantmanager.model.dto.pays.PaysDto;
 import com.djimgou.tenantmanager.model.dto.pays.PaysFilterDto;
 import com.djimgou.tenantmanager.model.dto.pays.PaysFindDto;
-
 import com.djimgou.tenantmanager.service.PaysService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

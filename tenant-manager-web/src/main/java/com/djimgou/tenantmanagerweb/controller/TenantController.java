@@ -1,6 +1,7 @@
 package com.djimgou.tenantmanagerweb.controller;
 
 import com.djimgou.core.annotations.Endpoint;
+import com.djimgou.session.enums.SessionKeys;
 import com.djimgou.tenantmanager.exceptions.PaysNotFoundException;
 import com.djimgou.tenantmanager.exceptions.TenantNotFoundException;
 import com.djimgou.tenantmanager.exceptions.TenantSessionNotFoundException;
@@ -9,7 +10,6 @@ import com.djimgou.tenantmanager.model.dto.tenant.TenantDto;
 import com.djimgou.tenantmanager.model.dto.tenant.TenantFilterDto;
 import com.djimgou.tenantmanager.model.dto.tenant.TenantFindDto;
 import com.djimgou.tenantmanager.model.dto.tenant.TenantSessionDto;
-import com.djimgou.session.enums.SessionKeys;
 import com.djimgou.tenantmanager.service.TenantService;
 import com.djimgou.tenantmanager.service.TenantSessionService;
 import org.springframework.beans.factory.annotation.Autowired;

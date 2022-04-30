@@ -1,5 +1,8 @@
 package com.djimgou.security.core.service;
 
+import com.djimgou.core.exception.ConflitException;
+import com.djimgou.core.exception.NotFoundException;
+import com.djimgou.core.infra.CustomPageable;
 import com.djimgou.security.core.exceptions.BadConfirmPasswordException;
 import com.djimgou.security.core.exceptions.UnautorizedException;
 import com.djimgou.security.core.exceptions.UtilisateurNotFoundException;
@@ -8,9 +11,6 @@ import com.djimgou.security.core.model.Role;
 import com.djimgou.security.core.model.StatutSecurityWorkflow;
 import com.djimgou.security.core.model.Utilisateur;
 import com.djimgou.security.core.model.dto.utilisateur.*;
-import com.djimgou.core.infra.CustomPageable;
-import com.djimgou.core.exception.ConflitException;
-import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.security.core.repo.RoleRepo;
 import com.djimgou.security.core.repo.UtilisateurBaseRepo;
 import com.djimgou.tenantmanager.exceptions.TenantNotFoundException;

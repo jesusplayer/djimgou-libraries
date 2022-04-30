@@ -4,7 +4,6 @@ import com.djimgou.core.test.initilizer.GenericDbManager;
 import com.djimgou.core.test.util.FakeBuilder;
 import com.djimgou.core.testing.app.MaincoreTestApplication;
 import com.djimgou.core.testing.app.model.Categorie;
-import com.djimgou.core.testing.app.model.CategorieDto;
 import com.djimgou.core.util.EntityRepository;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
@@ -17,10 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.servlet.ServletContext;
-
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;

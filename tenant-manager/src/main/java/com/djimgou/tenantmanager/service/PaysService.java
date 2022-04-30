@@ -1,5 +1,6 @@
 package com.djimgou.tenantmanager.service;
 
+import com.djimgou.core.infra.CustomPageable;
 import com.djimgou.core.service.AbstractDomainService;
 import com.djimgou.tenantmanager.exceptions.PaysNotFoundException;
 import com.djimgou.tenantmanager.model.Pays;
@@ -7,7 +8,6 @@ import com.djimgou.tenantmanager.model.QPays;
 import com.djimgou.tenantmanager.model.dto.pays.PaysDto;
 import com.djimgou.tenantmanager.model.dto.pays.PaysFilterDto;
 import com.djimgou.tenantmanager.model.dto.pays.PaysFindDto;
-import com.djimgou.core.infra.CustomPageable;
 import com.djimgou.tenantmanager.repository.PaysRepo;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAQueryBase;
