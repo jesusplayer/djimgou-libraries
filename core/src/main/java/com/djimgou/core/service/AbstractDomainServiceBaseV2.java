@@ -55,9 +55,13 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
     @Getter
     private BaseJpaRepository<T, ID> repo;
 
-    public AbstractDomainServiceBaseV2(BaseJpaRepository<T, ID> repo) {
+    @Getter
+    private EntityPathBase<T> qEntity;
+
+    public AbstractDomainServiceBaseV2(BaseJpaRepository<T, ID> repo, EntityPathBase<T> qEntity) {
         super(repo);
         this.repo = repo;
+        this.qEntity = qEntity;
     }
 
     /**
@@ -260,19 +264,14 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
     @Override
     public Page<T> findBy(FILTER_DTO filter) throws Exception {
         CustomPageable cpg = new CustomPageable(filter);
-        /*final boolean unsorted = cpg.getSort().isUnsorted();
-        if (unsorted) {
-            final Sort nomSort = Sort.by(Sort.Order.asc("nom"));
-            cpg.setSort(nomSort);
-        }*/
 
         Page<T> page;
-
 
         EntityPathBase<T> qQSommier = getQEntity();
 
         JPAQuery query = new JPAQuery(em);
         JPAQueryBase exp2 = query.from(qQSommier);
+        //LuceneQuery query2 = new LuceneQuery();
         List<BooleanExpression> expressionList = new ArrayList<>();
 
         List<OrderSpecifier> orders = new ArrayList<>();
@@ -340,6 +339,13 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
                     orders.add(orderSpecifier);
                 }
 
+            } else {
+                if (has(ffi)) {
+                    Path fName = Expressions.path(Objects.requireNonNull(ffi).getClass(), p, field.getName());
+                    Expression<Object> constant1 = Expressions.constant(ffi);
+                    BooleanOperation exp = Expressions.predicate(Ops.EQ, fName, constant1);
+                    expressionList.add(exp);
+                }
             }
         }
 
@@ -357,13 +363,5 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
         }
         return page;
     }
-
-    /**
-     * Retourne l'entité généré par QuerySdl de la forme QEntity.entity
-     *
-     * @return
-     */
-    public abstract EntityPathBase<T> getQEntity();
-
 
 }

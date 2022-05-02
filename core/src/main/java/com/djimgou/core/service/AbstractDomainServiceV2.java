@@ -6,6 +6,7 @@ import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.BaseFindDto;
 import com.djimgou.core.repository.BaseJpaRepository;
 import com.djimgou.core.util.model.IUuidBaseEntity;
+import com.querydsl.core.types.dsl.EntityPathBase;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.UUID;
@@ -23,8 +24,8 @@ public abstract class AbstractDomainServiceV2<T extends IUuidBaseEntity, FIND_DT
 
         extends AbstractDomainServiceBaseV2<T, FIND_DTO, FILTER_DTO, DTO, DETAIL_DTO, UUID> {
 
-    public AbstractDomainServiceV2(BaseJpaRepository<T, UUID> repo) {
-        super(repo);
+    public AbstractDomainServiceV2(BaseJpaRepository<T, UUID> repo, EntityPathBase<T> qEntity) {
+        super(repo, qEntity);
     }
 
 }
