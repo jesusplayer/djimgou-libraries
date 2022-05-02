@@ -188,7 +188,7 @@ public class GenericDbManager {
         mapNodeByDto = null;
     }
 
-    public static <T> T get(Class classe) {
+    public static <T> T get(Class<T> classe) {
         return (T) map.get(classe.getName()).getValue();
     }
 

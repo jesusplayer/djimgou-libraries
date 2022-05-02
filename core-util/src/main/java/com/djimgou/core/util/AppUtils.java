@@ -540,10 +540,24 @@ public class AppUtils {
 
     }
 
-    public static int dayDiff(Date startDate, Date endDate) {
-        DateTime start = new DateTime(startDate), end = new DateTime(endDate);
-        org.joda.time.Period p = new org.joda.time.Period(start, end);
-        return p.getDays();
+    public static int dayDiff(Date dateDebut, Date dateFin) {
+        int hour = hourDiff(dateDebut, dateFin);
+        return (int) (hour / 24.0);
+    }
+
+    public static Long getAnnee(Date date) {
+        String yearStr = AppUtils.formatDate(date, "YYYY");
+        return Long.parseLong(yearStr);
+    }
+
+    public static int getJour(Date date) {
+        String yearStr = AppUtils.formatDate(date, "dd");
+        return Integer.parseInt(yearStr);
+    }
+
+    public static int getMois(Date date) {
+        String yearStr = AppUtils.formatDate(date, "MM");
+        return Integer.parseInt(yearStr);
     }
 
     /**
