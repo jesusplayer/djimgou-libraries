@@ -70,4 +70,16 @@ public class FakeBuilder {
         }
     }
 
+    public static void nullAll(Object object) {
+        List<Field> var2 = ReflectionUtils.findFields(object.getClass(), field -> true, ReflectionUtils.HierarchyTraversalMode.TOP_DOWN);
+
+        for (Field m : var2) {
+            if (!(Modifier.isFinal(m.getModifiers()) && Modifier.isStatic(m.getModifiers()))) {
+                final String name = m.getName();
+
+                ReflectionTestUtils.setField(object, name, null);
+            }
+        }
+    }
+
 }

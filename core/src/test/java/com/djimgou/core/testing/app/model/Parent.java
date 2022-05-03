@@ -9,24 +9,13 @@ import lombok.experimental.FieldDefaults;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
 
 @Data
 @QueryEntity
 @Entity
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonIgnoreProperties({"createdDate", "lastModifiedDate", "utilisateur1Id", "utilisateur2Id", "historique"})
-public class Categorie extends BaseBdEntity {
-
-    @Column(unique = true)
-    String code;
-
+public class Parent extends BaseBdEntity {
     @Column(unique = true, nullable = false)
     String nom;
-
-    @Column(unique = true)
-    Integer annee;
-
-    @ManyToOne()
-    Parent parent;
 }

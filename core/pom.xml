@@ -17,12 +17,12 @@
         <groupId>com.djimgou</groupId>
         <version>0.0.3-SNAPSHOT</version>
     </parent>
-  <!--  <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.5.0</version>
-        <relativePath/> &lt;!&ndash; lookup parent from repository &ndash;&gt;
-    </parent>-->
+    <!--  <parent>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-parent</artifactId>
+          <version>2.5.0</version>
+          <relativePath/> &lt;!&ndash; lookup parent from repository &ndash;&gt;
+      </parent>-->
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>core</artifactId>
@@ -82,11 +82,20 @@
             <artifactId>hibernate-search-backend-lucene</artifactId>
             <version>6.0.3.Final</version>
         </dependency>
-
-        <!--<dependency>
+        <!-- https://mvnrepository.com/artifact/com.querydsl/querydsl-hibernate-search -->
+        <dependency>
             <groupId>com.querydsl</groupId>
-            <artifactId>querydsl-lucene6</artifactId>
-        </dependency>-->
+            <artifactId>querydsl-hibernate-search</artifactId>
+            <version>5.0.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.querydsl/querydsl-lucene5 -->
+        <dependency>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-lucene5</artifactId>
+            <version>5.0.0</version>
+        </dependency>
+
         <dependency>
             <groupId>com.lmax</groupId>
             <artifactId>disruptor</artifactId>
@@ -104,6 +113,12 @@
             <version>1.18.10</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-jpa</artifactId>
+            <version>${querydsl.version}</version>
+        </dependency>
 
     </dependencies>
+
 </project>

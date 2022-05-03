@@ -10,9 +10,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public abstract class BasePageableDto  implements IDto {
-    public static final String[] IGNORE = new String[]{
-          "searchText"  ,"page","size","sort"
-    };
 
     int page;
     int size;

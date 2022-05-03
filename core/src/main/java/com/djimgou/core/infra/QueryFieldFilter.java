@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PUBLIC)
 @Data
-public class FieldFilter<T> implements IFieldFilter<T> {
+public class QueryFieldFilter<T> implements IQueryFieldFilter<T> {
     T[] between;
     T eq;
     T ge;
@@ -22,5 +22,5 @@ public class FieldFilter<T> implements IFieldFilter<T> {
     String contains;
     String containsIgnoreCase;
     String like;
-    FieldOrder order;
+    QueryOrder order;
 }

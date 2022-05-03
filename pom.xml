@@ -388,6 +388,18 @@
                             <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>test-process</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/generated-test-sources
+                            </outputDirectory>
+                            <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
+                        </configuration>
+                    </execution>
                 </executions>
                 <dependencies>
                     <dependency>
@@ -447,6 +459,7 @@
                             <includeScope>system</includeScope>
                         </configuration>
                     </execution>
+
                 </executions>
             </plugin>
             <plugin>

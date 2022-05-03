@@ -1,11 +1,11 @@
 package com.djimgou.core.infra;
 
-public enum FieldOrder {
+public enum QueryOrder {
     asc("asc"),
     desc("desc");
     private final String order;
 
-    FieldOrder(String order) {
+    QueryOrder(String order) {
         this.order = order;
     }
 

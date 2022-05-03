@@ -1,11 +1,13 @@
 package com.djimgou.core.service;
 
+import com.djimgou.core.cooldto.annotations.DtoField;
 import com.djimgou.core.cooldto.exception.DtoChildFieldNotFound;
 import com.djimgou.core.cooldto.exception.DtoMappingException;
 import com.djimgou.core.cooldto.model.IEntityDetailDto;
 import com.djimgou.core.cooldto.model.IEntityDto;
 import com.djimgou.core.cooldto.service.DtoSerializerService;
 import com.djimgou.core.exception.NotFoundException;
+import com.djimgou.core.exception.UnknowQueryFilterOperator;
 import com.djimgou.core.infra.*;
 import com.djimgou.core.repository.BaseJpaRepository;
 import com.djimgou.core.util.AppUtils;
@@ -90,6 +92,16 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
      */
     public T create(DTO produitDto) throws NotFoundException, DtoMappingException {
         return save(null, produitDto);
+    }
+
+    @Transactional
+    public Collection<T> createAll(Collection<DTO> produitDto) throws NotFoundException, DtoMappingException {
+        Collection<T> targetCol = new ArrayList<>();
+        for (DTO dto : produitDto) {
+            T res = save(null, dto);
+            targetCol.add(res);
+        }
+        return targetCol;
     }
 
     /**
@@ -261,6 +273,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
         }
     }
 
+    @Transactional
     @Override
     public Page<T> findBy(FILTER_DTO filter) throws Exception {
         CustomPageable cpg = new CustomPageable(filter);
@@ -271,17 +284,39 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
 
         JPAQuery query = new JPAQuery(em);
         JPAQueryBase exp2 = query.from(qQSommier);
-        //LuceneQuery query2 = new LuceneQuery();
+        //LuceneQuery query2 = new LuceneQuery(new IndexSearcher());
         List<BooleanExpression> expressionList = new ArrayList<>();
 
         List<OrderSpecifier> orders = new ArrayList<>();
         List<Field> fiels = getFields(filter.getClass(), field -> true);
         final Class<T> entityClass = getFilterDtoClass(0);
         Path<T> p = Expressions.path(entityClass, entityClass.getSimpleName().toLowerCase());
+
+        processDefaultFilters(filter, expressionList, orders, fiels, p);
+
+        if (filter.hasOtherFilters()) {
+            processCustomFilters(filter, expressionList, p);
+        }
+        BooleanExpression exp = expressionList.stream().reduce(null, (old, newE) -> has(old) ? old.and(newE) : newE);
+
+        final QueryBase exp3 = exp2.where(exp);
+        if (has(orders)) {
+            exp3.orderBy(orders.toArray(new OrderSpecifier[orders.size()]));
+        }
+
+        if (has(exp)) {
+            page = getRepo().findAll(exp, cpg);
+        } else {
+            page = getRepo().findAll(cpg);
+        }
+        return page;
+    }
+
+    private void processDefaultFilters(FILTER_DTO filter, List<BooleanExpression> expressionList, List<OrderSpecifier> orders, List<Field> fiels, Path<T> p) {
         for (Field field : fiels) {
             Object ffi = getField(field.getName(), filter);
-            if (ffi instanceof IFieldFilter) {
-                FieldFilter ff = (FieldFilter) ffi;
+            if (ffi instanceof IQueryFieldFilter) {
+                QueryFieldFilter ff = (QueryFieldFilter) ffi;
 
 
                 if (has(ff.between)) {
@@ -298,8 +333,8 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
                     expressionList.add(exp);
                 }
                 if (has(ff.lt)) {
-                    Path fName = Expressions.path(ff.eq.getClass(), p, field.getName());
-                    Expression<Object> constant1 = Expressions.constant(ff.eq);
+                    Path fName = Expressions.path(ff.lt.getClass(), p, field.getName());
+                    Expression<Object> constant1 = Expressions.constant(ff.lt);
                     BooleanOperation exp = Expressions.predicate(Ops.LT, fName, constant1);
                     expressionList.add(exp);
                 }
@@ -333,6 +368,12 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
                     BooleanOperation exp = Expressions.predicate(Ops.STRING_CONTAINS_IC, fName, constant1);
                     expressionList.add(exp);
                 }
+                if (has(ff.like)) {
+                    Path fName = Expressions.path(ff.like.getClass(), p, field.getName());
+                    Expression<Object> constant1 = Expressions.constant(ff.like);
+                    BooleanOperation exp = Expressions.predicate(Ops.LIKE, fName, constant1);
+                    expressionList.add(exp);
+                }
                 if (has(ff.order)) {
                     Path path = Expressions.path(Object.class, p, field.getName());
                     OrderSpecifier orderSpecifier = new OrderSpecifier(Order.ASC, path);
@@ -340,28 +381,45 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
                 }
 
             } else {
-                if (has(ffi)) {
-                    Path fName = Expressions.path(Objects.requireNonNull(ffi).getClass(), p, field.getName());
+                // Lorsqu'il s'agit d'un filtre avec plusieurs champs qui ne dépendent pas de
+                // IQueryFieldFilter
+                boolean exist = Arrays.stream(BaseFilterDto.IGNORE).anyMatch(s -> s.equals(field.getName()));
+                if (has(ffi) && !exist) {
+                    String name = field.getName();
+                    if (field.isAnnotationPresent(DtoField.class)) {
+                        DtoField an = field.getAnnotation(DtoField.class);
+                        if (an != null && has(an.value())) {
+                            name = an.value()[0];
+                        }
+                    }
+                    Path fName = Expressions.path(Objects.requireNonNull(ffi).getClass(), p, name);
                     Expression<Object> constant1 = Expressions.constant(ffi);
                     BooleanOperation exp = Expressions.predicate(Ops.EQ, fName, constant1);
                     expressionList.add(exp);
                 }
             }
         }
+    }
 
-        BooleanExpression exp = expressionList.stream().reduce(null, (old, newE) -> has(old) ? old.and(newE) : newE);
-
-        final QueryBase exp3 = exp2.where(exp);
-        if (has(orders)) {
-            exp3.orderBy(orders.toArray(new OrderSpecifier[orders.size()]));
+    private void processCustomFilters(FILTER_DTO filterDto, List<BooleanExpression> expressionList, Path<T> p) throws UnknowQueryFilterOperator {
+        for (QueryOperation operation : filterDto.getOtherFilters()) {
+            Path fName = Expressions.path(operation.getValue1().getClass(), p, operation.getKey());
+            Expression<Object> constant1 = null;
+            Expression<Object> constant2 = null;
+            if (has(operation.getValue1())) {
+                constant1 = Expressions.constant(operation.getValue1());
+            }
+            if (has(operation.getValue2())) {
+                constant2 = Expressions.constant(operation.getValue2());
+            }
+            BooleanOperation exp;
+            if (QueryFilterOperator.between.equals(operation.getOperator())) {
+                exp = Expressions.predicate(Ops.BETWEEN, fName, constant1, constant2);
+            } else {
+                exp = Expressions.predicate(operation.ops(), fName, constant1);
+            }
+            expressionList.add(exp);
         }
-
-        if (has(exp)) {
-            page = getRepo().findAll(exp, cpg);
-        } else {
-            page = getRepo().findAll(cpg);
-        }
-        return page;
     }
 
 }

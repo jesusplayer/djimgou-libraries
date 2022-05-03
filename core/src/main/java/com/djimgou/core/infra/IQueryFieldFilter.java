@@ -4,7 +4,7 @@
 
 package com.djimgou.core.infra;
 
-public interface IFieldFilter<T> {
+public interface IQueryFieldFilter<T> {
     T[] getBetween();
 
     T getEq();
