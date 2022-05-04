@@ -3,6 +3,7 @@ package com.djimgou.reporting.service;
 import com.djimgou.core.exception.AppException;
 import com.djimgou.core.exception.BadRequestException;
 import com.djimgou.core.exception.NotFoundException;
+import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.CustomPageable;
 import com.djimgou.core.infra.DeleteAfterReadResource;
 import com.djimgou.core.service.AbstractDomainService;
@@ -215,6 +216,11 @@ public class ReportService extends AbstractDomainService<Report, ReportFindDto, 
             findDto.setSearchKeys(new String[]{"code", "nom"});
         }
         return super.searchPageable(findDto);
+    }
+
+    @Override
+    public Page<Report> advancedFindBy(BaseFilterDto baseFilter) throws Exception {
+        return findBy((ReportFilterDto) baseFilter);
     }
 
     public Optional<Report> findByNom(String nom) {

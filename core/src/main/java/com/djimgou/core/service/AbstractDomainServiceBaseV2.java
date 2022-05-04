@@ -273,9 +273,8 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
         }
     }
 
-    @Transactional
     @Override
-    public Page<T> findBy(BaseFilterDto filter) throws Exception {
+    public Page<T> advancedFindBy(BaseFilterDto filter) throws Exception {
         CustomPageable cpg = new CustomPageable(filter);
 
         Page<T> page;
@@ -296,7 +295,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
 
         if (filter instanceof BaseFilterAdvancedDto) {
             final BaseFilterAdvancedDto advancedDto = (BaseFilterAdvancedDto) filter;
-            if (advancedDto.hasOtherFilters()) {
+            if (advancedDto != null && advancedDto.hasOtherFilters()) {
                 processCustomFilters(advancedDto, expressionList, p);
             }
         }

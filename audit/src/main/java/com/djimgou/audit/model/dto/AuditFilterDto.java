@@ -11,7 +11,6 @@ import java.util.UUID;
 public class AuditFilterDto extends BaseFilterDto {
     AuditAction action;
     String nomEntite;
-    UUID parentId;
     UUID utilisateurId;
     String name;
     String username;

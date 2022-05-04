@@ -4,12 +4,15 @@ import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.BaseFindDto;
 import com.djimgou.core.service.AbstractDomainService;
+import com.djimgou.security.core.model.Role;
 import com.djimgou.security.core.model.SecurityBaseEntity;
+import com.djimgou.security.core.model.dto.role.RoleFilterDto;
 import com.djimgou.session.service.SessionService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -87,6 +90,11 @@ public abstract class AbstractSecurityBdService<T extends SecurityBaseEntity, S 
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    @Override
+    public Page<T> advancedFindBy(BaseFilterDto baseFilter) throws Exception {
+        return findBy((F) baseFilter);
     }
 
 }

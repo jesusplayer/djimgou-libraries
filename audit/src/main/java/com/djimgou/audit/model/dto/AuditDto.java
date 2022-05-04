@@ -13,7 +13,6 @@ import java.util.UUID;
 public class AuditDto implements IEntityDto {
     AuditAction action;
     String nomEntite;
-    UUID parentId;
     UUID utilisateurId;
     String name;
     String username;

@@ -3,11 +3,15 @@ package com.djimgou.audit.service;
 import com.djimgou.audit.model.Audit;
 import com.djimgou.audit.model.AuditAction;
 import com.djimgou.audit.model.QAudit;
+import com.djimgou.audit.model.dto.AuditDetaildto;
+import com.djimgou.audit.model.dto.AuditDto;
 import com.djimgou.audit.model.dto.AuditFilterDto;
 import com.djimgou.audit.model.dto.AuditFindDto;
 import com.djimgou.audit.repository.AuditRepo;
+import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.CustomPageable;
 import com.djimgou.core.service.AbstractDomainService;
+import com.djimgou.core.service.AbstractDomainServiceV2;
 import com.djimgou.core.util.AppUtils;
 import com.djimgou.session.service.SessionService;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -17,6 +21,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAQueryBase;
 import com.querydsl.jpa.impl.JPAQuery;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -37,75 +42,16 @@ import static com.djimgou.core.util.AppUtils.startOfTheDay;
  */
 @Log4j2
 @Service
-public class AuditBdService extends AbstractDomainService<Audit, AuditFindDto, AuditFilterDto> {
-    @PersistenceContext
-    EntityManager em;
+public class AuditBdService extends AbstractDomainServiceV2<Audit, AuditFindDto, AuditFilterDto, AuditDto, AuditDetaildto> {
 
     private SessionService sessionService;
-
+    @Getter
     private AuditRepo repo;
 
     public AuditBdService(AuditRepo repo, SessionService sessionService) {
-        super(repo);
+        super(repo, QAudit.audit);
         this.sessionService = sessionService;
         this.repo = repo;
-    }
-
-    @Transactional
-    @Override
-    public Page<Audit> findBy(AuditFilterDto baseFilter) throws Exception {
-        CustomPageable cpg = new CustomPageable(baseFilter);
-        cpg.setSort(Sort.by(Sort.Order.desc("date")));
-
-        Date dateDebut = baseFilter.getDateDebut();
-        Date dateFin = baseFilter.getDateFin();
-        AuditAction action = baseFilter.getAction();
-        UUID userId = baseFilter.getUtilisateurId();
-        String nomEntite = baseFilter.getNomEntite();
-        String username = baseFilter.getUsername();
-        QAudit audit = QAudit.audit;
-
-        //HibernateQuery<?>  query = new HibernateQuery<>(sessionFactory.getCurrentSession());
-        JPAQuery query = new JPAQuery(em);
-        JPAQueryBase exp2 = query.from(audit);
-                /* .where(audit.nomEntite.containsIgnoreCase(nomEntite))
-         .orderBy(audit.date.asc());*/
-
-
-        List<BooleanExpression> expressionList = new ArrayList<>();
-        if (AppUtils.has(dateDebut)) {
-            expressionList.add(audit.date.goe(startOfTheDay(dateDebut)));
-        }
-        if (AppUtils.has(dateDebut)) {
-            expressionList.add(audit.date.loe(endOfTheDay(dateFin)));
-        }
-        if (AppUtils.has(action)) {
-            expressionList.add(audit.action.eq(action));
-        }
-        if (AppUtils.has(userId)) {
-            expressionList.add(audit.utilisateurId.eq(userId));
-        }
-
-        if (AppUtils.has(nomEntite)) {
-            expressionList.add(audit.nomEntite.eq(nomEntite));
-        }
-
-        if (AppUtils.has(username)) {
-            expressionList.add(audit.username.containsIgnoreCase(username));
-        }
-
-        BooleanExpression exp = expressionList.stream().reduce(null, (old, newE) -> AppUtils.has(old) ? old.and(newE) : newE);
-
-        exp2.where(exp).orderBy(audit.date.asc());
-
-        Page<Audit> page = null;
-        if (AppUtils.has(exp)) {
-            page = repo.findAll(exp, cpg);
-
-        } else {
-            page = repo.findAll(cpg);
-        }
-        return page;
     }
 
     /**

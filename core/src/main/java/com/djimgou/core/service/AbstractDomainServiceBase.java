@@ -116,7 +116,11 @@ public abstract class AbstractDomainServiceBase<T extends IBaseEntity, FIND_DTO 
         return result;
     }
 
-    public abstract Page<T> findBy(BaseFilterDto baseFilter) throws Exception;
+    public abstract Page<T> advancedFindBy(BaseFilterDto baseFilter) throws Exception;
+
+    public Page<T> findBy(F baseFilter) throws Exception {
+        return advancedFindBy(baseFilter);
+    }
 
     public Page<T> searchBy(Filter<T> filter, Pageable pg) throws Exception {
         return Page.empty();

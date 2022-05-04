@@ -6,6 +6,7 @@ package com.djimgou.audit.controller;
 
 import com.djimgou.audit.exceptions.AuditNotFoundException;
 import com.djimgou.audit.model.Audit;
+import com.djimgou.audit.model.dto.AuditFilterAdvDto;
 import com.djimgou.audit.model.dto.AuditFilterDto;
 import com.djimgou.audit.model.dto.AuditFindDto;
 import com.djimgou.audit.service.AuditBdService;
@@ -68,6 +69,12 @@ public class AuditController {
     public Page<Audit> filterAudits(AuditFilterDto auditFilterDto) throws Exception {
         //auditService.findByDto()
         return auditService.findBy(auditFilterDto);
+    }
+
+    @PostMapping("/advancedFilter")
+    @Endpoint(value = "Filtre avancé des audits avec pagination", readOnlyMethod = true)
+    public Page<Audit> filterAdvancedAudits(AuditFilterAdvDto auditFilterDto) throws Exception {
+        return auditService.advancedFindBy(auditFilterDto);
     }
 
     @GetMapping("/search")

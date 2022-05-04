@@ -4,6 +4,7 @@ import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.BaseFindDto;
 import com.djimgou.core.util.model.IUuidBaseEntity;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
@@ -24,5 +25,8 @@ public abstract class AbstractDomainService<T extends IUuidBaseEntity, FIND_DTO 
         super(repo);
     }
 
-
+    @Override
+    public Page<T> advancedFindBy(BaseFilterDto baseFilter) throws Exception {
+        return findBy((F) baseFilter);
+    }
 }

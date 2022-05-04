@@ -2,6 +2,7 @@ package com.djimgou.audit.repository;
 
 import com.djimgou.audit.model.Audit;
 import com.djimgou.audit.model.AuditAction;
+import com.djimgou.core.repository.BaseJpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -15,7 +16,7 @@ import java.util.UUID;
 /**
  * @author DJIMGOU NKENNE DANY MARC 08/2020
  */
-public interface AuditRepo extends JpaRepository<Audit, UUID>, QuerydslPredicateExecutor<Audit> {
+public interface AuditRepo extends BaseJpaRepository<Audit, UUID> {
     @Query("SELECT d FROM Audit d WHERE " +
             "LOWER(d.nomEntite) LIKE LOWER(CONCAT('%',:searchText, '%')) OR " +
             "LOWER(d.action) LIKE LOWER(CONCAT('%',:searchText, '%')) OR " +
