@@ -13,12 +13,5 @@ import static com.djimgou.core.util.AppUtils.has;
 @Getter
 @Setter
 public abstract class BaseFilterDto extends BasePageableDto {
-    public static final String[] IGNORE = new String[]{
-            "searchText", "page", "size", "sort", "otherFilters"
-    };
-    List<QueryOperation> otherFilters;
 
-    public boolean hasOtherFilters() {
-        return has(otherFilters);
-    }
 }

@@ -6,10 +6,7 @@ import com.djimgou.core.infra.QueryOperation;
 import com.djimgou.core.test.initilizer.GenericDbManager;
 import com.djimgou.core.test.util.FakeBuilder;
 import com.djimgou.core.testing.app.MaincoreTestApplication;
-import com.djimgou.core.testing.app.model.Categorie;
-import com.djimgou.core.testing.app.model.CategorieDto;
-import com.djimgou.core.testing.app.model.CategorieFilterDto;
-import com.djimgou.core.testing.app.model.Parent;
+import com.djimgou.core.testing.app.model.*;
 import com.djimgou.core.testing.app.service.CategorieService;
 import com.djimgou.core.util.EntityRepository;
 import lombok.SneakyThrows;
@@ -151,7 +148,7 @@ public class FilterTest {
     @DisplayName("Filter avec custom operations")
     @Test
     public void testFieldEntityLevel3() {
-        CategorieFilterDto sFilterDto = new CategorieFilterDto();
+        CategorieFilterAdvDto sFilterDto = new CategorieFilterAdvDto();
         sFilterDto.setPage(0);
         sFilterDto.setSize(10);
 

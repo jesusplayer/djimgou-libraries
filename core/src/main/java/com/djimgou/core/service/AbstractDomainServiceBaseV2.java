@@ -294,8 +294,8 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
 
         processDefaultFilters(filter, expressionList, orders, fiels, p);
 
-        if (filter.hasOtherFilters()) {
-            processCustomFilters(filter, expressionList, p);
+        if (filter instanceof BaseFilterAdvancedDto) {
+            processCustomFilters((BaseFilterAdvancedDto) filter, expressionList, p);
         }
         BooleanExpression exp = expressionList.stream().reduce(null, (old, newE) -> has(old) ? old.and(newE) : newE);
 
@@ -390,7 +390,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
             } else {
                 // Lorsqu'il s'agit d'un filtre avec plusieurs champs qui ne dépendent pas de
                 // IQueryFieldFilter
-                boolean exist = Arrays.stream(BaseFilterDto.IGNORE).anyMatch(s -> s.equals(field.getName()));
+                boolean exist = Arrays.stream(BaseFilterAdvancedDto.IGNORE).anyMatch(s -> s.equals(field.getName()));
                 if (has(ffi) && !exist) {
 
                     Path fName = Expressions.path(Objects.requireNonNull(ffi).getClass(), p, name);
@@ -402,7 +402,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
         }
     }
 
-    private void processCustomFilters(BaseFilterDto filterDto, List<BooleanExpression> expressionList, Path<T> p) throws UnknowQueryFilterOperator {
+    private void processCustomFilters(BaseFilterAdvancedDto filterDto, List<BooleanExpression> expressionList, Path<T> p) throws UnknowQueryFilterOperator {
         for (QueryOperation operation : filterDto.getOtherFilters()) {
             Path fName = Expressions.path(operation.getValue1().getClass(), p, operation.getKey());
             Expression<Object> constant1 = null;
