@@ -18,6 +18,7 @@ public class QueryOperation {
         put(QueryFilterOperator.le, Ops.LOE);
         put(QueryFilterOperator.gt, Ops.GT);
         put(QueryFilterOperator.between, Ops.BETWEEN);
+        put(QueryFilterOperator.like, Ops.LIKE);
         put(QueryFilterOperator.contains, Ops.STRING_CONTAINS);
         put(QueryFilterOperator.containsIgnoreCase, Ops.STRING_CONTAINS_IC);
     }};
