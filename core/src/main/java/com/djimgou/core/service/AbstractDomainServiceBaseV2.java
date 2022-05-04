@@ -295,7 +295,10 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
         processDefaultFilters(filter, expressionList, orders, fiels, p);
 
         if (filter instanceof BaseFilterAdvancedDto) {
-            processCustomFilters((BaseFilterAdvancedDto) filter, expressionList, p);
+            final BaseFilterAdvancedDto advancedDto = (BaseFilterAdvancedDto) filter;
+            if (advancedDto.hasOtherFilters()) {
+                processCustomFilters(advancedDto, expressionList, p);
+            }
         }
         BooleanExpression exp = expressionList.stream().reduce(null, (old, newE) -> has(old) ? old.and(newE) : newE);
 
