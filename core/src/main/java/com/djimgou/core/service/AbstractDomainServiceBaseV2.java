@@ -275,7 +275,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
 
     @Transactional
     @Override
-    public Page<T> findBy(FILTER_DTO filter) throws Exception {
+    public Page<T> findBy(BaseFilterDto filter) throws Exception {
         CustomPageable cpg = new CustomPageable(filter);
 
         Page<T> page;
@@ -312,70 +312,77 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
         return page;
     }
 
-    private void processDefaultFilters(FILTER_DTO filter, List<BooleanExpression> expressionList, List<OrderSpecifier> orders, List<Field> fiels, Path<T> p) {
+    private void processDefaultFilters(BaseFilterDto filter, List<BooleanExpression> expressionList, List<OrderSpecifier> orders, List<Field> fiels, Path<T> p) {
         for (Field field : fiels) {
+            String name = field.getName();
+            if (field.isAnnotationPresent(DtoField.class)) {
+                DtoField an = field.getAnnotation(DtoField.class);
+                if (an != null && has(an.value())) {
+                    name = an.value()[0];
+                }
+            }
             Object ffi = getField(field.getName(), filter);
             if (ffi instanceof IQueryFieldFilter) {
                 QueryFieldFilter ff = (QueryFieldFilter) ffi;
 
 
                 if (has(ff.between)) {
-                    Path fName = Expressions.path(ff.between[0].getClass(), p, field.getName());
+                    Path fName = Expressions.path(ff.between[0].getClass(), p, name);
                     Expression<Object> constant1 = Expressions.constant(ff.between[0]);
                     Expression<Object> constant2 = Expressions.constant(ff.between[1]);
                     BooleanOperation exp = Expressions.predicate(Ops.BETWEEN, fName, constant1, constant2);
                     expressionList.add(exp);
                 }
                 if (has(ff.eq)) {
-                    Path fName = Expressions.path(ff.eq.getClass(), p, field.getName());
+                    Path fName = Expressions.path(ff.eq.getClass(), p, name);
                     Expression<Object> constant1 = Expressions.constant(ff.eq);
                     BooleanOperation exp = Expressions.predicate(Ops.EQ, fName, constant1);
                     expressionList.add(exp);
                 }
                 if (has(ff.lt)) {
-                    Path fName = Expressions.path(ff.lt.getClass(), p, field.getName());
+                    Path fName = Expressions.path(ff.lt.getClass(), p, name);
                     Expression<Object> constant1 = Expressions.constant(ff.lt);
                     BooleanOperation exp = Expressions.predicate(Ops.LT, fName, constant1);
                     expressionList.add(exp);
                 }
                 if (has(ff.le)) {
-                    Path fName = Expressions.path(ff.le.getClass(), p, field.getName());
+                    Path fName = Expressions.path(ff.le.getClass(), p, name);
                     Expression<Object> constant1 = Expressions.constant(ff.le);
                     BooleanOperation exp = Expressions.predicate(Ops.LOE, fName, constant1);
                     expressionList.add(exp);
                 }
                 if (has(ff.gt)) {
-                    Path fName = Expressions.path(ff.gt.getClass(), p, field.getName());
+                    Path fName = Expressions.path(ff.gt.getClass(), p, name);
                     Expression<Object> constant1 = Expressions.constant(ff.gt);
                     BooleanOperation exp = Expressions.predicate(Ops.GT, fName, constant1);
                     expressionList.add(exp);
                 }
                 if (has(ff.ge)) {
-                    Path fName = Expressions.path(ff.ge.getClass(), p, field.getName());
+                    Path fName = Expressions.path(ff.ge.getClass(), p, name);
                     Expression<Object> constant1 = Expressions.constant(ff.ge);
                     BooleanOperation exp = Expressions.predicate(Ops.GOE, fName, constant1);
                     expressionList.add(exp);
                 }
                 if (has(ff.contains)) {
-                    Path fName = Expressions.path(ff.contains.getClass(), p, field.getName());
+                    Path fName = Expressions.path(ff.contains.getClass(), p, name);
                     Expression<Object> constant1 = Expressions.constant(ff.contains);
                     BooleanOperation exp = Expressions.predicate(Ops.STRING_CONTAINS, fName, constant1);
                     expressionList.add(exp);
                 }
                 if (has(ff.containsIgnoreCase)) {
-                    Path fName = Expressions.path(ff.containsIgnoreCase.getClass(), p, field.getName());
+                    Path fName = Expressions.path(ff.containsIgnoreCase.getClass(), p, name);
                     Expression<Object> constant1 = Expressions.constant(ff.containsIgnoreCase);
                     BooleanOperation exp = Expressions.predicate(Ops.STRING_CONTAINS_IC, fName, constant1);
                     expressionList.add(exp);
                 }
                 if (has(ff.like)) {
-                    Path fName = Expressions.path(ff.like.getClass(), p, field.getName());
+                    Path fName = Expressions.path(ff.like.getClass(), p, name);
                     Expression<Object> constant1 = Expressions.constant(ff.like);
                     BooleanOperation exp = Expressions.predicate(Ops.LIKE, fName, constant1);
                     expressionList.add(exp);
                 }
                 if (has(ff.order)) {
-                    Path path = Expressions.path(Object.class, p, field.getName());
+                    Path path = Expressions.path(Object.class, p, name);
                     OrderSpecifier orderSpecifier = new OrderSpecifier(Order.ASC, path);
                     orders.add(orderSpecifier);
                 }
@@ -385,13 +392,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
                 // IQueryFieldFilter
                 boolean exist = Arrays.stream(BaseFilterDto.IGNORE).anyMatch(s -> s.equals(field.getName()));
                 if (has(ffi) && !exist) {
-                    String name = field.getName();
-                    if (field.isAnnotationPresent(DtoField.class)) {
-                        DtoField an = field.getAnnotation(DtoField.class);
-                        if (an != null && has(an.value())) {
-                            name = an.value()[0];
-                        }
-                    }
+
                     Path fName = Expressions.path(Objects.requireNonNull(ffi).getClass(), p, name);
                     Expression<Object> constant1 = Expressions.constant(ffi);
                     BooleanOperation exp = Expressions.predicate(Ops.EQ, fName, constant1);
@@ -401,7 +402,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
         }
     }
 
-    private void processCustomFilters(FILTER_DTO filterDto, List<BooleanExpression> expressionList, Path<T> p) throws UnknowQueryFilterOperator {
+    private void processCustomFilters(BaseFilterDto filterDto, List<BooleanExpression> expressionList, Path<T> p) throws UnknowQueryFilterOperator {
         for (QueryOperation operation : filterDto.getOtherFilters()) {
             Path fName = Expressions.path(operation.getValue1().getClass(), p, operation.getKey());
             Expression<Object> constant1 = null;

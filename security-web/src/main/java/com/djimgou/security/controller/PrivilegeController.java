@@ -14,7 +14,7 @@ import com.djimgou.security.core.model.dto.privilege.PrivilegeDto;
 import com.djimgou.security.core.model.dto.privilege.PrivilegeFilterDto;
 import com.djimgou.security.core.model.dto.privilege.PrivilegeFindDto;
 import com.djimgou.security.core.service.PrivilegeService;
-import com.djimgou.security.enpoints.EndPoint;
+import com.djimgou.security.enpoints.SecuredEndPoint;
 import com.djimgou.security.enpoints.EndPointsRegistry;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
@@ -48,7 +48,7 @@ public class PrivilegeController {
 
     @GetMapping("/endpoints")
     @Endpoint("Lister tous les privilèges disponibles dans l'application")
-    public Collection<EndPoint> listEndPoint() {
+    public Collection<SecuredEndPoint> listEndPoint() {
         return endPointsRegistry.getEndpointsMap().values();
     }
 

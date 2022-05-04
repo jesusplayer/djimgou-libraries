@@ -34,9 +34,10 @@ import static com.djimgou.core.util.AppUtils.has;
  */
 
 @Log4j2
-public abstract class AbstractDomainServiceBase<T extends IBaseEntity, FIND_DTO extends BaseFindDto, F extends BaseFilterDto, ID> extends AbstractBdServiceBase<T,ID> {
+public abstract class AbstractDomainServiceBase<T extends IBaseEntity, FIND_DTO extends BaseFindDto, F extends BaseFilterDto, ID> extends AbstractBdServiceBase<T, ID> {
     /**
-     *      * T=0, DTO=1 , DETAIL_DTO=2 , FIND_DTO=3 , FILTER_DTO=4
+     * * T=0, DTO=1 , DETAIL_DTO=2 , FIND_DTO=3 , FILTER_DTO=4
+     *
      * @param pos
      * @return
      */
@@ -115,7 +116,7 @@ public abstract class AbstractDomainServiceBase<T extends IBaseEntity, FIND_DTO 
         return result;
     }
 
-    public abstract Page<T> findBy(F baseFilter) throws Exception;
+    public abstract Page<T> findBy(BaseFilterDto baseFilter) throws Exception;
 
     public Page<T> searchBy(Filter<T> filter, Pageable pg) throws Exception {
         return Page.empty();

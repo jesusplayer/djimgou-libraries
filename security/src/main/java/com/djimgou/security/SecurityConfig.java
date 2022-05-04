@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
@@ -116,8 +115,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 authorizedUrl.permitAll();
             } else {
                 authorizedUrl.hasAuthority(endPoint.getName());
-                if (endPoint.isGet()) {
-                    rule[0].antMatchers(HttpMethod.GET, endPoint.toSecurityUrl()).hasRole(Role.ROLE_READONLY);
+                if (endPoint.getIsReadOnlyMethod()) {
+                    rule[0].antMatchers(endPoint.getHttpMethod(), endPoint.toSecurityUrl()).hasRole(Role.ROLE_READONLY);
                 }
             }
         });

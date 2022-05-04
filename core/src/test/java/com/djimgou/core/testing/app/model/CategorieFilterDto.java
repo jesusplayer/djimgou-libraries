@@ -9,7 +9,6 @@ import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.QueryFieldFilter;
 import lombok.Data;
 
-import java.util.Date;
 import java.util.UUID;
 
 @Data

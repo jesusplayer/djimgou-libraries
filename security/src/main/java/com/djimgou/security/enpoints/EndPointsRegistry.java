@@ -24,21 +24,21 @@ public class EndPointsRegistry {
 
     private ApplicationContext applicationContext;
 
-    Map<String, EndPoint> endpointsMap;
+    Map<String, SecuredEndPoint> endpointsMap;
 
     public EndPointsRegistry(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
         loadUrls();
     }
 
-    public void addUrl(String url, EndPoint e) {
+    public void addUrl(String url, SecuredEndPoint e) {
         if (endpointsMap == null) {
             setEndpointsMap(new HashMap<>());
         }
         endpointsMap.put(url, e);
     }
 
-    public Collection<EndPoint> endPoints() {
+    public Collection<SecuredEndPoint> endPoints() {
         return endpointsMap.values();
     }
 
@@ -51,16 +51,22 @@ public class EndPointsRegistry {
             String path = key.getPatternsCondition().getPatterns().iterator().next();
             final Iterator<RequestMethod> methodIterator = key.getMethodsCondition().getMethods().iterator();
             HttpMethod httpMethod = null;
-            EndPoint endPoint = EndPoint.builder().url(path).build();
-            if (methodIterator.hasNext()) {
-                RequestMethod m = methodIterator.next();
-                httpMethod = HttpMethod.resolve(m.name());
-                endPoint.setHttpMethod(httpMethod);
-            }
+            SecuredEndPoint endPoint = SecuredEndPoint.builder().url(path).build();
+
             Endpoint enAn = value.getMethod().getAnnotation(Endpoint.class);
             if (has(enAn) && has(enAn.value())) {
                 endPoint.setDescription(enAn.value());
             }
+            if (has(enAn) && has(enAn.readOnlyMethod())) {
+                endPoint.setIsReadOnlyMethod(enAn.readOnlyMethod());
+            }
+            if (methodIterator.hasNext()) {
+                RequestMethod m = methodIterator.next();
+                httpMethod = HttpMethod.resolve(m.name());
+                endPoint.setHttpMethod(httpMethod);
+                endPoint.setIsReadOnlyMethod(endPoint.isGet() || endPoint.getIsReadOnlyMethod());
+            }
+
             Map<String, Param> params = Arrays.stream(value.getMethodParameters()).filter(methodParameter ->
                             methodParameter.hasParameterAnnotation(RequestParam.class)
                     )

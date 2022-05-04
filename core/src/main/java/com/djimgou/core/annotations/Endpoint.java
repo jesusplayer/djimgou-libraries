@@ -12,5 +12,18 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Endpoint {
+    /**
+     * La description du edpoint qui sera automatiquement injectée dans le ôle en BD
+     *
+     * @return
+     */
     String value();
+
+    /**
+     * Pour indiquer qusi une methode est une lecture bien qu'elle ne soit pas avec GET
+     * Ainsi un utilisateur de profil READONLY pourra y avoir accès
+     *
+     * @return
+     */
+    boolean readOnlyMethod() default false;
 }
