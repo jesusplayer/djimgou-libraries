@@ -29,7 +29,7 @@ public class CategorieService extends AbstractDomainServiceV2<Categorie, Categor
         getRepo().deleteAll();
     }
 
-    void hibernateSearch() {
+   /* void hibernateSearch() {
         SessionFactory sessionFactory = getEm().unwrap(SessionFactory.class);
         SearchSession searchSession = Search.session(getEm());
         EntityPathBase<Categorie> qQSommier = getQEntity();
@@ -38,5 +38,5 @@ public class CategorieService extends AbstractDomainServiceV2<Categorie, Categor
         List<Categorie> list = query
                 .where(QCategorie.categorie.annee.eq(2033))
                 .fetch();
-    }
+    }*/
 }
