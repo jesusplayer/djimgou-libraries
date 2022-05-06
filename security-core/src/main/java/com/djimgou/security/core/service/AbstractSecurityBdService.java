@@ -92,6 +92,7 @@ public abstract class AbstractSecurityBdService<T extends SecurityBaseEntity, S 
         }
     }
 
+    @Transactional
     @Override
     public Page<T> advancedFindBy(BaseFilterDto baseFilter) throws Exception {
         return findBy((F) baseFilter);

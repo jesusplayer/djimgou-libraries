@@ -15,6 +15,7 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -116,8 +117,10 @@ public abstract class AbstractDomainServiceBase<T extends IBaseEntity, FIND_DTO 
         return result;
     }
 
+
     public abstract Page<T> advancedFindBy(BaseFilterDto baseFilter) throws Exception;
 
+    @Transactional
     public Page<T> findBy(F baseFilter) throws Exception {
         return advancedFindBy(baseFilter);
     }

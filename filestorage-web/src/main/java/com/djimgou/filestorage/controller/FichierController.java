@@ -6,6 +6,9 @@ import com.djimgou.core.exception.BadRequestException;
 import com.djimgou.filestorage.exception.FichierInvalidNameException;
 import com.djimgou.filestorage.exception.FichierNotFoundException;
 import com.djimgou.filestorage.model.Fichier;
+import com.djimgou.filestorage.model.FichierFilterAdvDto;
+import com.djimgou.filestorage.model.FichierFilterDto;
+import com.djimgou.filestorage.model.FichierFindDto;
 import com.djimgou.filestorage.service.FichierService;
 import com.djimgou.filestorage.service.FileStorage;
 import lombok.extern.log4j.Log4j2;
@@ -24,6 +27,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @Log4j2
@@ -123,11 +127,28 @@ public class FichierController {
     public void deleteimageByCustomData(@PathVariable("customData") String customData) throws FichierNotFoundException, AppException, IOException {
         fichierService.deleteByCustomData(customData);
     }
-/*
 
-    @DeleteMapping("/supprimerTout")
-    @ResponseStatus(HttpStatus.OK)
-    public void delete() throws Exception {
-        fichierService.deleteAll();
-    }*/
+    @GetMapping("/filter")
+    @Endpoint("Filtrer les fichiers avec pagination")
+    public Page<Fichier> filterFichiers(FichierFilterDto fichierFilterDto) throws Exception {
+        return fichierService.findBy(fichierFilterDto);
+    }
+
+    @PostMapping("/advancedFilter")
+    @Endpoint(value = "Filtre avancé des fichiers avec pagination", readOnlyMethod = true)
+    public Page<Fichier> filterAdvancedFichiers(FichierFilterAdvDto fichierFilterDto) throws Exception {
+        return fichierService.advancedFindBy(fichierFilterDto);
+    }
+
+    @GetMapping("/search")
+    @Endpoint("Recherche sur les fichiers")
+    public List<Fichier> searchFichiers(FichierFindDto fichierFindDto) throws Exception {
+        return fichierService.search(fichierFindDto).hits();
+    }
+
+    @GetMapping("/find")
+    @Endpoint("Recherche sur les fichiers avec pagination")
+    public Page<Fichier> findFichiers(FichierFindDto fichierFindDto) throws Exception {
+        return fichierService.searchPageable(fichierFindDto);
+    }
 }

@@ -273,6 +273,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
         }
     }
 
+    @Transactional
     @Override
     public Page<T> advancedFindBy(BaseFilterDto filter) throws Exception {
         CustomPageable cpg = new CustomPageable(filter);

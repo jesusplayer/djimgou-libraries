@@ -2,9 +2,10 @@ package com.djimgou.filestorage.service;
 
 import com.djimgou.core.exception.AppException;
 import com.djimgou.core.exception.BadRequestException;
+import com.djimgou.core.service.AbstractDomainServiceV2;
 import com.djimgou.filestorage.exception.FichierInvalidNameException;
 import com.djimgou.filestorage.exception.FichierNotFoundException;
-import com.djimgou.filestorage.model.Fichier;
+import com.djimgou.filestorage.model.*;
 import com.djimgou.filestorage.repository.FichierRepo;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
@@ -25,8 +26,8 @@ import java.util.UUID;
 @Log4j2
 @Getter
 @Service
-public class FichierService {
-
+public class FichierService extends AbstractDomainServiceV2<Fichier, FichierFindDto, FichierFilterDto, FichierDto, FichierDetailDto> {
+    @Getter
     private FichierRepo repo;
 
     private FileStorageFactory fsFactory;
@@ -36,7 +37,8 @@ public class FichierService {
      * aws
      */
 
-    public FichierService(FichierRepo repo, FileStorageFactory fsFactory) throws AppException {
+    public FichierService(FichierRepo repo, FileStorageFactory fsFactory) {
+        super(repo, QFichier.fichier);
         this.repo = repo;
         this.fsFactory = fsFactory;
         Fichier.fs = this.fsFactory.getInstance();
@@ -92,9 +94,13 @@ public class FichierService {
     }
 
     @Transactional
-    public void deleteById(UUID uuid) throws FichierNotFoundException, AppException, IOException {
+    public void deleteById(UUID uuid) throws FichierNotFoundException, AppException {
         Fichier fichier = findbyId(uuid);
-        deleteFileInLocalStorage(fichier);
+        try {
+            deleteFileInLocalStorage(fichier);
+        } catch (IOException e) {
+            throw new AppException(e.getMessage(), e);
+        }
         repo.deleteById(uuid);
     }
 
