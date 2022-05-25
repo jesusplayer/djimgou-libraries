@@ -106,7 +106,7 @@ public class RoleService extends AbstractSecurityBdService<Role, RoleFindDto, Ro
                             .collect(Collectors.toSet())
             );
             dto.getPrivileges().stream()
-                    .filter(privilege -> !finalRole.getPrivileges().contains(privilege))
+                    .filter(privilege -> finalRole.getPrivileges() == null || !finalRole.getPrivileges().contains(privilege))
                     .forEach(toAdd::add);
         }
 
@@ -122,12 +122,13 @@ public class RoleService extends AbstractSecurityBdService<Role, RoleFindDto, Ro
         }
     }
 
-    public Role saveRole(UUID id, RoleDto dto) throws RoleNotFoundException, NotFoundException {
+    public Role saveRole(UUID id, RoleDto dto) throws NotFoundException {
         Role role = new Role();
         if (has(id)) {
             role = repo.findById(id).orElseThrow(RoleNotFoundException::new);
-            updateChildren(role, dto);
         }
+        updateChildren(role, dto);
+
         role.fromDto(dto, "privileges", "enfants");
 
         if (has(dto.getParentId())) {
@@ -159,7 +160,7 @@ public class RoleService extends AbstractSecurityBdService<Role, RoleFindDto, Ro
         return role;
     }
 
-    public Role createRole(RoleDto dto) throws RoleNotFoundException, NotFoundException {
+    public Role createRole(RoleDto dto) throws NotFoundException {
         return saveRole(null, dto);
     }
 

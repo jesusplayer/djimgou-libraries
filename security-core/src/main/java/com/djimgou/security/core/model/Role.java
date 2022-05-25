@@ -4,6 +4,7 @@ import com.djimgou.audit.model.EntityListener;
 import com.djimgou.core.util.AppUtils;
 import com.djimgou.security.core.listeners.AuthorityChangeListener;
 import com.djimgou.security.core.model.dto.role.AuthorityDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -61,6 +62,7 @@ public class Role extends SecurityBaseEntity {
         this.name = name;
     }
 
+    @Transient
     public Set<String> getAllRolesAndPriv() {
         Set<String> roles = new HashSet<>();
         roles.add(name);
@@ -76,6 +78,7 @@ public class Role extends SecurityBaseEntity {
         return roles;
     }
 
+    @Transient
     public Set<AuthorityDto> getAllAuthoritiesDto() {
         Set<AuthorityDto> roles = new HashSet<>();
 //        roles.add(name);
