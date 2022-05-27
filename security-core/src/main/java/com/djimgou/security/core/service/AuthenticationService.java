@@ -172,9 +172,10 @@ public class AuthenticationService {
      * @param token    token
      * @param password mot de passse
      * @throws Exception exception
+     * @return
      */
     @Transactional
-    public void confirmUtilisateurAccount(String token, String password, String passwordEnc) throws BadInvitationLinkException, NotFoundException {
+    public Utilisateur confirmUtilisateurAccount(String token, String password, String passwordEnc) throws BadInvitationLinkException, NotFoundException {
         ConfirmationToken confirmationToken = confirmationTokenRepo.findByConfirmationToken(token);
         if (has(confirmationToken)) {
             Utilisateur user = utilisateurBdService.
@@ -192,6 +193,7 @@ public class AuthenticationService {
             }
             utilisateurBdService.save(user);
             confirmationTokenRepo.delete(confirmationToken);
+            return utilisateurBdService.findById(user.getId()).get();
         } else {
             throw new BadInvitationLinkException("Ce lien d'invitation est invalide");
         }

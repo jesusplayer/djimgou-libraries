@@ -107,12 +107,12 @@ public class CompteUtilisateurController {
 
     @GetMapping("/confirmerInvitation/{token}")
     @Endpoint("Confirmer l'invitation d'un utilisateur par son token")
-    public void confirmInvitaion(@PathVariable("token") final String token, @RequestParam(value = "password", required = false) String password) throws BadInvitationLinkException, NotFoundException {
+    public Utilisateur confirmInvitation(@PathVariable("token") final String token, @RequestParam(value = "password", required = false) String password) throws BadInvitationLinkException, NotFoundException {
         String encPassword = null;
         if(has(password)){
             encPassword = bCryptPasswordEncoder.encode(password);
         }
-        authenticationService.confirmUtilisateurAccount(token, password, encPassword);
+        return authenticationService.confirmUtilisateurAccount(token, password, encPassword);
     }
 
 }
