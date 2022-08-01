@@ -183,7 +183,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
      * @param entity
      * @return
      */
-    public final T persist(ID id, T entity) {
+    public final T persist(ID id, T entity) throws NotFoundException, DtoMappingException{
         if (this instanceof IBeforeSave) {
             entity = ((IBeforeSave<T, ID>) this).beforeSave(id, entity);
         }
@@ -300,7 +300,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
                 processCustomFilters(advancedDto, expressionList, p);
             }
         }
-        BooleanExpression exp = expressionList.stream().reduce(null, (old, newE) -> has(old) ? old.and(newE) : newE);
+        BooleanExpression exp = expressionList.stream().reduce(null, (old, newE) -> has(old) ? (filter.getSearch$$() ? old.or(newE) : old.and(newE)) : newE);
 
         final QueryBase exp3 = exp2.where(exp);
         if (has(orders)) {
@@ -313,6 +313,12 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
             page = getRepo().findAll(cpg);
         }
         return page;
+    }
+
+    @Override
+    public Page<T> advancedSearchBy(BaseFilterDto baseFilter) throws Exception {
+        baseFilter.setSearch$$(true);
+        return advancedFindBy(baseFilter);
     }
 
     private void processDefaultFilters(BaseFilterDto filter, List<BooleanExpression> expressionList, List<OrderSpecifier> orders, List<Field> fiels, Path<T> p) {

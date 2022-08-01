@@ -18,6 +18,8 @@ public enum UrlsAuthorized {
     API_DOC_4("/swagger-resources/**"),
     API_DOC_5("/configuration/ui"),
     API_DOC_6("/configuration/security"),
+    PUBLIC("/public/**"),
+    STATIC("/static/**"),
 
     INDEX("/"),
     UNAUTHORIZED("/403"),

@@ -1,4 +1,4 @@
-package com.djimgou.security.enpoints;
+package com.djimgou.security.core.enpoints;
 
 import lombok.Builder;
 import lombok.Data;

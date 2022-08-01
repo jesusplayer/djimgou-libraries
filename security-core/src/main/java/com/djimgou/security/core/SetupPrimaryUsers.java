@@ -1,8 +1,11 @@
-package com.djimgou.security;
+package com.djimgou.security.core;
 
 import com.djimgou.core.util.AppUtils;
-import com.djimgou.security.core.AppSecurityConfig;
-import com.djimgou.security.core.model.*;
+import com.djimgou.security.core.enpoints.EndPointsRegistry;
+import com.djimgou.security.core.model.ConfirmationToken;
+import com.djimgou.security.core.model.Privilege;
+import com.djimgou.security.core.model.Role;
+import com.djimgou.security.core.model.Utilisateur;
 import com.djimgou.security.core.model.dto.role.IdDto;
 import com.djimgou.security.core.model.dto.utilisateur.ModifierProfilDto;
 import com.djimgou.security.core.model.dto.utilisateur.UtilisateurDto;
@@ -12,8 +15,8 @@ import com.djimgou.security.core.repo.ConfirmationTokenRepo;
 import com.djimgou.security.core.repo.PrivilegeRepo;
 import com.djimgou.security.core.repo.RoleRepo;
 import com.djimgou.security.core.repo.UtilisateurRepo;
+import com.djimgou.security.core.service.PrivileEvaluator;
 import com.djimgou.security.core.service.UtilisateurBdServiceBase;
-import com.djimgou.security.enpoints.EndPointsRegistry;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.SetUtils;
@@ -23,9 +26,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,12 +56,6 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
     String defaultPrivilegesCreation;
 
     @Autowired
-    AppUtils appUtils;
-
-    @Autowired
-    AppSecurityConfig appSecurityConfig;
-
-    @Autowired
     private UtilisateurRepo userRepository;
 
     @Autowired
@@ -68,8 +67,6 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
     @Autowired
     private ConfirmationTokenRepo confirmationTokenRepo;
 
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
     EndPointsRegistry endPointsRegistry;
@@ -244,7 +241,7 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
                 return is;
             }).collect(Collectors.toSet()));
             try {
-                userDto.setEncodedPasswd(bCryptPasswordEncoder.encode(password));
+                userDto.setEncodedPasswd(passwordEncoder().encode(password));
                 user = getService().createUtilisateurGeneric(userDto);
                 getService().activer(user.getId());
             } catch (DataIntegrityViolationException | ConstraintViolationException e) {
@@ -253,6 +250,11 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
         }
         return user;
     }
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
+
 /*
 
     @Transactional

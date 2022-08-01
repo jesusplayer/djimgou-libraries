@@ -1,6 +1,7 @@
 package com.djimgou.security.core.model;
 
 import com.djimgou.audit.model.EntityListener;
+import com.djimgou.core.util.AppUtils;
 import com.djimgou.tenantmanager.model.Tenant;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
@@ -102,7 +103,7 @@ public class Utilisateur extends SecurityBaseEntity {
     String passwordPart2;
 
     public String getRoles() {
-        if (has(authorities)) {
+        if (AppUtils.has(authorities)) {
             roles = authorities.stream().map(a -> a.getName())
                     .collect(Collectors.joining(","));
         }
@@ -117,7 +118,7 @@ public class Utilisateur extends SecurityBaseEntity {
     }
 
     public String fullname() {
-        return (has(nom) ? nom : "") + " " + (has(prenom) ? prenom : "");
+        return (AppUtils.has(nom) ? nom : "") + " " + (AppUtils.has(prenom) ? prenom : "");
     }
 
     /*@ManyToMany(fetch = FetchType.EAGER)

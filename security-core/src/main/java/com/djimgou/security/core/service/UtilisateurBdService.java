@@ -252,7 +252,7 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
         user.fromDto(dto);
 
         if (!has(id)) {
-            Utilisateur conUser = securitySessionService.currentUserFromDb();
+            Utilisateur conUser = securitySessionService.currentUserFromDb(this);
 /*            if (!user.getEnabled() && has(user) && user.getStatutCreation().equals(StatutSecurityWorkflow.VALIDE)) {
                 user.setEnabled(Boolean.TRUE);
                 authenticationService.sendPaswordToUser(user, user.fullPassword());

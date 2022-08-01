@@ -1,13 +1,14 @@
 package com.djimgou.security;
 
 import com.djimgou.security.core.AppSecurityConfig;
+import com.djimgou.security.core.enpoints.EndPointsRegistry;
 import com.djimgou.security.core.model.Role;
 import com.djimgou.security.core.model.UrlsAuthorized;
 import com.djimgou.security.core.service.MyVoter;
 import com.djimgou.security.core.tracking.authentication.dao.ResourceRepository;
-import com.djimgou.security.enpoints.EndPointsRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDecisionVoter;
@@ -70,24 +71,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserDetailsService authenticationService;
-
+/*
     @Autowired
-    private FilterInvocationSecurityMetadataSource filterInvocationSecurityMetadataSource;
+    private FilterInvocationSecurityMetadataSource filterInvocationSecurityMetadataSource;*/
 
     @Autowired
     AuthSuccessHandler authSuccessHandler;
 
     @Autowired
     LogoutSuccessHandler authLogoutSuccessHandler;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
-
+/*
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    private ResourceRepository roleResourceRepository;
+    private ResourceRepository roleResourceRepository;*/
 
     @Autowired
     EndPointsRegistry endPointsRegistry;
@@ -182,16 +182,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new AuthAccessDeniedHandler();
     }
 
-    @Bean
+ /*   @Bean
     public FilterSecurityInterceptor filterSecurityInterceptor() {
         FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
         filterSecurityInterceptor.setAuthenticationManager(authenticationManager);
         filterSecurityInterceptor.setSecurityMetadataSource(filterInvocationSecurityMetadataSource);
         filterSecurityInterceptor.setAccessDecisionManager(affirmativeBased());
         return filterSecurityInterceptor;
-    }
+    }*/
 
-    @Bean
+/*    @Bean
     public AffirmativeBased affirmativeBased() {
         List<AccessDecisionVoter<? extends Object>> accessDecisionVoters = new ArrayList<>();
         // accessDecisionVoters.add(roleVoter());
@@ -199,32 +199,32 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         AffirmativeBased affirmativeBased = new AffirmativeBased(accessDecisionVoters);
         return affirmativeBased;
-    }
+    }*/
 
-    @Bean
+/*    @Bean
     public RoleHierarchyVoter roleVoter() {
         RoleHierarchyVoter roleHierarchyVoter = new RoleHierarchyVoter(roleHierarchy());
         roleHierarchyVoter.setRolePrefix("ROLE_");
         return roleHierarchyVoter;
-    }
+    }*/
 
-    @Bean
+/*    @Bean
     public RoleHierarchy roleHierarchy() {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
 
         roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
         return roleHierarchy;
-    }
+    }*/
 
     @Override
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
-
+/*
     private Filter expiredSessionFilter() {
         SessionManagementFilter smf = new SessionManagementFilter(new HttpSessionSecurityContextRepository());
         smf.setInvalidSessionStrategy((request, response) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Votre session a expiré"));
         return smf;
-    }
+    }*/
 }

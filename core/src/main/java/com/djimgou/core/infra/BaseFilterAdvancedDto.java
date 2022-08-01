@@ -14,7 +14,7 @@ import static com.djimgou.core.util.AppUtils.has;
 @Setter
 public abstract class BaseFilterAdvancedDto extends BaseFilterDto {
     public static final String[] IGNORE = new String[]{
-            "searchText", "page", "size", "sort", "otherFilters"
+            "searchText", "page", "size", "sort", "otherFilters","search$$"
     };
     List<QueryOperation> otherFilters;
 

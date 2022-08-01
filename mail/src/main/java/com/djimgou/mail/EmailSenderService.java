@@ -1,6 +1,7 @@
 package com.djimgou.mail;
 
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.mail.MailException;
@@ -23,23 +24,32 @@ import java.util.List;
 public class EmailSenderService {
 
     //@Qualifier("JavaMailSenderImpl")
+    @Autowired(required = false)
     private JavaMailSender javaMailSender;
-
-    public EmailSenderService(JavaMailSender javaMailSender) {
-        this.javaMailSender = javaMailSender;
-    }
 
     public void sendEmail(SimpleMailMessage email) {
         try {
-            javaMailSender.send(email);
+            if (isMailConfigured()) {
+                javaMailSender.send(email);
+            }
         } catch (MailException e) {
             e.printStackTrace();
         }
     }
 
+    public boolean isMailConfigured() {
+        if (javaMailSender == null) {
+            log.warn("impossible d'instancier JavaMail, veuillez saisir les paramètres de configuration du fichier smtp");
+            return false;
+        }
+        return true;
+    }
+
     public void sendEmail(MimeMessagePreparator email) {
         try {
-            javaMailSender.send(email);
+            if (isMailConfigured()) {
+                javaMailSender.send(email);
+            }
         } catch (MailException e) {
             e.printStackTrace();
         }
@@ -103,6 +113,8 @@ public class EmailSenderService {
 
     @Async
     public void sendEmailAsync(SimpleMailMessage email) {
-        javaMailSender.send(email);
+        if (isMailConfigured()) {
+            javaMailSender.send(email);
+        }
     }
 }

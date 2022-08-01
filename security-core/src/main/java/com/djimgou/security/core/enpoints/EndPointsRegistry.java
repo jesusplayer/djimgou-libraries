@@ -1,4 +1,4 @@
-package com.djimgou.security.enpoints;
+package com.djimgou.security.core.enpoints;
 
 import com.djimgou.core.annotations.Endpoint;
 import lombok.Getter;

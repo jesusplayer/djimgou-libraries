@@ -1,6 +1,7 @@
-package com.djimgou.security.core.model;
+package com.djimgou.security.core.service;
 
 import com.djimgou.core.util.AppUtils;
+import com.djimgou.security.core.model.Privilege;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.Authentication;

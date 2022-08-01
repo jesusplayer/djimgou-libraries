@@ -1,6 +1,7 @@
 package com.djimgou.core.cooldto.processors;
 
 
+import com.djimgou.core.cooldto.annotations.DtoIgnore;
 import com.djimgou.core.util.AppUtils;
 
 import java.lang.annotation.Annotation;
@@ -26,7 +27,7 @@ public interface DtoAnotationProcessor<T extends Annotation> extends IDtoAnotati
 
     default void init() {
         Objects.requireNonNull(getAnnotation(), "La classe annotation ne doit pas être vide");
-        Stream<Field> s = AppUtils.getFieldsAsStream(getDto().getClass(), field -> field.isAnnotationPresent(getAnnotation()));
+        Stream<Field> s = AppUtils.getFieldsAsStream(getDto().getClass(), field -> field.isAnnotationPresent(getAnnotation()) && !field.isAnnotationPresent(DtoIgnore.class));
         this.setFields(s.collect(Collectors.toList()));
     }
 

@@ -1,5 +1,7 @@
 package com.djimgou.core.service;
 
+import com.djimgou.core.cooldto.exception.DtoMappingException;
+import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.core.util.model.IBaseEntity;
 
 /**
@@ -14,5 +16,5 @@ public interface IAfterSave<T extends IBaseEntity, ID> {
      * @param newEntity l'entité enregistrée
      * @return Par défaut, retournez newEntity
      */
-    T afterSave(ID id, T newEntity);
+    T afterSave(ID id, T newEntity) throws NotFoundException, DtoMappingException;
 }

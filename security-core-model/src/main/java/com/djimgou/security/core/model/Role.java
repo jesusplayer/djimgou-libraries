@@ -2,9 +2,7 @@ package com.djimgou.security.core.model;
 
 import com.djimgou.audit.model.EntityListener;
 import com.djimgou.core.util.AppUtils;
-import com.djimgou.security.core.listeners.AuthorityChangeListener;
 import com.djimgou.security.core.model.dto.role.AuthorityDto;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,8 +11,6 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-
-import static com.djimgou.core.util.AppUtils.has;
 
 /**
  * @author DJIMGOU NKENNE DANY MARC 08/2020
@@ -26,7 +22,7 @@ import static com.djimgou.core.util.AppUtils.has;
 )
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(value = {"enfants", "utilisateurs",/* "privileges",*/ "allRoles"})
-@EntityListeners({EntityListener.class, AuthorityChangeListener.class})
+@EntityListeners({EntityListener.class})
 public class Role extends SecurityBaseEntity {
     public static final String ROLE_READONLY = "ROLE_READONLY";
 
@@ -116,13 +112,13 @@ public class Role extends SecurityBaseEntity {
     }
 
     public void clear() {
-        if (has(privileges)) {
+        if (AppUtils.has(privileges)) {
             privileges.clear();
         }
-        if (has(enfants)) {
+        if (AppUtils.has(enfants)) {
             enfants.clear();
         }
-        if (has(enfants)) {
+        if (AppUtils.has(enfants)) {
             enfants.clear();
         }
     }

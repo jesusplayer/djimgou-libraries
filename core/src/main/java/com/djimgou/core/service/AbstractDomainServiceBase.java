@@ -119,6 +119,7 @@ public abstract class AbstractDomainServiceBase<T extends IBaseEntity, FIND_DTO 
 
 
     public abstract Page<T> advancedFindBy(BaseFilterDto baseFilter) throws Exception;
+    public abstract Page<T> advancedSearchBy(BaseFilterDto baseFilter) throws Exception;
 
     @Transactional
     public Page<T> findBy(F baseFilter) throws Exception {

@@ -76,9 +76,9 @@ public class AuthenticationService {
             @Value("${auth.mail.signup.text:" +
                     "Bienvenue<p> Merci pour votre inscription. Pour confirmez votre compte, cliquez ici : " +
                     "}") String mailSignupMsg,
-            @Value("${auth.mail.signup.clickLinkText}") String mailClickLinkText,
-            @Value("${auth.mail.signup.from}") String mailFrom,
-            @Value("${auth.mail.signup.fromName}") String mailFromName,
+            @Value("${auth.mail.signup.clickLinkText:}") String mailClickLinkText,
+            @Value("${auth.mail.signup.from:}") String mailFrom,
+            @Value("${auth.mail.signup.fromName:}") String mailFromName,
             @Value("${auth.mail.signup.confirmationUrl:}") String signupConfirmUrl,
             @Value("${auth.mail.signup.subject:Completez votre enregistrement!" +
                     "}") String mailSubject

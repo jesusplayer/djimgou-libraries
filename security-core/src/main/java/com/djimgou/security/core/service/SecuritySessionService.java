@@ -3,6 +3,8 @@ package com.djimgou.security.core.service;
 import com.djimgou.core.util.AppUtils;
 import com.djimgou.security.core.UtilisateurDetails;
 import com.djimgou.security.core.model.Utilisateur;
+import com.djimgou.security.core.model.dto.utilisateur.UtilisateurFilterDto;
+import com.djimgou.security.core.model.dto.utilisateur.UtilisateurFindDto;
 import com.djimgou.session.service.SessionService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +23,8 @@ import java.util.UUID;
 @Component
 public class SecuritySessionService {
 
-    @Autowired(required = false)
-    UtilisateurBdService utilisateurBdService;
+    /*@Autowired(required = false)
+    UtilisateurBdService utilisateurBdService;*/
 
 /*    @Autowired(required = false)
     SessionRegistry sessionRegistry;*/
@@ -71,7 +73,7 @@ public class SecuritySessionService {
         return AppUtils.has(currentUser());
     }
 
-    public Utilisateur currentUserFromDb() {
+    public Utilisateur currentUserFromDb(AbstractSecurityBdService<Utilisateur, UtilisateurFindDto, UtilisateurFilterDto> utilisateurBdService) {
         UtilisateurDetails curUser = currentUser();
         if (AppUtils.has(curUser)) {
             Utilisateur u = curUser.getUtilisateur();
@@ -93,10 +95,10 @@ public class SecuritySessionService {
      * rafraichie la session courante de l'utilisateur
      * en prenant en compte ses valeurs en BD
      */
-    public void refreshUserFromDb() {
+    public void refreshUserFromDb(AbstractSecurityBdService<Utilisateur, UtilisateurFindDto, UtilisateurFilterDto> utilisateurBdService) {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         Authentication authentication = securityContext.getAuthentication();
-        Utilisateur user = currentUserFromDb();
+        Utilisateur user = currentUserFromDb(utilisateurBdService);
         UtilisateurDetails uDet = new UtilisateurDetails(user);
         updateUserAuthorities((Collection<GrantedAuthority>) uDet.getAuthorities(), uDet, authentication);
     }

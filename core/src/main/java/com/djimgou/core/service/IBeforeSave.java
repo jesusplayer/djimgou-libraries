@@ -1,5 +1,7 @@
 package com.djimgou.core.service;
 
+import com.djimgou.core.cooldto.exception.DtoMappingException;
+import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.core.util.model.IBaseEntity;
 
 /**
@@ -14,5 +16,5 @@ public interface IBeforeSave<T extends IBaseEntity, ID> {
      * @param entity entité dynamiquement renseignée qui sera enregistrer
      * @return Le nouvelle entité à enregistrer. Par défaut retournez la même entité
      */
-    T beforeSave(ID id, T entity);
+    T beforeSave(ID id, T entity) throws NotFoundException, DtoMappingException;
 }

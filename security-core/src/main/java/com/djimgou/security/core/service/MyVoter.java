@@ -2,7 +2,6 @@ package com.djimgou.security.core.service;
 
 import com.djimgou.security.core.AppSecurityConfig;
 import com.djimgou.security.core.UtilisateurDetails;
-import com.djimgou.security.core.model.PrivileEvaluator;
 import com.djimgou.security.core.model.UrlsAuthorized;
 import com.djimgou.security.core.tracking.authentication.dao.ResourceRepository;
 import com.djimgou.security.core.tracking.authentication.dao.ResourceRepositoryInterface;

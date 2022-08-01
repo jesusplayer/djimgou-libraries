@@ -16,18 +16,13 @@
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
     <dependencies>
+
         <dependency>
             <groupId>com.djimgou</groupId>
-            <artifactId>core</artifactId>
+            <artifactId>security-core-model</artifactId>
             <version>0.0.3-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.djimgou</groupId>
-            <artifactId>tenant-manager</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
+
         <dependency>
             <groupId>com.djimgou</groupId>
             <artifactId>mail</artifactId>
