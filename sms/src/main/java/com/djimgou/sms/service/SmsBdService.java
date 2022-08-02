@@ -1,5 +1,6 @@
 package com.djimgou.sms.service;
 
+import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.CustomPageable;
 import com.djimgou.core.service.AbstractDomainService;
 import com.djimgou.sms.exceptions.SmsNotFoundException;
@@ -59,6 +60,11 @@ public class SmsBdService extends AbstractDomainService<Sms, SmsFindDto, SmsFilt
     @SneakyThrows
     public Sms createSms(SmsDto SmsDto) {
         return saveSms(null, SmsDto);
+    }
+
+    @Override
+    public Page<Sms> advancedSearchBy(BaseFilterDto baseFilter) throws Exception {
+        return null;
     }
 
     /**

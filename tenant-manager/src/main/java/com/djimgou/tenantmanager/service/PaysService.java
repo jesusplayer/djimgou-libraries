@@ -1,5 +1,6 @@
 package com.djimgou.tenantmanager.service;
 
+import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.CustomPageable;
 import com.djimgou.core.service.AbstractDomainService;
 import com.djimgou.tenantmanager.exceptions.PaysNotFoundException;
@@ -68,6 +69,11 @@ public class PaysService extends AbstractDomainService<Pays, PaysFindDto, PaysFi
             findDto.setSearchKeys(new String[]{"code", "nom"});
         }
         return super.searchPageable(findDto);
+    }
+
+    @Override
+    public Page<Pays> advancedSearchBy(BaseFilterDto baseFilter) throws Exception {
+        return null;
     }
 
     @Transactional

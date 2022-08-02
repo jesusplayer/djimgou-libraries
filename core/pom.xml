@@ -15,7 +15,7 @@
     <parent>
         <artifactId>act-library-starter</artifactId>
         <groupId>com.djimgou</groupId>
-        <version>0.0.3-SNAPSHOT</version>
+        <version>0.0.4-SNAPSHOT</version>
     </parent>
     <!--  <parent>
           <groupId>org.springframework.boot</groupId>
@@ -38,13 +38,13 @@
         <dependency>
             <groupId>com.djimgou</groupId>
             <artifactId>core-cooldto</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
+            <version>0.0.4-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.djimgou</groupId>
             <artifactId>core-test</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
+            <version>0.0.4-SNAPSHOT</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>

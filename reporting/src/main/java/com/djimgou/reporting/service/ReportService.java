@@ -223,6 +223,11 @@ public class ReportService extends AbstractDomainService<Report, ReportFindDto, 
         return findBy((ReportFilterDto) baseFilter);
     }
 
+    @Override
+    public Page<Report> advancedSearchBy(BaseFilterDto baseFilter) throws Exception {
+        return null;
+    }
+
     public Optional<Report> findByNom(String nom) {
         Page<Report> p = repo.findByNom(nom, Pageable.unpaged());
         if (p.hasContent()) {

@@ -9,6 +9,7 @@ import com.djimgou.core.exception.ConflitException;
 import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.security.core.exceptions.*;
 import com.djimgou.security.core.model.Utilisateur;
+import com.djimgou.security.core.model.dto.utilisateur.*;
 import com.djimgou.security.core.service.AuthenticationService;
 import com.djimgou.security.core.service.SecuritySessionService;
 import com.djimgou.security.core.service.UtilisateurBdServiceBase;

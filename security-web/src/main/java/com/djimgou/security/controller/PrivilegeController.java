@@ -7,6 +7,8 @@ package com.djimgou.security.controller;
 
 import com.djimgou.core.annotations.Endpoint;
 import com.djimgou.core.exception.NotFoundException;
+import com.djimgou.security.core.enpoints.EndPointsRegistry;
+import com.djimgou.security.core.enpoints.SecuredEndPoint;
 import com.djimgou.security.core.exceptions.PrivilegeNotFoundException;
 import com.djimgou.security.core.exceptions.ReadOnlyException;
 import com.djimgou.security.core.model.Privilege;
@@ -14,8 +16,7 @@ import com.djimgou.security.core.model.dto.privilege.PrivilegeDto;
 import com.djimgou.security.core.model.dto.privilege.PrivilegeFilterDto;
 import com.djimgou.security.core.model.dto.privilege.PrivilegeFindDto;
 import com.djimgou.security.core.service.PrivilegeService;
-import com.djimgou.security.enpoints.SecuredEndPoint;
-import com.djimgou.security.enpoints.EndPointsRegistry;
+
 import lombok.Getter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -15,7 +15,7 @@
     <parent>
         <artifactId>act-library-starter</artifactId>
         <groupId>com.djimgou</groupId>
-        <version>0.0.3-SNAPSHOT</version>
+        <version>0.0.4-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -32,26 +32,26 @@
         <dependency>
             <groupId>com.djimgou</groupId>
             <artifactId>security-core</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
+            <version>0.0.4-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
     <!--    <dependency>
             <groupId>com.djimgoumgou</groupId>
             <artifactId>tenant-manager</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
+            <version>0.0.4-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.djimgoumgou</groupId>
             <artifactId>mail</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
+            <version>0.0.4-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>-->
 
        <!-- <dependency>
             <groupId>com.djimgoumgou</groupId>
             <artifactId>audit</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
+            <version>0.0.4-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
