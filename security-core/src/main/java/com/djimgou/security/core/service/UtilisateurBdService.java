@@ -2,6 +2,7 @@ package com.djimgou.security.core.service;
 
 import com.djimgou.core.exception.ConflitException;
 import com.djimgou.core.exception.NotFoundException;
+import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.CustomPageable;
 import com.djimgou.security.core.exceptions.BadConfirmPasswordException;
 import com.djimgou.security.core.exceptions.UnautorizedException;
@@ -294,6 +295,11 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
             page = repo.findAll(cpg);
         }
         return page;
+    }
+
+    @Override
+    public Page<Utilisateur> advancedSearchBy(BaseFilterDto baseFilter) throws Exception {
+        return null;
     }
 
     @Transactional

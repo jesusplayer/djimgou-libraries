@@ -1,6 +1,7 @@
 package com.djimgou.security.core.service;
 
 import com.djimgou.core.exception.NotFoundException;
+import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.CustomPageable;
 import com.djimgou.security.core.exceptions.PrivilegeNotFoundException;
 import com.djimgou.security.core.exceptions.ReadOnlyException;
@@ -80,6 +81,11 @@ public class PrivilegeService extends AbstractSecurityBdService<Privilege, Privi
             page = repo.findAll(cpg);
         }
         return page;
+    }
+
+    @Override
+    public Page<Privilege> advancedSearchBy(BaseFilterDto baseFilter) throws Exception {
+        return null;
     }
 
     @Transactional

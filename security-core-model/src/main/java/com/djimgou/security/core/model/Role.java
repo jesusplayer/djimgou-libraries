@@ -12,6 +12,8 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.djimgou.core.util.AppUtils.has;
+
 /**
  * @author DJIMGOU NKENNE DANY MARC 08/2020
  */
@@ -109,6 +111,13 @@ public class Role extends SecurityBaseEntity {
         if (Objects.equals(this.getId(), role.getId())) return true;
         //if (!super.equals(o)) return false;
         return Objects.equals(name, role.name);
+    }
+
+    public void addPrivilege(Privilege privilege) {
+        if (!has(privileges)) {
+            privileges = new HashSet<>();
+        }
+        privileges.add(privilege);
     }
 
     public void clear() {

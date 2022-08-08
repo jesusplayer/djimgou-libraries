@@ -17,6 +17,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static com.djimgou.core.util.AppUtils.has;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 @Log4j2
@@ -170,8 +171,12 @@ public class GenericDbManager {
                                 && entityRepo.isManagedEntity(f.getType()),
                         ReflectionUtils.HierarchyTraversalMode.TOP_DOWN
                 ).forEach(field -> {
-                    final Node nodeC = finalMapNode.get(field.getType().getName());
-                    setField(node.getDto(), field.getName(), nodeC.getValue());
+                    final Class<?> type = field.getType();
+                    if(finalMapNode.containsKey(type.getName())){
+                        final Node nodeC = finalMapNode.get(type.getName());
+                        setField(node.getDto(), field.getName(), nodeC.getValue());
+                    }
+
                 });
             }
             if (createFakeDto) {

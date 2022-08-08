@@ -1,6 +1,7 @@
 package com.djimgou.security.core.service;
 
 import com.djimgou.core.exception.NotFoundException;
+import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.CustomPageable;
 import com.djimgou.security.core.exceptions.PrivilegeNotFoundException;
 import com.djimgou.security.core.exceptions.RoleNotFoundException;
@@ -48,6 +49,11 @@ public class RoleService extends AbstractSecurityBdService<Role, RoleFindDto, Ro
         this.repo = repo;
         this.sessionManager = sessionManager;
         this.privilegeRepo = privilegeRepo;
+    }
+
+    @Override
+    public Page<Role> advancedSearchBy(BaseFilterDto baseFilter) throws Exception {
+        return null;
     }
 
     @Transactional

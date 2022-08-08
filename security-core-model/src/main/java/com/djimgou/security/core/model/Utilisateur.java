@@ -154,6 +154,27 @@ public class Utilisateur extends SecurityBaseEntity {
         return user;
     }
 
+    public void addRole(Role role) {
+        if (!has(authorities)) {
+            authorities = new HashSet<>();
+        }
+        authorities.add(role);
+    }
+
+    public void addRole(Set<Role> roles) {
+        if (!has(authorities)) {
+            authorities = new HashSet<>();
+        }
+        authorities.addAll(roles);
+    }
+
+    public void addTenants(Set<Tenant> tenants) {
+        if (!has(this.tenants)) {
+            this.tenants = new HashSet<>();
+        }
+        this.tenants.addAll(tenants);
+    }
+
     @Override
     public String toString() {
         return getId().toString();

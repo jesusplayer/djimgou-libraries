@@ -43,15 +43,15 @@ public class TenantService {
 
     private TenantRepo repo;
 
-    private PaysRepo etageRepo;
+    private PaysRepo paysRepo;
 
     @PersistenceContext
     private EntityManager em;
 
     @Autowired
-    public TenantService(TenantRepo repo, PaysRepo etageRepo) {
+    public TenantService(TenantRepo repo, PaysRepo paysRepo) {
         this.repo = repo;
-        this.etageRepo = etageRepo;
+        this.paysRepo = paysRepo;
     }
 
     public Page<Tenant> findBySearchText(String text, Pageable pg) {
@@ -69,7 +69,7 @@ public class TenantService {
         tenant.setNom(tenantDto.getNom());
         tenant.setVille(tenantDto.getVille());
         if (!(has(id) && Objects.equals(tenant.getPays().getId(), tenantDto.getPaysId()))) {
-            Pays pays = etageRepo.findById(tenantDto.getPaysId()).orElseThrow(PaysNotFoundException::new);
+            Pays pays = paysRepo.findById(tenantDto.getPaysId()).orElseThrow(PaysNotFoundException::new);
             tenant.setPays(pays);
         }
         try{

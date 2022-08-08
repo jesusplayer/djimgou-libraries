@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Arrays;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
         , uniqueConstraints = @UniqueConstraint(name = "UK_privileges_parent", columnNames = {"id", "parent_id"})
 )
 @EqualsAndHashCode(callSuper = false, exclude = {"enfants", "parent"})
+@ToString(exclude = {"enfants", "parent"})
 @JsonIgnoreProperties(value = {"enfants"})
 @EntityListeners({EntityListener.class})
 public class Privilege extends SecurityBaseEntity {
