@@ -26,6 +26,7 @@ public class Node<T> {
     private T value;
     private T dto;
     private Consumer<T> postConstructDto;
+    private Consumer<T> preConstructDto;
     //private DTO dto;
     private Collection<Node> children;
 
@@ -40,6 +41,12 @@ public class Node<T> {
         }
         this.children = Collections.EMPTY_LIST;
         this.postConstructDto = postConstructDto;
+    }
+
+    public Node(Node parent, Class<T> entityClass, Consumer<T> postConstructDto, Consumer<T> preConstructDto) {
+        // this.buildDto = buildDto;
+        this(parent, entityClass, postConstructDto);
+        this.preConstructDto = preConstructDto;
     }
 
     public Node(Node parent, Class<T> entityClass) {

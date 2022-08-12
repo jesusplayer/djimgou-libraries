@@ -41,6 +41,7 @@
         <module>security-core-model</module>
         <module>session-redis</module>
         <module>act-app-starter-parent-redis-ms</module>
+        <module>djimgou-app-starter-parent-ms</module>
         <!--        <module>appsepla</module>-->
 <!--        <module>apprayaleauto</module>-->
     </modules>

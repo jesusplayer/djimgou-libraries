@@ -6,6 +6,7 @@ import com.djimgou.core.cooldto.exception.DtoMappingException;
 import com.djimgou.core.cooldto.model.IEntityDetailDto;
 import com.djimgou.core.cooldto.model.IEntityDto;
 import com.djimgou.core.cooldto.service.DtoSerializerService;
+import com.djimgou.core.exception.AppException;
 import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.core.exception.UnknowQueryFilterOperator;
 import com.djimgou.core.infra.*;
@@ -90,12 +91,12 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
      * UUID entiteentiteParentId;
      * }
      */
-    public T create(DTO produitDto) throws NotFoundException, DtoMappingException {
+    public T create(DTO produitDto) throws NotFoundException, DtoMappingException, AppException {
         return save(null, produitDto);
     }
 
     @Transactional
-    public Collection<T> createAll(Collection<DTO> produitDto) throws NotFoundException, DtoMappingException {
+    public Collection<T> createAll(Collection<DTO> produitDto) throws NotFoundException, DtoMappingException, AppException {
         Collection<T> targetCol = new ArrayList<>();
         for (DTO dto : produitDto) {
             T res = save(null, dto);
@@ -128,7 +129,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
      * UUID entiteentiteParentId;
      * }
      */
-    public T update(ID id, DTO produitDto) throws NotFoundException, DtoMappingException {
+    public T update(ID id, DTO produitDto) throws NotFoundException, DtoMappingException, AppException {
         return save(id, produitDto);
     }
 
@@ -159,7 +160,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
      * }
      */
     @Transactional(/*propagation = Propagation.NESTED*/)
-    public T save(ID id, DTO entityDto) throws NotFoundException, DtoMappingException {
+    public T save(ID id, DTO entityDto) throws NotFoundException, DtoMappingException, AppException {
         T entity = ReflectionUtils.createInstanceIfPresent(getFilterDtoClass(0).getName(), null);
         if (has(id)) {
             entity = getRepo().findById(id).orElseThrow(() ->
@@ -183,7 +184,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
      * @param entity
      * @return
      */
-    public final T persist(ID id, T entity) throws NotFoundException, DtoMappingException{
+    public final T persist(ID id, T entity) throws NotFoundException, DtoMappingException, AppException {
         if (this instanceof IBeforeSave) {
             entity = ((IBeforeSave<T, ID>) this).beforeSave(id, entity);
         }

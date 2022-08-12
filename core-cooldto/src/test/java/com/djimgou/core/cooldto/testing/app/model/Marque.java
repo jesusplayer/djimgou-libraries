@@ -9,6 +9,7 @@ import lombok.experimental.FieldDefaults;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ public class Marque extends BaseBdEntity {
     @Column(unique = true, nullable = false)
     String nom;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     List<Categorie> categories;
 
     public Marque() {

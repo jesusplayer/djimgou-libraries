@@ -68,14 +68,14 @@ public class ReportController {
 
     @PostMapping("/creer")
     @Endpoint("créer un report vide")
-    public Report create(@RequestBody @Valid ReportDto clientDto) throws NotFoundException {
+    public Report create(@RequestBody @Valid ReportDto clientDto) throws NotFoundException, AppException {
         return reportService.createReportTemplate(clientDto);
     }
 
     @PutMapping("/modifier/{reportId}")
     @Endpoint("Modifier un report")
     public Report update(
-            @PathVariable("reportId") final UUID reportId, @RequestBody @Valid final ReportDto reportDto) throws NotFoundException {
+            @PathVariable("reportId") final UUID reportId, @RequestBody @Valid final ReportDto reportDto) throws NotFoundException, AppException {
         return reportService.saveReportTemplate(reportId, reportDto);
     }
 

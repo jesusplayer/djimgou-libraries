@@ -14,11 +14,13 @@ public class DtoProcessorfactory {
         final DtoFkIdProcessor fkIdProcessor = new DtoFkIdProcessor(entityRepo, processor);
         final DtoEntityFieldProcessor entityProc = new DtoEntityFieldProcessor(entityRepo, processor);
         final DtoCollectionProcessor coleProc = new DtoCollectionProcessor(entityRepo, processor);
+        final DtoCollectionIdProcessor coleIdProc = new DtoCollectionIdProcessor(entityRepo, processor);
 
         processor.add(fIdProc);
         processor.add(fieldProc);
         processor.add(fkIdProcessor);
         processor.add(entityProc);
+        processor.add(coleIdProc);
         processor.add(coleProc);
 
         return processor;

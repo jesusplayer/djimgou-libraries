@@ -175,6 +175,10 @@ public class Utilisateur extends SecurityBaseEntity {
         this.tenants.addAll(tenants);
     }
 
+    public boolean hasTenants() {
+        return has(tenants);
+    }
+
     @Override
     public String toString() {
         return getId().toString();

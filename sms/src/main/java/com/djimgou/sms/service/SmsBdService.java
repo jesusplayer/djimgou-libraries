@@ -1,5 +1,6 @@
 package com.djimgou.sms.service;
 
+import com.djimgou.core.exception.AppException;
 import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.CustomPageable;
 import com.djimgou.core.service.AbstractDomainService;
@@ -47,7 +48,7 @@ public class SmsBdService extends AbstractDomainService<Sms, SmsFindDto, SmsFilt
     }
 
     @Transactional(/*propagation = Propagation.NESTED*/)
-    public Sms saveSms(UUID id, SmsDto SmsDto) throws SmsNotFoundException {
+    public Sms saveSms(UUID id, SmsDto SmsDto) throws SmsNotFoundException, AppException {
         Sms Sms = new Sms();
         if (has(id)) {
             Sms = repo.findById(id).orElseThrow(SmsNotFoundException::new);

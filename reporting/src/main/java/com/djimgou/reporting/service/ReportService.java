@@ -197,7 +197,7 @@ public class ReportService extends AbstractDomainService<Report, ReportFindDto, 
     }
 
     @Transactional(/*propagation = Propagation.NESTED*/)
-    public Report saveReportTemplate(UUID id, ReportDto regionDto) throws NotFoundException {
+    public Report saveReportTemplate(UUID id, ReportDto regionDto) throws NotFoundException, AppException {
         Report etage = new Report();
         if (has(id)) {
             etage = repo.findById(id).orElseThrow(NotFoundException::new);
@@ -206,7 +206,7 @@ public class ReportService extends AbstractDomainService<Report, ReportFindDto, 
         return save(etage);
     }
 
-    public Report createReportTemplate(ReportDto paysDto) throws NotFoundException {
+    public Report createReportTemplate(ReportDto paysDto) throws NotFoundException, AppException {
         return saveReportTemplate(null, paysDto);
     }
 

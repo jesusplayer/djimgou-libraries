@@ -6,6 +6,7 @@ import java.lang.annotation.*;
  * Indique une propriété à mapper de type Array. Dans ce cas, on ne fera
  * pas de traitement particulier si ce n'est de se rassurer que le tableau cible value
  * n'est pas null. Dans ce cas il faudra le créé
+ * Doit s'utiliser avec une collection doù fetch = FetchType.EAGER
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)

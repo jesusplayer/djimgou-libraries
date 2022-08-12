@@ -20,11 +20,14 @@ public interface PaysRepo extends JpaRepository<Pays, UUID>, QuerydslPredicateEx
 
     Page<Pays> findByCodeContaining(String code, Pageable pageRequest);
 
+    boolean existsByCodeOrNom(String codePays, String nomPays);
+
+    boolean existsByCode(String codePays);
 
     Page<Pays> findByNomContaining(String nom, Pageable pageRequest);
 
     Page<Pays> findAll(Specification<Pays> spec, Pageable pageRequest);
-    
+
     /**
      * long countByDept(String deptName);
      * long countBySalaryGreaterThanEqual(int salary);

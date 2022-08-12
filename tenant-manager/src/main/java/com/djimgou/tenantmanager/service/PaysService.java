@@ -1,5 +1,6 @@
 package com.djimgou.tenantmanager.service;
 
+import com.djimgou.core.exception.AppException;
 import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.CustomPageable;
 import com.djimgou.core.service.AbstractDomainService;
@@ -49,7 +50,7 @@ public class PaysService extends AbstractDomainService<Pays, PaysFindDto, PaysFi
     }
 
     @Transactional(/*propagation = Propagation.NESTED*/)
-    public Pays savePays(UUID id, PaysDto regionDto) throws PaysNotFoundException {
+    public Pays savePays(UUID id, PaysDto regionDto) throws PaysNotFoundException, AppException {
         Pays etage = new Pays();
         if (has(id)) {
             etage = repo.findById(id).orElseThrow(PaysNotFoundException::new);
@@ -58,7 +59,7 @@ public class PaysService extends AbstractDomainService<Pays, PaysFindDto, PaysFi
         return save(etage);
     }
 
-    public Pays createPays(PaysDto paysDto) throws PaysNotFoundException {
+    public Pays createPays(PaysDto paysDto) throws PaysNotFoundException, AppException {
         return savePays(null, paysDto);
     }
 

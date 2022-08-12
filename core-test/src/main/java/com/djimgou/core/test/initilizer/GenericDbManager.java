@@ -50,6 +50,7 @@ public class GenericDbManager {
     public static List<Node> orderedEntitiesList = new ArrayList<>();
 
     private final Map<Class<? extends Object>, Consumer<? extends Object>> dtoCustomMap = new HashMap();
+    private final Map<Class<? extends Object>, Consumer<? extends Object>> dtoCustomPreMap = new HashMap();
 
     //@PostConstruct
     @Transactional
@@ -70,10 +71,7 @@ public class GenericDbManager {
             //final List<Field> fields = Arrays.asList(declaredFields);
             final List<Field> fields = ReflectionUtils.findFields(aClass, field -> true, ReflectionUtils.HierarchyTraversalMode.TOP_DOWN);
 
-            List<Node> child = fields.stream().filter(field ->
-                    map.containsKey(field.getType().getName())
-                            && !Objects.equals(field.getType().getName(), name)
-            ).map(field -> {
+            List<Node> child = fields.stream().filter(field -> map.containsKey(field.getType().getName()) && !Objects.equals(field.getType().getName(), name)).map(field -> {
                 map.get(field.getType().getName()).setParent(map.get(name));
                 return map.get(field.getType().getName());
             }).collect(Collectors.toList());
@@ -89,6 +87,11 @@ public class GenericDbManager {
         return this;
     }
 
+    public <T extends Object> GenericDbManager preConstructDto(Class<T> dtoClass, Consumer<T> dtoConsumer) {
+        dtoCustomPreMap.put(dtoClass, dtoConsumer);
+        return this;
+    }
+
     public GenericDbManager ignore(Class... entitiesClasses) {
         Arrays.asList(entitiesClasses).forEach(aClass -> {
             this.toIgnore.put(aClass, true);
@@ -97,24 +100,25 @@ public class GenericDbManager {
     }
 
     void initEntities() {
-        entityRepo.getEntityMap().keySet().stream()
-                .filter(entityType -> !this.toIgnore.containsKey(entityType))
-                .forEach((aClass) -> {
-                    final Node node = new Node(aClass);
-                    if (dtoCustomMap.containsKey(node.getDtoClasse())) {
-                        Consumer<? extends Object> postConstruct = dtoCustomMap.get(node.getDtoClasse());
-                        node.setPostConstructDto(postConstruct);
-                    }
-                    entitiesList.add(node.getClasse());
-                    map.put(node.getClasse().getName(), node);
-                });
+        entityRepo.getEntityMap().keySet().stream().filter(entityType -> !this.toIgnore.containsKey(entityType)).forEach((aClass) -> {
+            final Node node = new Node(aClass);
+            if (dtoCustomMap.containsKey(node.getDtoClasse())) {
+                Consumer<? extends Object> postConstruct = dtoCustomMap.get(node.getDtoClasse());
+                node.setPostConstructDto(postConstruct);
+            }
+            if (dtoCustomPreMap.containsKey(node.getDtoClasse())) {
+                Consumer<? extends Object> preConstruct = dtoCustomPreMap.get(node.getDtoClasse());
+                node.setPreConstructDto(preConstruct);
+            }
+            entitiesList.add(node.getClasse());
+            map.put(node.getClasse().getName(), node);
+        });
     }
 
     void order() {
         orderedEntitiesList.clear();
         Node.mapTemp.clear();
-        map.values().stream().filter(node -> !node.hasChildren()
-        ).map(node -> node.getClasse().getName()).forEach(name -> {
+        map.values().stream().filter(node -> !node.hasChildren()).map(node -> node.getClasse().getName()).forEach(name -> {
             map.get(name).print();
             Node.mapTemp.put(name, name);
         });
@@ -165,14 +169,9 @@ public class GenericDbManager {
             if (node.hasChildren()) {
                 Map<String, Node> finalMapNode = mapNode;
                 Map<String, Node> finalMapNodeByDto = mapNodeByDto;
-                ReflectionUtils.findFields(
-                        dtoClass,
-                        f -> !Objects.equals("id", f.getName())
-                                && entityRepo.isManagedEntity(f.getType()),
-                        ReflectionUtils.HierarchyTraversalMode.TOP_DOWN
-                ).forEach(field -> {
+                ReflectionUtils.findFields(dtoClass, f -> !Objects.equals("id", f.getName()) && entityRepo.isManagedEntity(f.getType()), ReflectionUtils.HierarchyTraversalMode.TOP_DOWN).forEach(field -> {
                     final Class<?> type = field.getType();
-                    if(finalMapNode.containsKey(type.getName())){
+                    if (finalMapNode.containsKey(type.getName())) {
                         final Node nodeC = finalMapNode.get(type.getName());
                         setField(node.getDto(), field.getName(), nodeC.getValue());
                     }
@@ -182,7 +181,9 @@ public class GenericDbManager {
             if (createFakeDto) {
                 node.setDto(FakeBuilder.fake(node.getDto().getClass()));
             }
-
+            if (has(node.getPreConstructDto())) {
+                node.getPreConstructDto().accept(node.getDto());
+            }
             em.persist(node.getDto());
             final Object value = node.getDto();
             //em.refresh(value);

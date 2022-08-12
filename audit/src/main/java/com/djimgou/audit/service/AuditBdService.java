@@ -8,6 +8,7 @@ import com.djimgou.audit.model.dto.AuditDto;
 import com.djimgou.audit.model.dto.AuditFilterDto;
 import com.djimgou.audit.model.dto.AuditFindDto;
 import com.djimgou.audit.repository.AuditRepo;
+import com.djimgou.core.exception.AppException;
 import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.CustomPageable;
 import com.djimgou.core.service.AbstractDomainService;
@@ -86,6 +87,8 @@ public class AuditBdService extends AbstractDomainServiceV2<Audit, AuditFindDto,
             log.error("Erreur d'enregistrement de l'audit :" + e.getMessage(), audit);
             // log.error(entity);
             //log.error("AUDIT="+audit);
+        } catch (AppException e) {
+            log.error("Erreur d'enregistrement de l'audit :" + e.getMessage(), audit);
         }
         return null;
     }

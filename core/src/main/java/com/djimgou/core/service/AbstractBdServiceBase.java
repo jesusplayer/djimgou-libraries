@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 public abstract class AbstractBdServiceBase<T extends IBaseEntity, ID> implements ISharedServiceBase<T>, Serializable {
     @PersistenceContext
     EntityManager em;
-    
+
     @Getter
     private JpaRepository<T, ID> repo;
 
@@ -84,11 +84,11 @@ public abstract class AbstractBdServiceBase<T extends IBaseEntity, ID> implement
     }
 
     public T searchById(ID id) {
-        return getRepo().findById( id).get();
+        return getRepo().findById(id).get();
     }
 
     public Optional<T> findById(ID id) throws NotFoundException {
-        return getRepo().findById( id);
+        return getRepo().findById(id);
     }
 
  /*   public Optional<T> findById(String id) throws NotFoundException {
@@ -128,33 +128,39 @@ public abstract class AbstractBdServiceBase<T extends IBaseEntity, ID> implement
         return getRepo().existsById(id);
     }
 
-    public T save(T entity) {
+    public T save(T entity) throws AppException {
         T item = null;
         try {
             item = getRepo().save(entity);
         } catch (Exception e) {
             if (AppUtils.has(entity)) {
-                e.printStackTrace();
                 MessageService.errorMessage("Erreur d'enregistrement de l'objet " + e.getMessage(), log);
-            } else {
-                e.printStackTrace();
             }
+            e.printStackTrace();
+            throw new AppException(e);
         }
         return item;
     }
 
     @Async
     public CompletableFuture<T> saveAsync(T entity) {
-        return CompletableFuture.supplyAsync(() -> save(entity));
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return save(entity);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     @Transactional
-    public T save(T entity, T oldEntity) {
+    public T save(T entity, T oldEntity) throws AppException {
         T item = null;
         try {
             item = getRepo().save(entity);
         } catch (Exception e) {
             MessageService.errorMessage("Erreur d'enregistrement de l'objet " + e.getMessage(), log);
+            throw new AppException(e);
         }
         return item;
     }
@@ -203,6 +209,12 @@ public abstract class AbstractBdServiceBase<T extends IBaseEntity, ID> implement
 
     @Transactional
     public CompletableFuture<List<T>> saveAllAsync(List<T> entities) {
-        return CompletableFuture.supplyAsync(() -> entities.stream().map(this::save).collect(Collectors.toList()));
+        return CompletableFuture.supplyAsync(() -> entities.stream().map(t -> {
+            try {
+                return this.save(t);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }).collect(Collectors.toList()));
     }
 }
