@@ -173,7 +173,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
         injectReferencedField(id, entityDto, entity);*/
         dtoSerializer.serialize(entityDto, entity);
 
-        T saved = persist(id, entity);
+        T saved = persist(id, entity, null);
         return saved;
     }
 
@@ -182,15 +182,16 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
      *
      * @param id
      * @param entity
+     * @param dto
      * @return
      */
-    public final T persist(ID id, T entity) throws NotFoundException, DtoMappingException, AppException {
+    public final T persist(ID id, T entity, DTO dto) throws NotFoundException, DtoMappingException, AppException {
         if (this instanceof IBeforeSave) {
-            entity = ((IBeforeSave<T, ID>) this).beforeSave(id, entity);
+            entity = ((IBeforeSave<T, ID, DTO>) this).beforeSave(id, entity, dto);
         }
         T saved = save(entity);
         if (this instanceof IAfterSave) {
-            saved = ((IAfterSave<T, ID>) this).afterSave(id, saved);
+            saved = ((IAfterSave<T, ID, DTO>) this).afterSave(id, saved, dto);
         }
         return saved;
     }

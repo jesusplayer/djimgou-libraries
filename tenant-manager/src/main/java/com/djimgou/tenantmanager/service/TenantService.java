@@ -14,6 +14,8 @@ import com.djimgou.tenantmanager.repository.TenantRepo;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAQueryBase;
 import com.querydsl.jpa.impl.JPAQuery;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.mapper.orm.Search;
@@ -38,6 +40,8 @@ import static com.djimgou.core.util.AppUtils.toPage;
 /**
  * @author djimgou
  */
+@Getter
+@Setter
 @Service
 public class TenantService {
 

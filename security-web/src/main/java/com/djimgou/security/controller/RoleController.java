@@ -82,7 +82,7 @@ public class RoleController {
     @Endpoint("Ajouter plusieurs privilèges sur un rôle")
     public Role update(
             @PathVariable("roleId") final UUID roleId, @RequestBody() final List<UUID> privilegeIds) throws NotFoundException {
-        return roleService.addPrivileges(roleId, privilegeIds);
+        return roleService.addPrivilegesByCode(roleId, privilegeIds);
     }
 
     @GetMapping("/detail/{roleId}")

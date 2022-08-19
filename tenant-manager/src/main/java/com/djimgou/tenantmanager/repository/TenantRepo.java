@@ -24,7 +24,17 @@ public interface TenantRepo extends JpaRepository<Tenant, UUID>, QuerydslPredica
     Page<Tenant> findBySearchText(@Param("searchText") String searchText, Pageable pageRequest);
 
 
+    Optional<Tenant> findOneByCode(String code);
+
+    Optional<Tenant> findOneByNom(String nom);
+
+    Page<Tenant> findByVilleContaining(String code, Pageable pageRequest);
+
+    Page<Tenant> findByVille(String ville, Pageable pageRequest);
+
     Page<Tenant> findByCodeContaining(String code, Pageable pageRequest);
+
+    Page<Tenant> findByPaysId(UUID paysId, Pageable pageRequest);
 
 
     Page<Tenant> findByNomContaining(String nom, Pageable pageRequest);

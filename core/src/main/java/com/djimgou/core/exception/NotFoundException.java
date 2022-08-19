@@ -4,7 +4,7 @@ package com.djimgou.core.exception;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class NotFoundException extends Exception {
+public class NotFoundException extends AppException {
     public NotFoundException(Class c) {
         super(c.getSimpleName() + " inexistant");
     }

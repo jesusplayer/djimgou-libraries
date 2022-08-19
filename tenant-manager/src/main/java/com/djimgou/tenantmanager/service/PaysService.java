@@ -14,6 +14,8 @@ import com.djimgou.tenantmanager.repository.PaysRepo;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAQueryBase;
 import com.querydsl.jpa.impl.JPAQuery;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,8 +34,10 @@ import static com.djimgou.core.util.AppUtils.has;
 /**
  * @author djimgou
  */
+@Getter@Setter
 @Service
 public class PaysService extends AbstractDomainService<Pays, PaysFindDto, PaysFilterDto> {
+    @Getter
     private PaysRepo repo;
 
     @PersistenceContext

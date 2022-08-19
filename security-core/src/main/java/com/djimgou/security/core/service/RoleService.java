@@ -16,6 +16,7 @@ import com.djimgou.security.core.repo.RoleRepo;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAQueryBase;
 import com.querydsl.jpa.impl.JPAQuery;
+import lombok.Getter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -37,7 +38,7 @@ public class RoleService extends AbstractSecurityBdService<Role, RoleFindDto, Ro
     @PersistenceContext
     EntityManager em;
 
-
+    @Getter
     private RoleRepo repo;
 
     private SessionManager sessionManager;
@@ -155,11 +156,26 @@ public class RoleService extends AbstractSecurityBdService<Role, RoleFindDto, Ro
     }
 
     @Transactional
-    public Role addPrivileges(UUID roleId, List<UUID> privilegeIds) throws NotFoundException {
+    public Role addPrivilegesByCode(UUID roleId, List<UUID> privilegeIds) throws NotFoundException {
         Role role = findById(roleId).orElseThrow(RoleNotFoundException::new);
         List<Privilege> privileges = new ArrayList<>();
         for (UUID uuid : privilegeIds) {
             Privilege privilege = privilegeRepo.findById(uuid).orElseThrow(PrivilegeNotFoundException::new);
+            privileges.add(privilege);
+        }
+        role.getPrivileges().addAll(privileges);
+        return role;
+    }
+
+    @Transactional
+    public Role addPrivilegesByCode(String roleName, List<String> privilegeCodes) throws NotFoundException {
+        Role role = repo.findByName(roleName);
+        if (!has(role)) {
+            throw new RoleNotFoundException();
+        }
+        List<Privilege> privileges = new ArrayList<>();
+        for (String privCode : privilegeCodes) {
+            Privilege privilege = privilegeRepo.findByCode(privCode).orElseThrow(PrivilegeNotFoundException::new);
             privileges.add(privilege);
         }
         role.getPrivileges().addAll(privileges);
@@ -250,4 +266,7 @@ public class RoleService extends AbstractSecurityBdService<Role, RoleFindDto, Ro
         return page;
     }
 
+    public Role findByName(String roleName) {
+        return repo.findByName(roleName);
+    }
 }

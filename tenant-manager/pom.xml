@@ -24,7 +24,7 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <quesrydsl.version>4.3.1</quesrydsl.version>
+        <quesrydsl.version>5.0.0</quesrydsl.version>
     </properties>
     <dependencies>
         <dependency>

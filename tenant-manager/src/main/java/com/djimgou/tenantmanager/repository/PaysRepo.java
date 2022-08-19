@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface PaysRepo extends JpaRepository<Pays, UUID>, QuerydslPredicateExecutor<Pays> {
@@ -19,6 +20,10 @@ public interface PaysRepo extends JpaRepository<Pays, UUID>, QuerydslPredicateEx
 
 
     Page<Pays> findByCodeContaining(String code, Pageable pageRequest);
+
+
+    Optional<Pays> findOneByCode(String code);
+    Optional<Pays> findOneByNom(String code);
 
     boolean existsByCodeOrNom(String codePays, String nomPays);
 

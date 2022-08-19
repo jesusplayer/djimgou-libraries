@@ -15,19 +15,20 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.1</version>
+        <version>2.6.2</version>
         <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
+
     <groupId>com.djimgou</groupId>
     <artifactId>djimgou-app-starter-parent-ms</artifactId>
-
+    <packaging>pom</packaging>
     <version>0.0.5-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <quesrydsl.version>4.3.1</quesrydsl.version>
+        <quesrydsl.version>5.0.0</quesrydsl.version>
         <spring-cloud.version>2021.0.0</spring-cloud.version>
     </properties>
     <dependencyManagement>

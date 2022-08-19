@@ -48,7 +48,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.5.0</version>
+        <version>2.6.2</version>
     </parent>
     <groupId>com.djimgou</groupId>
     <artifactId>act-library-starter</artifactId>
@@ -58,7 +58,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mojarra.version>2.3.4</mojarra.version>
-        <quesrydsl.version>4.3.1</quesrydsl.version>
+        <quesrydsl.version>5.0.0</quesrydsl.version>
     </properties>
 
 
