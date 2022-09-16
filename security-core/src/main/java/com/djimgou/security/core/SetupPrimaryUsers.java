@@ -2,6 +2,7 @@ package com.djimgou.security.core;
 
 import com.djimgou.core.util.AppUtils;
 import com.djimgou.security.core.enpoints.EndPointsRegistry;
+import com.djimgou.security.core.enpoints.SecuredEndPoint;
 import com.djimgou.security.core.model.ConfirmationToken;
 import com.djimgou.security.core.model.Privilege;
 import com.djimgou.security.core.model.Role;
@@ -34,6 +35,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -90,14 +92,17 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
     }
 
     public void initDefaultPriv2() {
-        endPointsRegistry.endPoints().stream().map(endPoint -> {
-            Privilege fullAccess = new Privilege();
-            fullAccess.setCode(endPoint.getName());
-            fullAccess.setName(endPoint.getName());
-            fullAccess.setUrl(endPoint.toSecurityUrl());
-            fullAccess.setDescription(endPoint.getDescription());
-            return fullAccess;
-        }).forEach(this::createPrivilegeIfNotFound);
+        final Collection<SecuredEndPoint> securedEndPoints = endPointsRegistry.endPoints();
+        if (has(securedEndPoints)) {
+            securedEndPoints.stream().map(endPoint -> {
+                Privilege fullAccess = new Privilege();
+                fullAccess.setCode(endPoint.getName());
+                fullAccess.setName(endPoint.getName());
+                fullAccess.setUrl(endPoint.toSecurityUrl());
+                fullAccess.setDescription(endPoint.getDescription());
+                return fullAccess;
+            }).forEach(this::createPrivilegeIfNotFound);
+        }
         Privilege fullAccess = new Privilege();
         fullAccess.setCode(PrivileEvaluator.FULL_ACCESS);
         fullAccess.setName("Avoir tous les droits");
@@ -148,7 +153,6 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
 
 
     @Override
-    @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
 
         if (alreadySetup)
@@ -250,8 +254,9 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
         }
         return user;
     }
+
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -340,11 +345,11 @@ en);
         Role role = roleRepository.findByName(authorityName);
         if (role == null) {
             role = new Role(authorityName);
+            role.setPrivileges(privileges);
+            role.setParent(parent);
+            role.setReadonlyValue(true);
+            roleRepository.save(role);
         }
-        role.setReadonlyValue(true);
-        role.setPrivileges(privileges);
-        role.setParent(parent);
-        roleRepository.save(role);
         return role;
     }
 }

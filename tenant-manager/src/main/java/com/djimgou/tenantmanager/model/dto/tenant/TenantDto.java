@@ -4,6 +4,7 @@ import com.djimgou.core.cooldto.model.IEntityDto;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Data
@@ -17,6 +18,6 @@ public class TenantDto implements IEntityDto {
     @NotBlank()
     String ville;
 
-    @NotBlank()
+    @NotNull()
     UUID paysId;
 }

@@ -22,6 +22,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAQueryBase;
 import com.querydsl.jpa.impl.JPAQuery;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -44,6 +45,7 @@ import static com.djimgou.core.util.AppUtils.*;
  * @author djimgou
  */
 
+@Getter@Setter
 @Log4j2
 public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DTO extends BaseFindDto, FILTER_DTO extends BaseFilterDto, DTO extends IEntityDto, DETAIL_DTO extends IEntityDetailDto, ID>
         extends AbstractDomainServiceBase<T, FIND_DTO, FILTER_DTO, ID> {
@@ -173,7 +175,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
         injectReferencedField(id, entityDto, entity);*/
         dtoSerializer.serialize(entityDto, entity);
 
-        T saved = persist(id, entity, null);
+        T saved = persist(id, entity, entityDto);
         return saved;
     }
 

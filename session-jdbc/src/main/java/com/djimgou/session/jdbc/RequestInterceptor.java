@@ -40,14 +40,16 @@ public class RequestInterceptor extends RequestContextFilter {
 
         HttpSession session = request.getSession();
         String proxySesssionId = request.getHeader(SessionKeys.PROXY_SESSION_ID);
-        String username;
-        String sessionId;
-        String tenantId;
+        String username = null;
+        String sessionId = null;
+        String tenantId = null;
         if (proxySesssionId != null) {
             Session sessionS = sessionRepository.findById(proxySesssionId);
-            username = sessionS.getAttribute(SessionKeys.USERNAME);
-            sessionId = sessionS.getAttribute(SessionKeys.SESSION_ID);
-            tenantId =  sessionS.getAttribute(SessionKeys.TENANT_ID);
+            if (sessionS != null) {
+                username = sessionS.getAttribute(SessionKeys.USERNAME);
+                sessionId = sessionS.getAttribute(SessionKeys.SESSION_ID);
+                tenantId = sessionS.getAttribute(SessionKeys.TENANT_ID);
+            }
         } else {
             username = (String) session.getAttribute(SessionKeys.USERNAME);
             sessionId = (String) session.getAttribute(SessionKeys.SESSION_ID);
@@ -55,12 +57,18 @@ public class RequestInterceptor extends RequestContextFilter {
         }
         /*String sessionId2 = (String) session.getAttribute(SessionKeys.USER_ID);
         String tenantId = (String) session.getAttribute(SessionKeys.TENANT_ID);*/
-        if (username != null && sessionId != null) {
-            SessionContext.setCurrentSessionId(sessionId);
+        if (username != null) {
             SessionContext.setCurrentUsername(username);
+        }
+        if (sessionId != null) {
+            SessionContext.setCurrentSessionId(sessionId);
+        }
+        if (tenantId != null) {
             SessionContext.setCurrentTenantId(tenantId);
         }
-        logger.info("Username: " + username);
+        if (null != username) {
+            logger.info("Username: " + username);
+        }
 
         filterChain.doFilter(request, response);
     }

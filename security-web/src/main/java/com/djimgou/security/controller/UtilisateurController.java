@@ -11,14 +11,12 @@ import com.djimgou.core.util.AppUtils;
 import com.djimgou.security.core.exceptions.BadConfirmPasswordException;
 import com.djimgou.security.core.exceptions.UtilisateurNotFoundException;
 import com.djimgou.security.core.model.Utilisateur;
-import com.djimgou.security.core.model.dto.utilisateur.ModifierProfilDto;
-import com.djimgou.security.core.model.dto.utilisateur.UtilisateurDto;
-import com.djimgou.security.core.model.dto.utilisateur.UtilisateurFilterDto;
-import com.djimgou.security.core.model.dto.utilisateur.UtilisateurFindDto;
+import com.djimgou.security.core.model.dto.utilisateur.*;
 import com.djimgou.security.core.service.*;
 import com.djimgou.tenantmanager.exceptions.TenantNotFoundException;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
@@ -86,8 +84,10 @@ public class UtilisateurController {
     @PutMapping("/modifier/{utilisateurId}")
     @Endpoint("Modifier un utilisateur")
     public Utilisateur update(
-            @PathVariable("utilisateurId") final UUID id, @RequestBody @Valid final UtilisateurDto utilisateurDto) throws ConflitException, BadConfirmPasswordException, NotFoundException {
-        return getService().saveUtilisateur(id, utilisateurDto);
+            @PathVariable("utilisateurId") final UUID id, @RequestBody @Valid final ModifierUtilisateurDto utilisateurDto) throws ConflitException, BadConfirmPasswordException, NotFoundException {
+        UtilisateurDto u = new UtilisateurDto();
+        BeanUtils.copyProperties(utilisateurDto, u);
+        return getService().saveUtilisateur(id, u);
     }
 
     @PostMapping("/activer/{utilisateurId}")

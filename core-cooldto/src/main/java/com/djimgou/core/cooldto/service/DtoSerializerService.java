@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Log4j2
 @Service
-public class DtoSerializerService {
+public class DtoSerializerService implements DtoSerializer {
 
     final private EntityRepository entityRepo;
 
@@ -24,6 +24,7 @@ public class DtoSerializerService {
      * @param entity l'entité à produire
      * @throws DtoMappingException
      */
+    @Override
     public void serialize(Object dto, Object entity) throws DtoMappingException {
         DtoClassProcessor processor = DtoProcessorfactory.newInstance(dto, entity, entityRepo);
         // Extraction

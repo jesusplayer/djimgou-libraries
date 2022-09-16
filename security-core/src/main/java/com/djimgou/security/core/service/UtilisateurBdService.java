@@ -11,6 +11,7 @@ import com.djimgou.security.core.model.QUtilisateur;
 import com.djimgou.security.core.model.Role;
 import com.djimgou.security.core.model.StatutSecurityWorkflow;
 import com.djimgou.security.core.model.Utilisateur;
+import com.djimgou.security.core.model.dto.role.IdDto;
 import com.djimgou.security.core.model.dto.utilisateur.*;
 import com.djimgou.security.core.repo.RoleRepo;
 import com.djimgou.security.core.repo.UtilisateurBaseRepo;
@@ -172,7 +173,9 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
         Set<Role> toAdd = new HashSet<>();
         if (has(user.getAuthorities())) {
             user.getAuthorities().stream()
-                    .filter(privilege -> !dto.getAuthorities().contains(privilege))
+                    .filter(role -> dto.getAuthorities().stream().map(IdDto::getId)
+                            .noneMatch(uuid -> Objects.equals(uuid, role.getId()))
+                    )
                     .forEach(toRemove::add);
         }
         if (has(dto.getAuthorities())) {
@@ -203,7 +206,9 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
         Set<Tenant> toAdd = new HashSet<>();
         if (has(user.getTenants())) {
             user.getTenants().stream()
-                    .filter(privilege -> !dto.getTenants().contains(privilege))
+                    .filter(tenant -> dto.getTenants().stream().map(IdDto::getId)
+                            .noneMatch(uuid -> Objects.equals(uuid, tenant.getId()))
+                    )
                     .forEach(toRemove::add);
         }
         if (has(dto.getTenants())) {
@@ -212,7 +217,7 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
                     .map(privilege -> tenantRepo.findById(privilege.getId()).orElse(null))
                     .collect(Collectors.toSet());
             tenants.stream()
-                    .filter(privilege -> !finalUser.getTenants().contains(privilege))
+                    .filter(tenant -> !finalUser.getTenants().contains(tenant))
                     .forEach(toAdd::add);
         }
 

@@ -4,12 +4,28 @@ import com.djimgou.core.exception.*;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.stream.Collectors;
+
 @RestControllerAdvice
 public class GlobalTenantExceptionHandler extends AppExceptionHandler {
+
+    @ExceptionHandler({
+            org.springframework.web.bind.MethodArgumentNotValidException.class
+
+    })
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String ValidationExceptions(MethodArgumentNotValidException ex) {
+        return ex.getBindingResult().getAllErrors().stream().collect(Collectors.toMap(
+                objectError -> ((FieldError) objectError).getField(),
+                objectError -> objectError.getDefaultMessage()
+        )).entrySet().stream().map(stringStringEntry -> stringStringEntry.getKey()+" "+stringStringEntry.getValue()).collect(Collectors.joining("; "));
+    }
 
     @ExceptionHandler({
             ConversionFailedException.class,

@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="devDany-Gateway" type="MavenRunConfiguration" factoryName="Maven">
+  <configuration default="false" name="devGuylli-Gateway" type="MavenRunConfiguration" factoryName="Maven">
     <MavenSettings>
       <option name="myGeneralSettings" />
       <option name="myRunnerSettings">
@@ -31,7 +31,7 @@
           <option name="pomFileName" />
           <option name="profilesMap">
             <map>
-              <entry key="devDany" value="true" />
+              <entry key="devGuylli" value="true" />
             </map>
           </option>
           <option name="resolveToWorkspace" value="false" />
