@@ -3,6 +3,7 @@ package com.djimgou.audit.model;
 import com.djimgou.audit.service.AuditBdService;
 import com.djimgou.core.util.model.IBaseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
@@ -39,24 +40,25 @@ public class EntityListener {
      * @param entity entite
      * @param <T>    parametre
      */
+    @Async
     @PreUpdate// @PreUpdate
     public <T extends IBaseEntity> void preUpdate(T entity) {
         prePersist(entity);
     }
-
+    @Async
     @PostPersist
     public <T extends IBaseEntity> void creation(T entity) {
-        nonNull(() -> EntityListener.auditBdService.add(entity, AuditAction.CREATION));
+        nonNull(() -> EntityListener.auditBdService.addAsync(entity, AuditAction.CREATION));
     }
-
+    @Async
     @PostUpdate
     public <T extends IBaseEntity> void modification(T entity) {
-        nonNull(() -> EntityListener.auditBdService.add(entity, AuditAction.MODIFICATION));
+        nonNull(() -> EntityListener.auditBdService.addAsync(entity, AuditAction.MODIFICATION));
     }
-
+    @Async
     @PostRemove
     public <T extends IBaseEntity> void suppression(T entity) {
-        nonNull(() -> EntityListener.auditBdService.add(entity, AuditAction.SUPPRESSION));
+        nonNull(() -> EntityListener.auditBdService.addAsync(entity, AuditAction.SUPPRESSION));
     }
 
     void nonNull(Supplier fn) {

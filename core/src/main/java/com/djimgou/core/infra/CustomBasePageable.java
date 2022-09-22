@@ -2,6 +2,7 @@ package com.djimgou.core.infra;
 
 import com.djimgou.core.util.AppUtils;
 import lombok.Data;
+import lombok.Getter;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -141,7 +142,7 @@ public class CustomBasePageable<T> implements Pageable {
 
     @Override
     public Pageable withPage(int i) {
-        return null;
+        return pg.withPage(i);
     }
 
     @Override

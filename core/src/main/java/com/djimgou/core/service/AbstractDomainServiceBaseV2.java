@@ -294,7 +294,9 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
         List<OrderSpecifier> orders = new ArrayList<>();
         List<Field> fiels = getFields(filter.getClass(), field -> true);
         final Class<T> entityClass = getFilterDtoClass(0);
-        Path<T> p = Expressions.path(entityClass, entityClass.getSimpleName().toLowerCase());
+        String simpleName = entityClass.getSimpleName();
+        String className = Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1);
+        Path<T> p = Expressions.path(entityClass, className);
 
         processDefaultFilters(filter, expressionList, orders, fiels, p);
 
@@ -312,7 +314,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
         }
 
         if (has(exp)) {
-            page = getRepo().findAll(exp, cpg);
+            page = getRepo().findAll(exp, cpg.getPg());
         } else {
             page = getRepo().findAll(cpg);
         }

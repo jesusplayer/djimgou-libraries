@@ -12,6 +12,7 @@ import org.springframework.core.type.filter.RegexPatternTypeFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 
@@ -1155,11 +1156,17 @@ public class AppUtils {
         return new PageImpl<>(newContent);
     }
 
-    public static <T> Page<T> toPage(Pageable pageable, List<T> newContent, int totalAmount) {
+    public static <T> Page<T> toPage(Pageable pageable, List<T> newContent, int totalElements) {
         final int start = (int) pageable.getOffset();
-        final int end = Math.min((start + pageable.getPageSize()), totalAmount);
-        final Page<T> page = new PageImpl<>(newContent.subList(start, end), pageable, totalAmount);
+        final int end = Math.min((start + pageable.getPageSize()), totalElements);
+        final Page<T> page = new PageImpl<>(newContent.subList(start, end), pageable, totalElements);
         return page;
+    }
+
+    public static <T, M> Page<M> mapPage(Page<T> page, Function<T, M> mapFunction) {
+        List<M> res = page.getContent().stream().map(mapFunction).collect(Collectors.toList());
+        final Page<M> newPage = new PageImpl<>(res, page.getPageable(), page.getTotalElements());
+        return newPage;
     }
 
     /**

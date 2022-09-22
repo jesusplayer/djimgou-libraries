@@ -26,6 +26,7 @@ import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 import static com.djimgou.core.util.AppUtils.endOfTheDay;
 import static com.djimgou.core.util.AppUtils.startOfTheDay;
@@ -91,6 +93,17 @@ public class AuditBdService extends AbstractDomainServiceV2<Audit, AuditFindDto,
             log.error("Erreur d'enregistrement de l'audit :" + e.getMessage(), audit);
         }
         return null;
+    }
+
+    @Async
+    public <T> CompletableFuture<Audit> addAsync(T entity, AuditAction action) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                return add(entity, action);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
     /*public Page<Audit> findByUserAndDate(Date dateDebut, Date dateFin, UUID utilisateurId) {
         Date startDate = appUtils.startOfDay(dateDebut);
