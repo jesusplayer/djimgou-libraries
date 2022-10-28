@@ -5,6 +5,7 @@ import com.djimgou.core.test.util.FakeBuilder;
 import com.djimgou.core.testing.app.MaincoreTestApplication;
 import com.djimgou.core.testing.app.model.Categorie;
 import com.djimgou.core.util.EntityRepository;
+import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -147,6 +148,7 @@ public class CoreTest {
     @Test
     public void testDeleteByid() {
         Categorie cat = FakeBuilder.fake(Categorie.class);
+        cat.setNom(Faker.instance().idNumber().valid());
         er.save(cat);
         //Categorie cat = dbManager.deepCreate(Categorie.class);;
         restTemplate.delete(apiurl + "/" + cat.getId());
