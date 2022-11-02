@@ -1,8 +1,10 @@
 package com.djimgou.core.infra;
 
 import com.djimgou.core.util.AppUtils;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -19,6 +21,7 @@ import static com.djimgou.core.util.AppUtils.has;
 /**
  * @author djimgou
  */
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
 public class CustomBasePageable<T> implements Pageable {
     Pageable pg;
@@ -26,9 +29,10 @@ public class CustomBasePageable<T> implements Pageable {
     Sort sort;
 
     Filter<T> filter;
-
+    boolean notPaged = false;
     public CustomBasePageable(Pageable pg) {
         this.pg = pg;
+        this.notPaged = pg.isUnpaged();
     }
 
     // TODO A ameliorer le trie de la page
@@ -39,6 +43,7 @@ public class CustomBasePageable<T> implements Pageable {
         } else {
             this.pg = PageRequest.of(pg.getPage(), pg.getSize());
         }
+        this.notPaged = pg.isUnpaged();
         /*if (has(pg.getSearchText())) {
             if (!has(filter)) {
                 filter = new Filter<>(pg.getSearchText(), null);
@@ -92,7 +97,7 @@ public class CustomBasePageable<T> implements Pageable {
 
     @Override
     public boolean isPaged() {
-        return pg.isPaged();
+        return !notPaged;
     }
 
     @Override

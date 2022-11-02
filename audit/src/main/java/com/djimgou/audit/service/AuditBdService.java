@@ -85,12 +85,10 @@ public class AuditBdService extends AbstractDomainServiceV2<Audit, AuditFindDto,
                     username
             );
             return super.save(audit);
-        } catch (JsonProcessingException | NullPointerException e) {
+        } catch (JsonProcessingException | NullPointerException | AppException e) {
             log.error("Erreur d'enregistrement de l'audit :" + e.getMessage(), audit);
             // log.error(entity);
             //log.error("AUDIT="+audit);
-        } catch (AppException e) {
-            log.error("Erreur d'enregistrement de l'audit :" + e.getMessage(), audit);
         }
         return null;
     }

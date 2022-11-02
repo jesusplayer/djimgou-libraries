@@ -1,17 +1,24 @@
 package com.djimgou.core.infra;
 
 import com.djimgou.core.cooldto.model.IDto;
+import lombok.AccessLevel;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.FieldDefaults;
 
 /**
  * Mettre
  */
-@Getter
-@Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Data
 public abstract class BasePageableDto  implements IDto {
 
     int page;
     int size;
     String[] sort;
+
+    public boolean isUnpaged() {
+        return page == 0 && size == 0;
+    }
 }
