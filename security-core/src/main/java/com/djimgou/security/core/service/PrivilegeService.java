@@ -93,7 +93,7 @@ public class PrivilegeService extends AbstractSecurityBdService<Privilege, Privi
     public Page<Privilege> findBy(PrivilegeFilterDto baseFilter) throws Exception {
         CustomPageable cpg = new CustomPageable(baseFilter);
         if (cpg.getSort().isUnsorted()) {
-            cpg.setSort(Sort.by(Sort.Order.asc("nom")));
+            cpg.setSort(Sort.by(Sort.Order.asc("name")));
         }
         Page<Privilege> page;
         String name = baseFilter.getName();

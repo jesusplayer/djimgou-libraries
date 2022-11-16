@@ -62,7 +62,7 @@ public class RoleService extends AbstractSecurityBdService<Role, RoleFindDto, Ro
     public Page<Role> findBy(RoleFilterDto baseFilter) throws Exception {
         CustomPageable cpg = new CustomPageable(baseFilter);
         if (cpg.getSort().isUnsorted()) {
-            cpg.setSort(Sort.by(Sort.Order.asc("nom")));
+            cpg.setSort(Sort.by(Sort.Order.asc("name")));
         }
         Page<Role> page;
         String name = baseFilter.getName();

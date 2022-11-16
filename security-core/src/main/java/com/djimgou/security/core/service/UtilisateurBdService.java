@@ -312,7 +312,7 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
     public Page<Utilisateur> findBy(UtilisateurFilterDto baseFilter) throws Exception {
         CustomPageable cpg = new CustomPageable(baseFilter);
         if (cpg.getSort().isUnsorted()) {
-            cpg.setSort(Sort.by(Sort.Order.asc("nom")));
+            cpg.setSort(Sort.by(Sort.Order.asc("username")));
         }
         Page<Utilisateur> page;
         String name = baseFilter.getNom();
