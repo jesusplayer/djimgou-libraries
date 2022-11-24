@@ -213,7 +213,7 @@ public class ReportService extends AbstractDomainService<Report, ReportFindDto, 
     @Override
     public Page<Report> searchPageable(ReportFindDto findDto) {
         if (!has(findDto.getSearchKeys())) {
-            findDto.setSearchKeys(new String[]{"code", "nom"});
+            findDto.setSearchKeys(new String[]{"code", "nom","nomReport"});
         }
         return super.searchPageable(findDto);
     }
@@ -225,6 +225,13 @@ public class ReportService extends AbstractDomainService<Report, ReportFindDto, 
 
     public Optional<Report> findByNom(String nom) {
         Page<Report> p = repo.findByNom(nom, Pageable.unpaged());
+        if (p.hasContent()) {
+            return Optional.of(p.getContent().get(0));
+        }
+        return Optional.empty();
+    }
+    public Optional<Report> findByNomReport(String nomReport) {
+        Page<Report> p = repo.findByNomReport(nomReport, Pageable.unpaged());
         if (p.hasContent()) {
             return Optional.of(p.getContent().get(0));
         }

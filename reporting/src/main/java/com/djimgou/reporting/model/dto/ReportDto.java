@@ -9,6 +9,9 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class ReportDto implements IEntityDto {
     @NotBlank()
+    String nom;
+
+    @NotBlank()
     String nomReport;
 
     String clientRouteUrl;
