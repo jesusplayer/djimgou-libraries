@@ -33,7 +33,7 @@ public class Utilisateur extends SecurityBaseEntity {
     @Column(name = "enabled", nullable = false)
     private Boolean enabled = Boolean.FALSE;
 
-    @Email
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     private String nom;

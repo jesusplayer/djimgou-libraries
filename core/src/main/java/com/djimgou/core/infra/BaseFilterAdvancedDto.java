@@ -17,7 +17,6 @@ public abstract class BaseFilterAdvancedDto extends BaseFilterDto {
             "searchText", "page", "size", "sort", "otherFilters"
     };
     List<QueryOperation> otherFilters;
-
     public boolean hasOtherFilters() {
         return has(otherFilters);
     }

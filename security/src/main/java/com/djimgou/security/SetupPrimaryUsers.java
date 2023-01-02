@@ -164,42 +164,22 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
         if (!has(defaultPrivilegesCreation) || (!defaultPrivilegesCreation.equals("disabled") || defaultPrivilegesCreation.isEmpty())) {
             initDefaultPriv2();
 
-            PrivileEvaluator pe = new PrivileEvaluator(Privilege.class);
+            //PrivileEvaluator pe = new PrivileEvaluator(Privilege.class);
             Privilege fullPrivilege
                     = privilegeRepository.findByCode(PrivileEvaluator.FULL_ACCESS).orElse(null);
-        /*Privilege writePrivilege
-                = createPrivilegeIfNotFound("WRITE_PRIVILEGE");*/
-
-            Privilege paramPrivilege
-                    = createPrivilegeIfNotFound("PrivParametresVoir");
 
 
-            Set<Privilege> adminPrivileges = SetUtils.hashSet(paramPrivilege, fullPrivilege);
-            Role userAuth = createAuthorityIfNotFound("ROLE_USER", SetUtils.hashSet(paramPrivilege), null);
-            createAuthorityIfNotFound("ROLE_ADMIN", adminPrivileges, userAuth);
+/*
+            Set<Privilege> adminPrivileges = SetUtils.hashSet(fullPrivilege);
+            //Role userAuth = createAuthorityIfNotFound("ROLE_USER", SetUtils.hashSet(paramPrivilege), null);
+            createAuthorityIfNotFound("ROLE_ADMIN", adminPrivileges,null);
+
+*/
+            //Role userRole = roleRepository.findByName("ROLE_USER");
 
 
-            Role adminRole = roleRepository.findByName("ROLE_ADMIN");
-
-            Role userRole = roleRepository.findByName("ROLE_USER");
-
-            Utilisateur admin = createUserIfNotFound("admin", "admin", "admin@actsarl.com",
-                    "admin", SetUtils.hashSet(adminRole), Boolean.TRUE);
-
-            Utilisateur admin2 = createUserIfNotFound("admin2", "admin2", "admin2@actsarl.com",
-                    "admin", SetUtils.hashSet(adminRole), Boolean.TRUE);
-
-            Utilisateur user = createUserIfNotFound("user", "user", "user@actsarl.com", "user",
-                    SetUtils.hashSet(userRole), Boolean.TRUE);
-
-            Utilisateur dan = createUserIfNotFound("dany", "marc", "danmfacto@gmail.com", "user",
-                    SetUtils.hashSet(userRole), Boolean.FALSE);
-
-            ConfirmationToken ct = new ConfirmationToken(dan);
-            ct.setConfirmationToken("b326bebc-0498-4561-b0ed-099f31f2b193");
         /*LocalDateTime ldt = LocalDateTime.now().minusDays(2);
         ct.setCreatedDate(Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant()));*/
-            confirmationTokenRepo.save(ct);
 
             if (defaultPrivilegesCreation.equals("deleteAndCreate")) {
                 String msg = "Vous avez configuré la propriété auth.defaultPrivilegesCreation=deleteAndCreate " +

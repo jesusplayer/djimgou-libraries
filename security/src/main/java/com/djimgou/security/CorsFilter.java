@@ -41,7 +41,7 @@ public class CorsFilter extends GenericFilterBean {
             String origin = request.getHeader("Origin");
             final String ACCES_CONTROL = "Access-Control-Allow-Origin";
             if(!has(response.getHeader(ACCES_CONTROL))){
-                response.setHeader(ACCES_CONTROL, allowedOrigins.contains(origin) ? origin : "");
+                response.setHeader(ACCES_CONTROL, allowedOrigins.contains(origin) ? origin : "*");
                 response.setHeader("Vary", "Origin");
 
                 // Access-Control-Max-Age

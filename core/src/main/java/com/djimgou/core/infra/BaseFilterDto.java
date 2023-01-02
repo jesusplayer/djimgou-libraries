@@ -13,5 +13,5 @@ import static com.djimgou.core.util.AppUtils.has;
 @Getter
 @Setter
 public abstract class BaseFilterDto extends BasePageableDto {
-
+    String searchText;
 }

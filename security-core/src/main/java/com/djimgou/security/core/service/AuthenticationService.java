@@ -1,11 +1,13 @@
 package com.djimgou.security.core.service;
 
+import com.djimgou.core.exception.BadRequestException;
 import com.djimgou.core.exception.ConflitException;
 import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.mail.EmailSenderService;
 import com.djimgou.security.core.exceptions.*;
 import com.djimgou.security.core.model.ConfirmationToken;
 import com.djimgou.security.core.model.Utilisateur;
+import com.djimgou.security.core.model.dto.utilisateur.PasswordChangeByEmailDto;
 import com.djimgou.security.core.model.dto.utilisateur.PasswordChangeDto;
 import com.djimgou.security.core.model.dto.utilisateur.UserNameChangeDto;
 import com.djimgou.security.core.repo.ConfirmationTokenRepo;
@@ -55,8 +57,11 @@ public class AuthenticationService {
     private String ssl;
     private String mailFrom;
     private String mailSubject;
+    private String mailChangePasswordSubject;
     private String mailSignupMsg;
+    private String mailChangePasswdMsg;
     private String signupConfirmUrl;
+    private String changePasswordClientUrl;
     private String mailClickLinkText;
     private String mailFromName;
 
@@ -76,12 +81,18 @@ public class AuthenticationService {
             @Value("${auth.mail.signup.text:" +
                     "Bienvenue<p> Merci pour votre inscription. Pour confirmez votre compte, cliquez ici : " +
                     "}") String mailSignupMsg,
+            @Value("${auth.mail.changePasswordText:" +
+                    "Pour le changement de votre mot de passe, cliquez ici : " +
+                    "}") String mailChangePasswdMsg,
             @Value("${auth.mail.signup.clickLinkText}") String mailClickLinkText,
             @Value("${auth.mail.signup.from}") String mailFrom,
             @Value("${auth.mail.signup.fromName}") String mailFromName,
             @Value("${auth.mail.signup.confirmationUrl:}") String signupConfirmUrl,
+            @Value("${auth.mail.changePasswordClientUrl:}") String changePasswordClientUrl,
             @Value("${auth.mail.signup.subject:Completez votre enregistrement!" +
-                    "}") String mailSubject
+                    "}") String mailSubject,
+            @Value("${auth.mail.changePasswordSubject:Changement de mot de passe!" +
+                    "}") String mailChangePasswordSubject
     ) {
         this.utilisateurBdService = utilisateurBdService;
         this.confirmationTokenRepo = confirmationTokenRepo;
@@ -97,10 +108,13 @@ public class AuthenticationService {
         this.ssl = ssl;
         this.mailSignupMsg = mailSignupMsg;
         this.signupConfirmUrl = signupConfirmUrl;
+        this.changePasswordClientUrl = changePasswordClientUrl;
         this.mailFrom = mailFrom;
         this.mailSubject = mailSubject;
         this.mailClickLinkText = mailClickLinkText;
         this.mailFromName = mailFromName;
+        this.mailChangePasswdMsg = mailChangePasswdMsg;
+        this.mailChangePasswordSubject = mailChangePasswordSubject;
     }
 
 /*
@@ -140,7 +154,8 @@ public class AuthenticationService {
             MimeMessagePreparator msg = emailSender.buildMessage(
                     mailFrom,
                     mailFromName,
-                    mailSubject, user.getEmail(), null, null,
+                    mailSubject
+                    , user.getEmail(), null, null,
                     mailSignupMsg + " <a href=\"" + url + "\">" + mailClickLinkText + "</a>",
                     null);
             emailSender.sendEmail(msg);
@@ -148,6 +163,36 @@ public class AuthenticationService {
             confirmationTokenRepo.save(confirmationToken);
         }
 
+    }
+
+    @Transactional
+    public void inviteChangePasswd(String email) throws BadRequestException, UtilisateurNotFoundException {
+
+        Utilisateur user = utilisateurBdService.getRepo().findOneByEmail(email).orElseThrow(UtilisateurNotFoundException::new);
+        if (!user.getEnabled()) {
+            throw new BadRequestException("Cet utilisateur est actif. impossible d'éffectuer cette opération");
+        }
+
+        ConfirmationToken confirmationToken = new ConfirmationToken(user);
+
+        String prefixConfirmUrl = changePasswordClientUrl;
+        if (!has(changePasswordClientUrl)) {
+            prefixConfirmUrl = (Boolean.parseBoolean(ssl) ? "https://" : "http://")
+                    + (has(host) ? host : "localhost") + ":" + port + contextPath;
+            prefixConfirmUrl = prefixConfirmUrl + "/compteUtilisateur/changerMotDePasse/";
+        }
+        final String url = prefixConfirmUrl +
+                confirmationToken.getConfirmationToken() + "/" + user.getEmail();
+
+        MimeMessagePreparator msg = emailSender.buildMessage(
+                mailFrom,
+                mailFromName,
+                mailChangePasswordSubject, user.getEmail(), null, null,
+                mailChangePasswdMsg + " <a href=\"" + url + "\">" + mailClickLinkText + "</a>",
+                null);
+        emailSender.sendEmail(msg);
+        // gmailMessageService.send(mailMessage);
+        confirmationTokenRepo.save(confirmationToken);
     }
 
     public void sendPaswordToUser(Utilisateur user, String password) {
@@ -171,15 +216,14 @@ public class AuthenticationService {
      *
      * @param token    token
      * @param password mot de passse
-     * @throws Exception exception
      * @return
+     * @throws Exception exception
      */
     @Transactional
     public Utilisateur confirmUtilisateurAccount(String token, String password, String passwordEnc) throws BadInvitationLinkException, NotFoundException {
         ConfirmationToken confirmationToken = confirmationTokenRepo.findByConfirmationToken(token);
         if (has(confirmationToken)) {
-            Utilisateur user = utilisateurBdService.
-                    findById(confirmationToken.getUtilisateurId())
+            Utilisateur user = utilisateurBdService.findById(confirmationToken.getUtilisateurId())
                     .orElseThrow(UtilisateurNotFoundException::new);
             validateVerificationToken(token, user.getEmail());
             user.setEnabled(true);
@@ -192,6 +236,36 @@ public class AuthenticationService {
                 // user.setPassword(utilisateurBdService.getBCryptPasswordEncoder().encode(password));
             }
             utilisateurBdService.save(user);
+            confirmationTokenRepo.delete(confirmationToken);
+            return utilisateurBdService.findById(user.getId()).get();
+        } else {
+            throw new BadInvitationLinkException("Ce lien d'invitation est invalide");
+        }
+    }
+
+    @Transactional
+    public Utilisateur confirmResetPassword(String token, PasswordChangeByEmailDto dto) throws BadInvitationLinkException, NotFoundException {
+        ConfirmationToken confirmationToken = confirmationTokenRepo.findByConfirmationToken(token);
+        if (has(confirmationToken)) {
+            Utilisateur user = utilisateurBdService.
+                    findById(confirmationToken.getUtilisateurId())
+                    .orElseThrow(UtilisateurNotFoundException::new);
+
+            validateVerificationToken(token, user.getEmail());
+            if (has(dto.getNewPassword())) {
+                //String oldP = bCryptPasswordEncoder.encode(dto.getOldPassword());
+                try {
+                    if (has(dto.getPasswordConfirm()) && Objects.equals(dto.getNewPassword(), dto.getPasswordConfirm())) {
+                        // L'utilisateur a bien saisi l'ancien nom d'utilisateur
+                        utilisateurBdService.changePassword(user.getId(), dto.getPasswordEnc());
+                        //utilisateurBdService.changePassword(user.getId(), utilisateurBdService.getBCryptPasswordEncoder().encode(dto.getNewPassword()));
+                    } else {
+                        throw new BadConfirmPasswordException();
+                    }
+                } catch (AuthenticationException | BadConfirmPasswordException e) {
+                    throw new BadCredentialsException("Vos anciennes information Les information de connexion sont éronnées");
+                }
+            }
             confirmationTokenRepo.delete(confirmationToken);
             return utilisateurBdService.findById(user.getId()).get();
         } else {
@@ -223,10 +297,10 @@ public class AuthenticationService {
     }
 
     public void changePassword(PasswordChangeDto dto) throws NotFoundException, BadConfirmPasswordException, UnautorizedException {
-        Optional<UUID> optUId = sessionService.currentUserId();
-        UUID userId = optUId.orElseThrow(UnautorizedException::new);
+        /*Optional<UUID> optUId = sessionService.currentUserId();
+        UUID userId = optUId.orElseThrow(UnautorizedException::new);*/
         Utilisateur user = utilisateurBdService
-                .findById(userId).orElseThrow(UtilisateurNotFoundException::new);
+                .findByUsername(dto.getUsername()).orElseThrow(UtilisateurNotFoundException::new);
         if (has(dto.getNewPassword())) {
             //String oldP = bCryptPasswordEncoder.encode(dto.getOldPassword());
             try {
