@@ -283,15 +283,15 @@ public class AuthenticationService {
     }
 
     public void changeUsername(UserNameChangeDto dto) throws NotFoundException, UnautorizedException, ConflitException {
-        Optional<UUID> optUId = sessionService.currentUserId();
-        UUID userId = optUId.orElseThrow(UnautorizedException::new);
+        /*Optional<UUID> optUId = sessionService.currentUserId();
+        UUID userId = optUId.orElseThrow(UnautorizedException::new);*/
         Utilisateur user = utilisateurBdService
-                .findById(userId).orElseThrow(UtilisateurNotFoundException::new);
+                .findByUsername(dto.getUsername()).orElseThrow(UtilisateurNotFoundException::new);
 
         // Tentative de changement du nom d'utilisateur
         if (has(dto.getNewUsername()) && Objects.equals(user.getUsername(), dto.getUsername())) {
             // L'utilisateur a bien saisi l'ancien nom d'utilisateur
-            utilisateurBdService.checkDuplicateUserName(dto.getNewUsername(), userId);
+            utilisateurBdService.checkDuplicateUserName(dto.getNewUsername(), user.getId());
             utilisateurBdService.changeUsername(user.getId(), dto.getNewUsername());
         }
     }
