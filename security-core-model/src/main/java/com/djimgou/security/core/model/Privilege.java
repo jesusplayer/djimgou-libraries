@@ -5,6 +5,7 @@ import com.djimgou.core.util.AppUtils;
 import com.djimgou.security.core.model.dto.role.AuthorityDto;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -46,7 +47,7 @@ public class Privilege extends SecurityBaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "parent_id")
-    @JsonBackReference
+    //@JsonManagedReference
     Privilege parent;
 
     @OneToMany(mappedBy = "parent", orphanRemoval = true, fetch = FetchType.EAGER, cascade = {CascadeType.MERGE/*, CascadeType.REMOVE*/})
