@@ -9,10 +9,14 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.UUID;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ModifierProfilDto implements IDto {
+    @NotNull
+    UUID id;
+
     @NotNull @NotBlank @NotEmpty
     String nom;
 

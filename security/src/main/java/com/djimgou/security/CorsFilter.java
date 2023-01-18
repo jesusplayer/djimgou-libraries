@@ -55,7 +55,7 @@ public class CorsFilter extends GenericFilterBean {
 
                 // Access-Control-Allow-Headers
                 response.setHeader("Access-Control-Allow-Headers",
-                        "Origin, X-Requested-With, Content-Type, Accept, X-CSRF-TOKEN, X-TenantId, X-SessionId, X-Username");
+                        "Origin, X-Requested-With, Content-Type, Accept, X-CSRF-TOKEN, X-TenantId, X-SessionId, X-Username, X-Auth-With-Token");
             }
         }
 

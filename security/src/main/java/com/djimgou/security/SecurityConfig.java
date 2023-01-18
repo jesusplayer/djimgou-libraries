@@ -8,6 +8,7 @@ import com.djimgou.security.core.tracking.authentication.dao.ResourceRepository;
 import com.djimgou.security.enpoints.EndPointsRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDecisionVoter;
@@ -29,6 +30,7 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.session.SessionManagementFilter;
@@ -52,7 +54,11 @@ import java.util.List;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    /*    @Autowired
+
+    @Value("${auth.jwt.enabled:}")
+    Boolean jwtEnabled = false;
+
+    /*  @Autowired
         WebInvocationPrivilegeEvaluator evaluator;*/
     @Autowired
     AppSecurityConfig appSecurityConfig;
@@ -67,9 +73,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private AuthenticationManager authenticationManager;
 
     @Qualifier("userDetailsServiceImpl")
-
     @Autowired
-    private UserDetailsService authenticationService;
+    private UserDetailsService userDetailsService;
 
     @Autowired
     private FilterInvocationSecurityMetadataSource filterInvocationSecurityMetadataSource;
@@ -135,9 +140,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // Add Filter 1 - JWTLoginFilter
                 //
                 .addFilterBefore(new CorsFilter(), ChannelProcessingFilter.class)
+                .addFilterBefore(new AuthTokenFilter(userDetailsService, jwtEnabled, appSecurityConfig),
+                        UsernamePasswordAuthenticationFilter.class
+                )
+
                 /*.addFilterBefore(new JWTLoginFilter(UrlsAuthorized.LOGIN.toString(), authenticationManager()),
                         UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new JWTAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)*/
+                .addFilterBefore(new AuthTokenFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)*/
 
 
                 //.addFilterAfter(expiredSessionFilter(), SessionManagementFilter.class)
@@ -173,7 +182,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(authenticationService).passwordEncoder(passwordEncoder);
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
 
     }
 

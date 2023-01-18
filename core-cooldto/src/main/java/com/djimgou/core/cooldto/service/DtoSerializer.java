@@ -7,16 +7,7 @@ import com.djimgou.core.util.EntityRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-@Log4j2
-@Service
-public class DtoSerializerService implements DtoSerializer{
-
-    final private EntityRepository entityRepo;
-
-    public DtoSerializerService(EntityRepository entityRepo) {
-        this.entityRepo = entityRepo;
-    }
-
+public interface DtoSerializer {
     /**
      * Convertit automatiquement un dto en une entité pouvant être enregistrée
      *
@@ -24,10 +15,5 @@ public class DtoSerializerService implements DtoSerializer{
      * @param entity l'entité à produire
      * @throws DtoMappingException
      */
-    @Override
-    public void serialize(Object dto, Object entity) throws DtoMappingException {
-        DtoClassProcessor processor = DtoProcessorfactory.newInstance(dto, entity, entityRepo);
-        // Extraction
-        processor.dtoToEntity();
-    }
+    void serialize(Object dto, Object entity) throws DtoMappingException;
 }

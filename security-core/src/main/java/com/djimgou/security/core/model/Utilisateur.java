@@ -158,4 +158,10 @@ public class Utilisateur extends SecurityBaseEntity {
         return getId().toString();
     }
 
+    public String telephoneFormated() {
+        if (!has(getTelephone())) {
+            return getTelephone();
+        }
+        return getTelephone().replaceAll("\\+","");
+    }
 }

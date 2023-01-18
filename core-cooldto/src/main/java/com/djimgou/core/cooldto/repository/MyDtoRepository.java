@@ -3,6 +3,7 @@ package com.djimgou.core.cooldto.repository;
 import com.djimgou.core.cooldto.annotations.Dto;
 import com.djimgou.core.cooldto.exception.DtoMappingException;
 import com.djimgou.core.cooldto.exception.DtoTargetClassMissMatchException;
+import com.djimgou.core.cooldto.service.DtoSerializer;
 import com.djimgou.core.cooldto.service.DtoSerializerService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,15 +15,18 @@ import javax.persistence.PersistenceContext;
 
 import static com.djimgou.core.util.AppUtils.has;
 
+/**
+ * Composant permetant
+ */
 @Component
-class MyCoolDtoRepository implements ICoolDtoRepository {
+class MyDtoRepository implements IDtoRepository {
     @PersistenceContext
     private final EntityManager em;
 
-    private final DtoSerializerService serializer;
+    private final DtoSerializer serializer;
 
     @Autowired
-    public MyCoolDtoRepository(DtoSerializerService dtoSerial, EntityManager em) {
+    public MyDtoRepository(DtoSerializer dtoSerial, EntityManager em) {
         this.serializer = dtoSerial;
         this.em = em;
     }

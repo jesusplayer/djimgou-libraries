@@ -335,6 +335,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
             final BaseFilterAdvancedDto advancedDto = (BaseFilterAdvancedDto) filter;
             if (advancedDto != null) {
                 if (advancedDto.hasOtherFilters()) {
+                    advancedDto.ignoreNullOtherFilter();
                     processCustomFilters(advancedDto, expressionList, p, entityClass);
                 }
             }
