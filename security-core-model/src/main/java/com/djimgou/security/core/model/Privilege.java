@@ -31,11 +31,11 @@ import java.util.stream.Collectors;
 @EntityListeners({EntityListener.class})
 public class Privilege extends SecurityBaseEntity {
 
-    @Column(name = "code", nullable = false)
+    @Column(name = "code", nullable = false, unique = true)
     private String code;
 
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
     @Column(name = "description", length = 500)

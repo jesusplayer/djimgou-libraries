@@ -1,6 +1,7 @@
 package com.djimgou.security.core.repo;
 
 import com.djimgou.security.core.model.Utilisateur;
+import com.djimgou.security.core.model.dto.utilisateur.IUsernameDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -63,6 +64,10 @@ public interface UtilisateurBaseRepo<T extends Utilisateur, I> extends JpaReposi
 
     @Query("SELECT d FROM Utilisateur d WHERE d.username = :username")
     Optional<T> findValidatedUsername(@Param("username") String username);
+
+
+    @Query("SELECT d.id as id,d.username as username, d.email as email FROM Utilisateur d")
+    Page<IUsernameDto> findUsernames(Pageable pageRequest);
 
 
     Optional<T> findOneByNomAndPrenom(String nom, String prenom);

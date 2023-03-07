@@ -31,7 +31,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     UtilisateurBaseRepo<Utilisateur, UUID> customRepo;
 
     @Qualifier("appDefaultUtilisateurRepo")
-    @Autowired()
+    @Autowired
     UtilisateurBaseRepo<Utilisateur, UUID> repo;
 
     // @Autowired

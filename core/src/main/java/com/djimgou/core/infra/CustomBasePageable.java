@@ -9,9 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.djimgou.core.util.AppUtils.has;
@@ -30,6 +28,7 @@ public class CustomBasePageable<T> implements Pageable {
 
     Filter<T> filter;
     boolean notPaged = false;
+
     public CustomBasePageable(Pageable pg) {
         this.pg = pg;
         this.notPaged = pg.isUnpaged();
@@ -62,24 +61,14 @@ public class CustomBasePageable<T> implements Pageable {
      * @return
      */
     private Sort buildSort(String[] sortStr) {
-        List<Sort.Order> b = new ArrayList<>();
+        Set<Sort.Order> b = new HashSet<>();
         Sort sort = null;
-        if (has(sortStr)) {
+        if (sortStr != null && sortStr.length > 0) {
             if (sortStr.length == 1) {
-                b.add(Sort.Order.asc(sortStr[0]));
+                b.add(getSortOrder(sortStr[0]));
             } else {
                 for (int i = 1; i < sortStr.length; i++) {
-                    String s = sortStr[i];
-                    String s1 = sortStr[i - 1];
-                    Sort.Order o = null;
-                    if (has(s)) {
-                        if ("asc".equalsIgnoreCase(s)) {
-                            o = Sort.Order.asc(s1);
-                        } else if ("desc".equalsIgnoreCase(s)) {
-                            o = Sort.Order.desc(s1);
-                        }
-
-                    }
+                    Sort.Order o = getSortOrder(sortStr[i]);
                     if (has(o)) {
                         b.add(o);
                     }
@@ -90,6 +79,22 @@ public class CustomBasePageable<T> implements Pageable {
                     has).collect(Collectors.toList()));
         }
         return sort;
+    }
+
+    private Sort.Order getSortOrder(String sortStr) {
+        String[] split = sortStr.split(",");
+        String s = split[1];
+        String s1 = split[0];
+        Sort.Order o = null;
+        if (has(s)) {
+            if ("asc".equalsIgnoreCase(s)) {
+                o = Sort.Order.asc(s1);
+            } else if ("desc".equalsIgnoreCase(s)) {
+                o = Sort.Order.desc(s1);
+            }
+
+        }
+        return o;
     }
 
     public CustomBasePageable() {

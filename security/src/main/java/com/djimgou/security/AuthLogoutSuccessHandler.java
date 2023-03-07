@@ -9,6 +9,7 @@ import com.djimgou.security.core.model.Utilisateur;
 import com.djimgou.security.core.service.MyVoter;
 import com.djimgou.security.core.service.SecuritySessionService;
 import com.djimgou.security.core.service.UtilisateurBdService;
+import com.djimgou.security.service.TokenAuthenticationService;
 import com.djimgou.session.context.SessionContext;
 import com.djimgou.session.enums.SessionKeys;
 import com.djimgou.tenantmanager.aop.TenantContext;
@@ -51,11 +52,15 @@ public class AuthLogoutSuccessHandler implements org.springframework.security.we
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         Utilisateur utilisa = null;
-        String userId = (String) request.getAttribute(SessionKeys.USER_ID);
+        String username = (String) request.getAttribute(SessionKeys.USERNAME);
         request.removeAttribute(SessionKeys.USER_ID);
+        if (!has(username)) {
+            String jwt = TokenAuthenticationService.parseJwt(request);
+            username = TokenAuthenticationService.getUserNameFromJwtToken(jwt);
+        }
         //sessions.findByPrincipalName()
-        if (has(userId)) {
-            Optional<Utilisateur> u = utilisateurBdService.findById(UUID.fromString(userId));
+        if (has(username)) {
+            Optional<Utilisateur> u = utilisateurBdService.findByUsername(username);
             utilisa = u.get();
         }
         if (has(authentication)) {

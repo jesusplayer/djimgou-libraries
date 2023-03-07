@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="devGuylli-Gateway" type="MavenRunConfiguration" factoryName="Maven">
+  <configuration default="false" name="devGuylli-TenantMs" type="MavenRunConfiguration" factoryName="Maven">
     <MavenSettings>
       <option name="myGeneralSettings" />
       <option name="myRunnerSettings">
@@ -35,7 +35,7 @@
             </map>
           </option>
           <option name="resolveToWorkspace" value="false" />
-          <option name="workingDirPath" value="$PROJECT_DIR$/../../BEAC/previ-ms/previ-gateway" />
+          <option name="workingDirPath" value="$PROJECT_DIR$/../../BEAC/previ-ms/tenant-manager-ms" />
         </MavenRunnerParameters>
       </option>
     </MavenSettings>

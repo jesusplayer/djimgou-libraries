@@ -36,8 +36,8 @@ import javax.persistence.PersistenceContext;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-import static com.djimgou.core.util.AppUtils.endOfTheDay;
-import static com.djimgou.core.util.AppUtils.startOfTheDay;
+import static com.djimgou.core.util.AppUtils.*;
+import static com.djimgou.core.util.AppUtils.has;
 
 
 /**
@@ -48,6 +48,7 @@ import static com.djimgou.core.util.AppUtils.startOfTheDay;
 public class AuditBdService extends AbstractDomainServiceV2<Audit, AuditFindDto, AuditFilterDto, AuditDto, AuditDetaildto> {
 
     private SessionService sessionService;
+
     @Getter
     private AuditRepo repo;
 
@@ -56,7 +57,6 @@ public class AuditBdService extends AbstractDomainServiceV2<Audit, AuditFindDto,
         this.sessionService = sessionService;
         this.repo = repo;
     }
-
     /**
      * Ajoute une entité dans l'audit
      *
@@ -67,18 +67,23 @@ public class AuditBdService extends AbstractDomainServiceV2<Audit, AuditFindDto,
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public <T> Audit add(T entity, AuditAction action) {
+        String username = null; UUID userId = null;
+        if (sessionService.hasUser()) {
+            username = sessionService.username();
+            userId = sessionService.currentUserId().orElse(null);
+        }
+        return add(entity,action,username,userId);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public <T> Audit add(T entity, AuditAction action,String username,UUID userId ) {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         Audit audit = null;
         try {
             String str = objectMapper.writeValueAsString(entity);
-            UUID userId = null;
-            String username = null;
-            if (sessionService.hasUser()) {
-                username = sessionService.username();
-                userId = sessionService.currentUserId().orElse(null);
-            }
+           
             audit = new Audit(Calendar.getInstance().getTime(), str,
                     AppUtils.localizeClassName(entity.getClass().getSimpleName()), action,
                     userId,
@@ -102,6 +107,33 @@ public class AuditBdService extends AbstractDomainServiceV2<Audit, AuditFindDto,
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    @Override
+    public Page<Audit> searchPageable(AuditFindDto findDto) {
+        CustomPageable cpg = new CustomPageable(findDto);
+        if (cpg.getSort().isUnsorted()) {
+            cpg.setSort(Sort.by(Sort.Order.desc("date")));
+        }
+        Page<Audit> page;
+        String txt = findDto.getSearchText();
+
+        QAudit qUser = QAudit.audit;
+        List<BooleanExpression> expList = new ArrayList<>();
+        expList.add(qUser.nomEntite.containsIgnoreCase(txt));
+        expList.add(qUser.data.containsIgnoreCase(txt));
+        expList.add(qUser.username.containsIgnoreCase(txt));
+        expList.add(qUser.action.stringValue().containsIgnoreCase(txt));
+        expList.add(qUser.date.stringValue().containsIgnoreCase(txt));
+
+        BooleanExpression exp = expList.stream().reduce(null, (old, newE) -> has(old) ? old.or(newE) : newE);
+
+        if (has(exp)) {
+            page = repo.findAll(exp, cpg);
+        } else {
+            page = repo.findAll(cpg);
+        }
+        return page;
     }
     /*public Page<Audit> findByUserAndDate(Date dateDebut, Date dateFin, UUID utilisateurId) {
         Date startDate = appUtils.startOfDay(dateDebut);

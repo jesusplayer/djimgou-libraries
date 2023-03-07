@@ -1,5 +1,6 @@
 package com.djimgou.security.core.service;
 
+import com.djimgou.core.exception.ConflitException;
 import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.CustomPageable;
@@ -129,10 +130,16 @@ public class RoleService extends AbstractSecurityBdService<Role, RoleFindDto, Ro
         }
     }
 
-    public Role saveRole(UUID id, RoleDto dto) throws NotFoundException {
+    public Role saveRole(UUID id, RoleDto dto) throws NotFoundException, ConflitException {
         Role role = new Role();
         if (has(id)) {
             role = repo.findById(id).orElseThrow(RoleNotFoundException::new);
+        }else{
+
+            Optional<Role> opt2 = repo.findOneByName(dto.getName());
+            if(opt2.isPresent()){
+                throw new ConflitException("Un Rôle du même nom existe déjà");
+            }
         }
         updateChildren(role, dto);
 
@@ -182,7 +189,7 @@ public class RoleService extends AbstractSecurityBdService<Role, RoleFindDto, Ro
         return role;
     }
 
-    public Role createRole(RoleDto dto) throws NotFoundException {
+    public Role createRole(RoleDto dto) throws NotFoundException, ConflitException {
         return saveRole(null, dto);
     }
 

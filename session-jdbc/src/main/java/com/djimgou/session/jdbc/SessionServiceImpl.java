@@ -31,7 +31,7 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public boolean hasUser() {
-        return false;
+        return SessionContext.getCurrentUsername() != null;
     }
 
     @Override
@@ -64,6 +64,6 @@ public class SessionServiceImpl implements SessionService {
             return new CusHttpSession(sess);
         }
 
-        return httpSession;
+        return SessionContext.getCurrentSession()!=null?SessionContext.getCurrentSession():httpSession;
     }
 }

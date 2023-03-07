@@ -19,4 +19,8 @@ public class TenantSessionDto implements Serializable {
     String ville;
 
     Pays pays;
+    /**
+     * Nouveau token à retourner au client
+     */
+    String token;
 }

@@ -12,6 +12,7 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 /**
  * @author DJIMGOU NKENNE DANY MARC 08/2020
@@ -36,6 +37,9 @@ public interface AuditRepo extends BaseJpaRepository<Audit, UUID> {
     @Query("SELECT s FROM Audit s WHERE s.action=:action AND " +
             "(s.date BETWEEN :startDate AND :endDate)")
     Page<Audit> findByActionDate(@Param("action") AuditAction action, @Param("startDate") Date startDate, @Param("endDate") Date endDate, Pageable pageRequest);
+
+    @Query("SELECT DISTINCT s.nomEntite FROM Audit s")
+    List<String> findNomEntite();
 
     Page<Audit> findByAction(UUID utilisateurId, Pageable pageRequest);
 

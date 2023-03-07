@@ -28,7 +28,7 @@ import static com.djimgou.core.util.AppUtils.has;
 public class Role extends SecurityBaseEntity {
     public static final String ROLE_READONLY = "ROLE_READONLY";
 
-    @Column(name = "name", nullable = false, length = 128)
+    @Column(name = "name", nullable = false, length = 128, unique = true)
     private String name;
 
     @Column(name = "description", length = 500)

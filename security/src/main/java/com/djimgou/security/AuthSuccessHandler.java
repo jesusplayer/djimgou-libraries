@@ -9,6 +9,7 @@ import com.djimgou.security.core.model.Utilisateur;
 import com.djimgou.security.core.model.dto.utilisateur.UtilisateurSessionDto;
 import com.djimgou.security.core.service.MyVoter;
 import com.djimgou.security.core.service.SecuritySessionService;
+import com.djimgou.security.service.TokenAuthenticationService;
 import com.djimgou.session.context.SessionContext;
 import com.djimgou.session.enums.SessionKeys;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -70,7 +71,7 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
             session.setAttribute(SessionKeys.USER_ID, uId);
 
             Utilisateur user = uDetail.getUtilisateur().singleInfo();
-            auditBdService.add(user, AuditAction.CONNEXION);
+            auditBdService.add(user, AuditAction.CONNEXION, uDetail.getUsername(), uDetail.getUtilisateur().getId());
 
 
             ObjectMapper objectMapper = new ObjectMapper();
@@ -78,14 +79,19 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
             objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
             UtilisateurSessionDto uSess = new UtilisateurSessionDto();
             uSess.fromDto(uDetail.getUtilisateur());
-            String token = response.getHeader("Authorization");
+
+            String token = TokenAuthenticationService.addAuthentication(response, uSess.getUsername());
+            //String token = response.getHeader(TokenAuthenticationService.HEADER_STRING);
             uSess.setToken(token);
+
+
             String str = objectMapper.writeValueAsString(uSess);
             //session.setAttribute(SessionKeys.CONNECTED_USER, uSess);
             SessionContext.setCurrentSessionId(session.getId());
             SessionContext.setCurrentUsername(uSess.getUsername());
 
             session.setAttribute(SessionKeys.USERNAME, uSess.getUsername());
+            session.setAttribute(SessionKeys.USER_ID, uSess.getId().toString());
             session.setAttribute(SessionKeys.SESSION_ID, session.getId());
             response.setHeader("Content-Type", "application/json");
             response.getWriter().write(str);

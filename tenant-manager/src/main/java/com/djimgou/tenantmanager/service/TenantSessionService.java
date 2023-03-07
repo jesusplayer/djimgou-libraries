@@ -4,6 +4,7 @@ import com.djimgou.tenantmanager.exceptions.TenantSessionNotFoundException;
 import com.djimgou.tenantmanager.model.Tenant;
 import com.djimgou.tenantmanager.model.dto.tenant.TenantSessionDto;
 import com.djimgou.tenantmanager.repository.TenantRepo;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +12,7 @@ import java.util.HashMap;
 import java.util.Optional;
 
 import static com.djimgou.core.util.AppUtils.has;
-
+@NoArgsConstructor
 @Service
 public class TenantSessionService {
     private static HashMap<String, Tenant> tenantMap = new HashMap<>();

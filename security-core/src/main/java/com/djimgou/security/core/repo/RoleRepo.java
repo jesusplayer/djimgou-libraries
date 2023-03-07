@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -24,6 +25,8 @@ public interface RoleRepo extends JpaRepository<Role, UUID>, QuerydslPredicateEx
 
 
     Role findByName(String authority);
+
+    Optional<Role> findOneByName(String authority);
 ;
 
 }
