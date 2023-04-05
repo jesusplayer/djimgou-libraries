@@ -1,6 +1,8 @@
 package com.djimgou.tenantmanager.repository;
 
 import com.djimgou.tenantmanager.model.Tenant;
+import com.djimgou.tenantmanager.views.IPaysExport;
+import com.djimgou.tenantmanager.views.ITenantExport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -10,6 +12,7 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -46,4 +49,12 @@ public interface TenantRepo extends JpaRepository<Tenant, UUID>, QuerydslPredica
      * long countByNameEndingWith(String endString);
      * long countByNameLike(String likeString);
      */
+    @Query("SELECT " +
+            "v.code AS code, " +
+            "v.nom AS nom, " +
+            "v.pays.nom AS nomPays, " +
+            "v.ville AS ville " +
+            "FROM Tenant v " +
+            "")
+    List<ITenantExport> exporter();
 }

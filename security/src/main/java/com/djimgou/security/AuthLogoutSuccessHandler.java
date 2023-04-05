@@ -41,11 +41,13 @@ public class AuthLogoutSuccessHandler implements org.springframework.security.we
     private SecuritySessionService sessionService;
 
     private UtilisateurBdService utilisateurBdService;
+    private TokenAuthenticationService tokenAuthenticationService;
 
-    public AuthLogoutSuccessHandler(AuditBdService auditBdService, SecuritySessionService sessionService, UtilisateurBdService utilisateurBdService) {
+    public AuthLogoutSuccessHandler(AuditBdService auditBdService, SecuritySessionService sessionService, UtilisateurBdService utilisateurBdService, TokenAuthenticationService tokenAuthenticationService) {
         this.auditBdService = auditBdService;
         this.sessionService = sessionService;
         this.utilisateurBdService = utilisateurBdService;
+        this.tokenAuthenticationService = tokenAuthenticationService;
     }
 
     @SneakyThrows
@@ -56,7 +58,11 @@ public class AuthLogoutSuccessHandler implements org.springframework.security.we
         request.removeAttribute(SessionKeys.USER_ID);
         if (!has(username)) {
             String jwt = TokenAuthenticationService.parseJwt(request);
-            username = TokenAuthenticationService.getUserNameFromJwtToken(jwt);
+            try {
+                username = TokenAuthenticationService.getUserNameFromJwtToken(jwt);
+            } catch (Exception e) {
+                // Le token est invalide
+            }
         }
         //sessions.findByPrincipalName()
         if (has(username)) {

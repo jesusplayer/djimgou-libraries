@@ -1,6 +1,7 @@
 package com.djimgou.security.core.repo;
 
 import com.djimgou.security.core.model.Privilege;
+import com.djimgou.security.core.model.views.IPrivilegeExport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,5 +30,23 @@ public interface PrivilegeRepo extends JpaRepository<Privilege, UUID>, QuerydslP
 
     Optional<Privilege> findByCode(String nom);
 
+    /**
+     * Liste des enfants d'un privilège
+     * @param parentId
+     * @return
+     */
+    List<Privilege> findByParentId(UUID parentId);
+
+    List<Privilege> findByParentCode(String codePrivParent);
+
     Page<Privilege> findAll(Specification<Privilege> spec, Pageable pageRequest);
+
+
+    @Query("SELECT " +
+            "v.code AS code, " +
+            "v.name AS name, " +
+            "v.description AS description " +
+            "FROM Privilege v " +
+            "")
+    List<IPrivilegeExport> exporter();
 }

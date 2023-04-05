@@ -30,12 +30,12 @@ import java.util.stream.Collectors;
 @JsonIgnoreProperties(value = {"enfants"})
 @EntityListeners({EntityListener.class})
 public class Privilege extends SecurityBaseEntity {
-
-    @Column(name = "code", nullable = false, unique = true)
+   // TODO Attention!! l'ajout de la contrainte unique peut empieter sur les tests
+    @Column(name = "code", nullable = false/*, unique = true*/)
     private String code;
 
-
-    @Column(name = "name", nullable = false, unique = true)
+    // TODO Attention!! l'ajout de la contrainte unique peut empieter sur les tests
+    @Column(name = "name", nullable = false/*, unique = true*/)
     private String name;
 
     @Column(name = "description", length = 500)

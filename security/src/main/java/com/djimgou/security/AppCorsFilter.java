@@ -44,7 +44,7 @@ public class AppCorsFilter extends GenericFilterBean /*implements WebMvcConfigur
     HttpSession httpSession;
 
     boolean matchOrigin(String origin) {
-        if (allowedOrigins.contains(origin) || allowedOrigins.contains("*")) {
+        if (origin == null || allowedOrigins.contains(origin) || allowedOrigins.contains("*")) {
             return true;
         }
 
@@ -69,30 +69,35 @@ public class AppCorsFilter extends GenericFilterBean /*implements WebMvcConfigur
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         // https://stackoverflow.com/questions/43114750/header-in-the-response-must-not-be-the-wildcard-when-the-requests-credentia
         // Lets make sure that we are working with HTTP (that is, against HttpServletRequest and HttpServletResponse objects)
-        if (servletRequest instanceof HttpServletRequest && servletResponse instanceof HttpServletResponse) {
-            HttpServletRequest request = (HttpServletRequest) servletRequest;
-            HttpServletResponse response = (HttpServletResponse) servletResponse;
-            // request.getRequestURI().replace(request.getContextPath(),"")
-            // Access-Control-Allow-Origin
-            String origin = request.getHeader("Origin");
-            final String ACCES_CONTROL = "Access-Control-Allow-Origin";
-            if (!has(response.getHeader(ACCES_CONTROL))) {
-                response.setHeader(ACCES_CONTROL, matchOrigin(origin) ? origin : "");
-                response.setHeader("Vary", "Origin");
+        try {
+            if (servletRequest instanceof HttpServletRequest && servletResponse instanceof HttpServletResponse) {
+                HttpServletRequest request = (HttpServletRequest) servletRequest;
+                HttpServletResponse response = (HttpServletResponse) servletResponse;
+                // request.getRequestURI().replace(request.getContextPath(),"")
+                // Access-Control-Allow-Origin
+                String origin = request.getHeader("Origin");
+                final String ACCES_CONTROL = "Access-Control-Allow-Origin";
+                if (!has(response.getHeader(ACCES_CONTROL))) {
+                    response.setHeader(ACCES_CONTROL, matchOrigin(origin) ? origin : "");
+                    response.setHeader("Vary", "Origin");
 //                if(request.getContentType().contains(MediaType.MULTIPART_FORM_DATA_VALUE)){ }
-                // Access-Control-Max-Age
-                response.setHeader("Access-Control-Max-Age", "360000000");
+                    // Access-Control-Max-Age
+                    response.setHeader("Access-Control-Max-Age", "360000000");
 
-                // Access-Control-Allow-Credentials
-                response.setHeader("Access-Control-Allow-Credentials", "true");
+                    // Access-Control-Allow-Credentials
+                    response.setHeader("Access-Control-Allow-Credentials", "true");
 
-                // Access-Control-Allow-Methods
-                response.setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, OPTIONS, DELETE");
+                    // Access-Control-Allow-Methods
+                    response.setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, OPTIONS, DELETE");
 
-                // Access-Control-Allow-Headers
-                response.setHeader("Access-Control-Allow-Headers",
-                        "Origin, X-Requested-With, Content-Type, Accept, Authorization, X-CSRF-TOKEN, X-TenantId, X-SessionId, X-Username");
+                    // Access-Control-Allow-Headers
+                    response.setHeader("Access-Control-Allow-Headers",
+                            "Origin, X-Requested-With, Content-Type, Accept, Authorization, X-CSRF-TOKEN, X-TenantId, X-SessionId, X-Username");
+                }
             }
+
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
 
         filterChain.doFilter(servletRequest, servletResponse);

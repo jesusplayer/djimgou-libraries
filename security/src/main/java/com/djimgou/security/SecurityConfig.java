@@ -5,6 +5,7 @@ import com.djimgou.security.core.AppSecurityConfig;
 import com.djimgou.security.core.enpoints.EndPointsRegistry;
 import com.djimgou.security.core.model.Role;
 import com.djimgou.security.core.model.UrlsAuthorized;
+import com.djimgou.security.core.service.PrivileEvaluator;
 import com.djimgou.tenantmanager.service.TenantSessionService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -125,9 +127,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 if (appSecurityConfig.permitAll()) {
                     authorizedUrl.permitAll();
                 } else {
-                    authorizedUrl.hasAuthority(endPoint.getName());
+                    authorizedUrl.hasAnyAuthority(endPoint.getName(), Role.ROLE_ADMIN);
                     if (endPoint.getIsReadOnlyMethod()) {
-                        rule[0].antMatchers(endPoint.getHttpMethod(), endPoint.toSecurityUrl()).hasRole(Role.ROLE_READONLY);
+                   /*     rule[0].antMatchers(endPoint.getHttpMethod(), endPoint.toSecurityUrl()).hasAnyRole(Role.ROLE_READONLY.replaceAll("ROLE_",""),
+                                Role.ROLE_ADMIN.replaceAll("ROLE_",""));*/
+                        rule[0].antMatchers(endPoint.getHttpMethod(), endPoint.toSecurityUrl()).hasAnyAuthority(Role.ROLE_ADMIN, Role.ROLE_READONLY);
                     }
                 }
             });
@@ -137,6 +141,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 rule[0].antMatchers("**/**").permitAll();
                 rule[0].antMatchers("/**/**").permitAll();
                 rule[0].antMatchers("/**/*").permitAll();
+            } else {
+                rule[0].antMatchers("*").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+                rule[0].antMatchers("**/**").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+                rule[0].antMatchers("/**/**").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+                rule[0].antMatchers("/**/*").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+
+
+                rule[0].antMatchers(HttpMethod.GET, "*").hasAnyAuthority(Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+                rule[0].antMatchers(HttpMethod.GET, "**/**").hasAnyAuthority(Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+                rule[0].antMatchers(HttpMethod.GET, "/**/**").hasAnyAuthority(Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+                rule[0].antMatchers(HttpMethod.GET, "/**/*").hasAnyAuthority(Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+
             }
         }
 

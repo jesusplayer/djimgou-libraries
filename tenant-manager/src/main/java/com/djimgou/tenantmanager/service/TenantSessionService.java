@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Optional;
 
 import static com.djimgou.core.util.AppUtils.has;
+
 @NoArgsConstructor
 @Service
 public class TenantSessionService {
@@ -23,6 +24,15 @@ public class TenantSessionService {
     @Autowired(required = false)
     public TenantSessionService(TenantRepo tenantRepo) {
         this.tenantRepo = tenantRepo;
+    }
+
+    public synchronized void refreshTenant(Tenant tenant) throws TenantSessionNotFoundException {
+        String tenantId = has(tenant.getExternalId()) ? tenant.getExternalId() : has(tenant.getId()) ? tenant.getId().toString() : null;
+        if (!has(tenantId) || !tenantMap.containsKey(tenant.getExternalId())) {
+            tenant = tenantRepo.findByExternalId(tenantId).orElseThrow(TenantSessionNotFoundException::new);
+
+        }
+        tenantMap.put(tenantId, tenant);
     }
 
     public synchronized Optional<Tenant> putTenant(String tenantId) throws TenantSessionNotFoundException {

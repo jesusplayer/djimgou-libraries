@@ -13,4 +13,5 @@ import java.util.UUID;
 @Repository("appDefaultUtilisateurRepo")
 public interface UtilisateurRepo extends UtilisateurBaseRepo<Utilisateur, UUID> {
 
+
 }

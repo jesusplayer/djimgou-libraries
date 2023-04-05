@@ -1,6 +1,7 @@
 package com.djimgou.security.core.repo;
 
 import com.djimgou.security.core.model.Role;
+import com.djimgou.security.core.model.views.IRoleExport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,7 +28,20 @@ public interface RoleRepo extends JpaRepository<Role, UUID>, QuerydslPredicateEx
 
     Role findByName(String authority);
 
+    List<Role> findByParentId(UUID parentId);
+
+    List<Role> findByPrivilegesIdIn(List<UUID> privilegeIds);
+
+    List<Role> findByPrivilegesCodeIn(List<String> privilegeCodes);
+
     Optional<Role> findOneByName(String authority);
-;
+
+    @Query("SELECT " +
+            "v.name AS name, " +
+            "v.description AS description, " +
+            "v.parent.name AS nomParent " +
+            "FROM Role v " +
+            "")
+    List<IRoleExport> exporter();
 
 }

@@ -19,6 +19,8 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.djimgou.core.util.AppUtils.has;
+
 @Log4j2
 @Component
 public class SecuritySessionService {
@@ -46,7 +48,11 @@ public class SecuritySessionService {
     }
 
     public Optional<UUID> currentUserId() {
-        return sessionService.currentUserId();
+        UtilisateurDetails user = currentUser();
+        if (has(user.getUtilisateur())) {
+            return Optional.ofNullable(user.getUtilisateur().getId());
+        }
+        return Optional.empty();
     }
 
 
@@ -66,16 +72,16 @@ public class SecuritySessionService {
     }
 
     public boolean hasUser(Authentication authentication) {
-        return AppUtils.has(currentUser(authentication));
+        return has(currentUser(authentication));
     }
 
     public boolean hasUser() {
-        return AppUtils.has(currentUser());
+        return has(currentUser());
     }
 
     public Utilisateur currentUserFromDb(AbstractSecurityBdService<Utilisateur, UtilisateurFindDto, UtilisateurFilterDto> utilisateurBdService) {
         UtilisateurDetails curUser = currentUser();
-        if (AppUtils.has(curUser)) {
+        if (has(curUser)) {
             Utilisateur u = curUser.getUtilisateur();
             return utilisateurBdService.searchById(u.getId());
         } /*else {

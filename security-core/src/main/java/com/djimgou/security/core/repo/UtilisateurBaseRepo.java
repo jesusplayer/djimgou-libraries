@@ -2,6 +2,7 @@ package com.djimgou.security.core.repo;
 
 import com.djimgou.security.core.model.Utilisateur;
 import com.djimgou.security.core.model.dto.utilisateur.IUsernameDto;
+import com.djimgou.security.core.model.views.IUtilisateurExport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -13,6 +14,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,7 +33,6 @@ public interface UtilisateurBaseRepo<T extends Utilisateur, I> extends JpaReposi
             "LOWER(d.prenom) LIKE LOWER(CONCAT('%',:searchText, '%')) " +
             ")")
     Page<T> findBySearchText(@Param("searchText") String searchText, Pageable pageRequest);
-
 
 
     @Modifying
@@ -85,7 +86,21 @@ public interface UtilisateurBaseRepo<T extends Utilisateur, I> extends JpaReposi
 
     Page<T> findAll(Specification<T> spec, Pageable pageRequest);
 
+    List<T> findByAuthoritiesIdIn(List<UUID> rolesIds);
 
+    List<T> findByAuthoritiesNameIn(List<String> codes);
+
+    long countByAuthoritiesNameIn(List<String> codes);
+
+    List<T> findByTenantsIdIn(List<UUID> tenantIds);
+
+    long countByTenantsIdIn(List<UUID> tenantIds);
+
+    List<T> findByTenantsCodeIn(List<String> tenantCodes);
+
+    long countByTenantsCodeIn(List<String> tenantCodes);
+
+    List<T> findByTenantsNomIn(List<String> tenantNames);
 
     @Modifying
     @Query("UPDATE Utilisateur u SET u.enabled = ?1 where u.id = ?2")
@@ -109,5 +124,17 @@ public interface UtilisateurBaseRepo<T extends Utilisateur, I> extends JpaReposi
     void changeUsername(
             @Param("id") UUID id,
             @Param("username") String username
-            );
+    );
+
+
+    @Query("SELECT " +
+            "v.username AS codeSecteur, " +
+            "v.enabled AS enabled, " +
+            "v.email AS email, " +
+            "concat(v.nom,' ',v.prenom) AS fullName, " +
+            "v.telephone AS telephone, " +
+            "v.fonction AS fonction " +
+            "FROM Utilisateur v " +
+            "")
+    List<IUtilisateurExport> exporter();
 }

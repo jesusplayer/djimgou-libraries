@@ -1,7 +1,10 @@
 package com.djimgou.security.core.service;
 
+import com.djimgou.core.exception.AppException;
+import com.djimgou.core.exception.BadRequestException;
 import com.djimgou.core.exception.ConflitException;
 import com.djimgou.core.exception.NotFoundException;
+import com.djimgou.core.export.DataExportParser;
 import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.CustomPageable;
 import com.djimgou.security.core.exceptions.PrivilegeNotFoundException;
@@ -9,11 +12,13 @@ import com.djimgou.security.core.exceptions.RoleNotFoundException;
 import com.djimgou.security.core.model.Privilege;
 import com.djimgou.security.core.model.QRole;
 import com.djimgou.security.core.model.Role;
+import com.djimgou.security.core.model.Utilisateur;
 import com.djimgou.security.core.model.dto.role.RoleDto;
 import com.djimgou.security.core.model.dto.role.RoleFilterDto;
 import com.djimgou.security.core.model.dto.role.RoleFindDto;
 import com.djimgou.security.core.repo.PrivilegeRepo;
 import com.djimgou.security.core.repo.RoleRepo;
+import com.djimgou.security.core.repo.UtilisateurRepo;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAQueryBase;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -46,13 +51,20 @@ public class RoleService extends AbstractSecurityBdService<Role, RoleFindDto, Ro
 
     private PrivilegeRepo privilegeRepo;
 
-    public RoleService(RoleRepo repo, SessionManager sessionManager, PrivilegeRepo privilegeRepo) {
+    private UtilisateurRepo utilisateurRepo;
+    private DataExportParser dataExportParser;
+    public RoleService(RoleRepo repo, SessionManager sessionManager, PrivilegeRepo privilegeRepo, UtilisateurRepo utilisateurRepo, DataExportParser dataExportParser) {
         super(repo);
         this.repo = repo;
         this.sessionManager = sessionManager;
         this.privilegeRepo = privilegeRepo;
+        this.utilisateurRepo = utilisateurRepo;
+        this.dataExportParser = dataExportParser;
     }
-
+    public List<List<?>> exporter() {
+        List<List<?>> er = dataExportParser.parse(repo.exporter());
+        return er;
+    }
     @Override
     public Page<Role> advancedSearchBy(BaseFilterDto baseFilter) throws Exception {
         return null;
@@ -130,14 +142,34 @@ public class RoleService extends AbstractSecurityBdService<Role, RoleFindDto, Ro
         }
     }
 
-    public Role saveRole(UUID id, RoleDto dto) throws NotFoundException, ConflitException {
+    public Role saveRole(UUID id, RoleDto dto) throws NotFoundException, ConflitException, BadRequestException {
         Role role = new Role();
+
         if (has(id)) {
+
             role = repo.findById(id).orElseThrow(RoleNotFoundException::new);
-        }else{
+
+            Set<Role> enfants = role.getEnfants();
+
+            if (enfants != null) {
+                enfants.add(role);
+            } else {
+                enfants = new HashSet<>();
+            }
+
+            if (has(dto.getParentId())) {
+                boolean match = enfants.stream().map(Role::getId).anyMatch(enfantId ->
+                        Objects.equals(dto.getParentId(), enfantId)
+                );
+                if (match) {
+                    throw new BadRequestException("Un rôle ne peut avoir comme parent lui-même ni l'un de ses enfants");
+                }
+            }
+
+        } else {
 
             Optional<Role> opt2 = repo.findOneByName(dto.getName());
-            if(opt2.isPresent()){
+            if (opt2.isPresent()) {
                 throw new ConflitException("Un Rôle du même nom existe déjà");
             }
         }
@@ -189,7 +221,7 @@ public class RoleService extends AbstractSecurityBdService<Role, RoleFindDto, Ro
         return role;
     }
 
-    public Role createRole(RoleDto dto) throws NotFoundException, ConflitException {
+    public Role createRole(RoleDto dto) throws NotFoundException, ConflitException, BadRequestException {
         return saveRole(null, dto);
     }
 
@@ -219,18 +251,28 @@ public class RoleService extends AbstractSecurityBdService<Role, RoleFindDto, Ro
         return super.save(entity);
     }
 
-    @Override
-    public void delete(Role entity) throws RoleNotFoundException {
-        entity.getEnfants().clear();
-        repo.delete(entity);
-        afterDataDeleted(entity);
+    @Transactional
+    public void deleteRoleById(UUID id) throws AppException {
+        Role role = repo.findById(id).orElseThrow(RoleNotFoundException::new);
+        List<Role> enfants = repo.findByParentId(role.getId());
+        if (has(role.getEnfants())) {
+            throw new AppException("Impossible de supprimer ce rôle car il contient " + enfants.size() + " rôle(s) fils (" + enfants.stream().map(Role::getName).collect(Collectors.joining(",")) + ")");
+        }
+
+        final List<Utilisateur> utilisateurs = utilisateurRepo.findByAuthoritiesIdIn(Arrays.asList(role.getId()));
+
+        if (has(utilisateurs)) {
+            throw new AppException("Impossible de supprimer ce rôle car " + utilisateurs.size() + " utilisateur(s) l'utilise(nt) (" + utilisateurs.stream().map(Utilisateur::getUsername).collect(Collectors.joining(",")) + ")");
+        }
+
+        if (has(role.getPrivileges())) {
+            role.getPrivileges().clear();
+        }
+
+        repo.delete(role);
+        afterDataDeleted(role);
     }
 
-    @Override
-    public void deleteById(UUID id) throws RoleNotFoundException {
-        Role role = repo.findById(id).orElseThrow(RoleNotFoundException::new);
-        delete(role);
-    }
 
     public void afterDataSaved(Role data) {
         sessionManager.authorityUpdated();

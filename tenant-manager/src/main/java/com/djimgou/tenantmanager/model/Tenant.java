@@ -46,7 +46,7 @@ public class Tenant extends BaseBdEntity {
 
     Boolean actif = Boolean.TRUE;
 
-
+    Boolean readonlyValue = Boolean.FALSE;
 
     @PrePersist
     void beforeSave() {

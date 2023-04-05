@@ -27,6 +27,7 @@ import static com.djimgou.core.util.AppUtils.has;
 @EntityListeners({EntityListener.class})
 public class Role extends SecurityBaseEntity {
     public static final String ROLE_READONLY = "ROLE_READONLY";
+    public static final String ROLE_ADMIN = "ROLE_ADMIN";
 
     @Column(name = "name", nullable = false, length = 128, unique = true)
     private String name;

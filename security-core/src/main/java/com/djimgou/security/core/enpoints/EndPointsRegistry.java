@@ -1,6 +1,7 @@
 package com.djimgou.security.core.enpoints;
 
 import com.djimgou.core.annotations.Endpoint;
+import com.djimgou.security.core.model.UrlsAuthorized;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.ApplicationContext;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.djimgou.core.util.AppUtils.has;
 
@@ -36,7 +38,9 @@ public class EndPointsRegistry {
         if (endpointsMap == null) {
             setEndpointsMap(new HashMap<>());
         }
-        endpointsMap.put(url, e);
+        if (!(e.getName().contains("openApiResource#") || e.getName().contains("swaggerWelcome#")) && Stream.of(UrlsAuthorized.values()).map(UrlsAuthorized::toString).noneMatch(s -> Objects.equals(s,url))) {
+            endpointsMap.put(url, e);
+        }
     }
 
     public Collection<SecuredEndPoint> endPoints() {
@@ -50,8 +54,13 @@ public class EndPointsRegistry {
         if (!map.isEmpty()) {
             map.forEach((key, value) -> {
                 PatternsRequestCondition patternsCondition = key.getPatternsCondition();
+                String path;
                 if (has(patternsCondition) && has(patternsCondition.getPatterns())) {
-                    String path = patternsCondition.getPatterns().iterator().next();
+                    path = patternsCondition.getPatterns().iterator().next();
+                } else {
+                    path = key.getPathPatternsCondition().getPatterns().iterator().next().toString();
+                }
+                if (has(path)) {
                     final Iterator<RequestMethod> methodIterator = key.getMethodsCondition().getMethods().iterator();
                     HttpMethod httpMethod = null;
                     SecuredEndPoint endPoint = SecuredEndPoint.builder().url(path).build();
@@ -71,8 +80,8 @@ public class EndPointsRegistry {
                     }
 
                     Map<String, Param> params = Arrays.stream(value.getMethodParameters()).filter(methodParameter ->
-                                    methodParameter.hasParameterAnnotation(RequestParam.class)
-                            )
+                            methodParameter.hasParameterAnnotation(RequestParam.class)
+                    )
                             .collect(Collectors.toMap(methodParameter ->
                                             methodParameter.getParameter().getName(),
                                     o -> {

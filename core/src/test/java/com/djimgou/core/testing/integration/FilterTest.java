@@ -1,11 +1,15 @@
 package com.djimgou.core.testing.integration;
 
+import com.djimgou.core.export.DataExportParser;
+import com.djimgou.core.export.ExportHeader;
 import com.djimgou.core.infra.QueryFieldFilter;
 import com.djimgou.core.infra.QueryFilterOperator;
 import com.djimgou.core.infra.QueryOperation;
 import com.djimgou.core.test.initilizer.GenericDbManager;
 import com.djimgou.core.test.util.FakeBuilder;
 import com.djimgou.core.testing.app.MaincoreTestApplication;
+import com.djimgou.core.testing.app.export.IRefVariableExport;
+import com.djimgou.core.testing.app.export.RefVar;
 import com.djimgou.core.testing.app.model.*;
 import com.djimgou.core.testing.app.service.CategorieService;
 import com.djimgou.core.util.EntityRepository;
@@ -54,12 +58,15 @@ public class FilterTest {
 
     private final CategorieService categorieService;
 
+    private DataExportParser dataExportParser;
+
     @Autowired
     public FilterTest(
             GenericDbManager dbManager,
             TestRestTemplate restTemplate, @LocalServerPort int port, ServletContext servletContext,
             EntityRepository er,
-            CategorieService categorieService
+            CategorieService categorieService,
+            DataExportParser dataExportParser
     ) {
         dbManager.initDb();
         this.dbManager = dbManager;
@@ -69,6 +76,7 @@ public class FilterTest {
         this.restTemplate = restTemplate;
         this.er = er;
         this.categorieService = categorieService;
+        this.dataExportParser = dataExportParser;
         createAcategories();
 
     }
@@ -165,6 +173,19 @@ public class FilterTest {
         sFilterDto.setOtherFilters(l);
         Page<Categorie> page3 = categorieService.advancedFindBy(sFilterDto);
         assertEquals(1, page3.getNumberOfElements());
+    }
+
+    @SneakyThrows
+    @DisplayName("tester extraction des colonnes")
+    @Test
+    public void testExtractExportColumn() {
+        List<RefVar> list = new ArrayList<>();
+        list.add(new RefVar());
+        list.add(new RefVar());
+        list.add(new RefVar());
+       // List<ExportHeader> col = dataExportParser.parseColumn(IRefVariableExport.class);
+        List<List<?>> res = dataExportParser.parse(list);
+        assertFalse(res.isEmpty());
     }
 
 

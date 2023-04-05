@@ -1,17 +1,23 @@
 package com.djimgou.security.core.service;
 
+import com.djimgou.core.exception.AppException;
 import com.djimgou.core.exception.ConflitException;
 import com.djimgou.core.exception.NotFoundException;
+import com.djimgou.core.export.DataExportParser;
 import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.CustomPageable;
 import com.djimgou.security.core.exceptions.PrivilegeNotFoundException;
 import com.djimgou.security.core.exceptions.ReadOnlyException;
+import com.djimgou.security.core.exceptions.RoleNotFoundException;
 import com.djimgou.security.core.model.Privilege;
 import com.djimgou.security.core.model.QPrivilege;
+import com.djimgou.security.core.model.Role;
+import com.djimgou.security.core.model.Utilisateur;
 import com.djimgou.security.core.model.dto.privilege.PrivilegeDto;
 import com.djimgou.security.core.model.dto.privilege.PrivilegeFilterDto;
 import com.djimgou.security.core.model.dto.privilege.PrivilegeFindDto;
 import com.djimgou.security.core.repo.PrivilegeRepo;
+import com.djimgou.security.core.repo.RoleRepo;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAQueryBase;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -40,12 +46,20 @@ public class PrivilegeService extends AbstractSecurityBdService<Privilege, Privi
 
     @PersistenceContext
     EntityManager em;
+    private RoleRepo roleRepo;
+    private DataExportParser dataExportParser;
 
     @Autowired
-    public PrivilegeService(PrivilegeRepo repo) {
+    public PrivilegeService(PrivilegeRepo repo, RoleRepo roleRepo, DataExportParser dataExportParser) {
         super(repo);
         this.repo = repo;
+        this.roleRepo = roleRepo;
+        this.dataExportParser = dataExportParser;
+    }
 
+    public List<List<?>> exporter() {
+        List<List<?>> er = dataExportParser.parse(repo.exporter());
+        return er;
     }
 
     @Transactional
@@ -132,13 +146,13 @@ public class PrivilegeService extends AbstractSecurityBdService<Privilege, Privi
             priv = repo.findById(id).orElseThrow(PrivilegeNotFoundException::new);
             dto.setCode(priv.getCode());
             chackreadOnly(priv);
-        }else {
+        } else {
             Optional<Privilege> opt = repo.findByCode(dto.getCode());
-            if(opt.isPresent()){
+            if (opt.isPresent()) {
                 throw new ConflitException("Un privilège du même code existe déjà");
             }
             Optional<Privilege> opt2 = repo.findByName(dto.getCode());
-            if(opt2.isPresent()){
+            if (opt2.isPresent()) {
                 throw new ConflitException("Un privilège du même nom existe déjà");
             }
         }
@@ -198,6 +212,29 @@ public class PrivilegeService extends AbstractSecurityBdService<Privilege, Privi
     public void deleteById(UUID id) throws PrivilegeNotFoundException {
         Privilege p = repo.findById(id).orElseThrow(PrivilegeNotFoundException::new);
         repo.deleteById(id);
+    }
+
+    @Transactional
+    public void deletePrivilegeById(UUID id) throws AppException {
+        Privilege privilege = repo.findById(id).orElseThrow(PrivilegeNotFoundException::new);
+        List<Privilege> enfants = repo.findByParentId(privilege.getId());
+
+        if (has(privilege.getEnfants())) {
+            throw new AppException("Impossible de supprimer ce privilège car il contient " + enfants.size() + " privilèges(s) fils(" + enfants.stream().map(Privilege::getCode).collect(Collectors.joining(",")) + ")");
+        }
+
+        final List<Role> roles = roleRepo.findByPrivilegesIdIn(Arrays.asList(privilege.getId()));
+
+        if (has(roles)) {
+            throw new AppException("Impossible de supprimer ce privilège car " + roles.size() + " rôles(s) l'utilise(nt) (" + roles.stream().map(Role::getName).collect(Collectors.joining(",")) + ")");
+        }
+
+        if (has(privilege.getEnfants())) {
+            privilege.getEnfants().clear();
+        }
+
+        repo.delete(privilege);
+        //afterDataDeleted(privilege);
     }
 
     @Transactional

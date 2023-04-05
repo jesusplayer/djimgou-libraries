@@ -22,6 +22,7 @@ import javax.validation.constraints.NotBlank;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EntityListeners(EntityListener.class)
 public class Pays extends BaseBdEntity {
+    public static String SC = "SC";
 
     @Column(unique = true)
     @NotBlank()
@@ -32,4 +33,6 @@ public class Pays extends BaseBdEntity {
     @NotBlank()
     @FullTextField
     String nom;
+
+    Boolean readonlyValue = Boolean.FALSE;
 }

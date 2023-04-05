@@ -3,6 +3,7 @@ package com.djimgou.security.core.service;
 import com.djimgou.core.exception.ConflitException;
 import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.mail.EmailSenderService;
+import com.djimgou.security.core.UtilisateurDetails;
 import com.djimgou.security.core.exceptions.*;
 import com.djimgou.security.core.model.ConfirmationToken;
 import com.djimgou.security.core.model.Utilisateur;
@@ -209,50 +210,56 @@ public class AuthenticationService {
     }
 
     public void changeUsername(UserNameChangeDto dto) throws NotFoundException, UnautorizedException, ConflitException {
-        Optional<UUID> optUId = sessionService.currentUserId();
-        UUID userId = optUId.orElseThrow(UnautorizedException::new);
-        Utilisateur user = utilisateurBdService
-                .findById(userId).orElseThrow(UtilisateurNotFoundException::new);
+        UtilisateurDetails uDet = sessionService.currentUser();
+        if(has(uDet) && has(uDet.getUsername())){
+        Utilisateur user = uDet.getUtilisateur();
 
         // Tentative de changement du nom d'utilisateur
         if (has(dto.getNewUsername()) && Objects.equals(user.getUsername(), dto.getUsername())) {
             // L'utilisateur a bien saisi l'ancien nom d'utilisateur
-            utilisateurBdService.checkDuplicateUserName(dto.getNewUsername(), userId);
+            utilisateurBdService.checkDuplicateUserName(dto.getNewUsername(), user.getId());
             utilisateurBdService.changeUsername(user.getId(), dto.getNewUsername());
+        }
+    }
+        else {
+            throw new UnautorizedException("Vous n'êtes pas autorisé à effectué cette opération");
         }
     }
 
     public void changePassword(PasswordChangeDto dto) throws NotFoundException, BadConfirmPasswordException, UnautorizedException {
-        Optional<UUID> optUId = sessionService.currentUserId();
-        UUID userId = optUId.orElseThrow(UnautorizedException::new);
-        Utilisateur user = utilisateurBdService
-                .findById(userId).orElseThrow(UtilisateurNotFoundException::new);
-        if (has(dto.getNewPassword())) {
-            //String oldP = bCryptPasswordEncoder.encode(dto.getOldPassword());
-            try {
-                if (has(dto.getPasswordConfirm()) && Objects.equals(dto.getNewPassword(), dto.getPasswordConfirm())) {
-                    // On vérifie si cest anciennes
-                    UsernamePasswordAuthenticationToken authReq
-                            = new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword());
-                    /**
-                     * Dans le cas ou le module parent
-                     * est un microservice, le SecurityConfig n'est
-                     * pas créé et par conséquent
-                     * nest pas controlé par spring security
-                     * par co
-                     */
-                    if (has(authenticationManager)) {
-                        authenticationManager.authenticate(authReq);
+        UtilisateurDetails uDet = sessionService.currentUser();
+        if(has(uDet) && has(uDet.getUsername())){
+            Utilisateur user = uDet.getUtilisateur();
+            if (has(dto.getNewPassword())) {
+                //String oldP = bCryptPasswordEncoder.encode(dto.getOldPassword());
+                try {
+                    if (has(dto.getPasswordConfirm()) && Objects.equals(dto.getNewPassword(), dto.getPasswordConfirm())) {
+                        // On vérifie si cest anciennes
+                        UsernamePasswordAuthenticationToken authReq
+                                = new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword());
+                        /**
+                         * Dans le cas ou le module parent
+                         * est un microservice, le SecurityConfig n'est
+                         * pas créé et par conséquent
+                         * nest pas controlé par spring security
+                         * par co
+                         */
+                        if (has(authenticationManager)) {
+                            authenticationManager.authenticate(authReq);
+                        }
+                        // L'utilisateur a bien saisi l'ancien nom d'utilisateur
+                        utilisateurBdService.changePassword(user.getId(), dto.getPasswordEnc());
+                        //utilisateurBdService.changePassword(user.getId(), utilisateurBdService.getBCryptPasswordEncoder().encode(dto.getNewPassword()));
+                    } else {
+                        throw new BadConfirmPasswordException();
                     }
-                    // L'utilisateur a bien saisi l'ancien nom d'utilisateur
-                    utilisateurBdService.changePassword(user.getId(), dto.getPasswordEnc());
-                    //utilisateurBdService.changePassword(user.getId(), utilisateurBdService.getBCryptPasswordEncoder().encode(dto.getNewPassword()));
-                } else {
-                    throw new BadConfirmPasswordException();
+                } catch (AuthenticationException e) {
+                    throw new BadCredentialsException("Vos anciennes information Les information de connexion sont éronnées");
                 }
-            } catch (AuthenticationException e) {
-                throw new BadCredentialsException("Vos anciennes information Les information de connexion sont éronnées");
             }
+
+        }else {
+            throw new UnautorizedException("Vous n'êtes pas autorisé à effectué cette opération");
         }
 
 

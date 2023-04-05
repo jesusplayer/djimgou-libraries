@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
@@ -28,6 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+
+import static com.djimgou.core.util.AppUtils.has;
 
 /**
  * @author DJIMGOU NKENNE DANY MARC 08/2020
@@ -42,9 +45,12 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
 
     private SecuritySessionService sessionService;
 
-    public AuthSuccessHandler(AuditBdService auditBdService, SecuritySessionService sessionService) {
+    private TokenAuthenticationService tokenAuthenticationService;
+
+    public AuthSuccessHandler(AuditBdService auditBdService, SecuritySessionService sessionService, TokenAuthenticationService tokenAuthenticationService) {
         this.auditBdService = auditBdService;
         this.sessionService = sessionService;
+        this.tokenAuthenticationService = tokenAuthenticationService;
     }
 
     @Override
@@ -64,10 +70,10 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         UtilisateurDetails uDetail = sessionService.currentUser(authentication);
-        if (AppUtils.has(uDetail)) {
+        if (has(uDetail)) {
             MyVoter.userSessionToUpdate.put(uDetail.getUsername(), Boolean.FALSE);
             String uId = uDetail.getUtilisateur().getId().toString();
-            final HttpSession session= request.getSession();
+            final HttpSession session = request.getSession();
             session.setAttribute(SessionKeys.USER_ID, uId);
 
             Utilisateur user = uDetail.getUtilisateur().singleInfo();
@@ -80,7 +86,7 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
             UtilisateurSessionDto uSess = new UtilisateurSessionDto();
             uSess.fromDto(uDetail.getUtilisateur());
 
-            String token = TokenAuthenticationService.addAuthentication(response, uSess.getUsername());
+            String token = tokenAuthenticationService.addAuthentication2(response, uSess.getUsername());
             //String token = response.getHeader(TokenAuthenticationService.HEADER_STRING);
             uSess.setToken(token);
 

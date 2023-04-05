@@ -9,9 +9,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.djimgou.core.util.AppUtils.has;
@@ -177,6 +175,36 @@ public class Utilisateur extends SecurityBaseEntity {
 
     public boolean hasTenants() {
         return has(tenants);
+    }
+
+    public boolean hasTenant(String tenantCode) {
+        if (has(tenantCode) && has(tenants)) {
+            return tenants.stream().anyMatch(tenant -> Objects.equals(tenant.getCode(), tenantCode));
+        }
+        return false;
+    }
+
+    public boolean hasPaysInTenants(String paysCode) {
+        if (has(paysCode) && has(tenants)) {
+            return tenants.stream().anyMatch(tenant -> Objects.equals(tenant.getPays().getCode(), paysCode));
+        }
+        return false;
+    }
+
+    public boolean hasTenantId(UUID tenantId) {
+        if (has(tenantId) && has(tenants)) {
+            return tenants.stream().anyMatch(tenant -> Objects.equals(tenant.getId(), tenantId));
+        }
+        return false;
+    }
+
+    @JsonIgnore
+    @Transient
+    public boolean isSuperAdmin() {
+        if (has(this.getAuthorities())) {
+            return this.getAuthorities().stream().anyMatch(authority -> authority.getName().equals("ROLE_ADMIN"));
+        }
+        return false;
     }
 
     @Override

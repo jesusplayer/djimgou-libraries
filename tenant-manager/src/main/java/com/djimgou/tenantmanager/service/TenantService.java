@@ -1,6 +1,10 @@
 package com.djimgou.tenantmanager.service;
 
+import com.djimgou.core.exception.AppException;
+import com.djimgou.core.exception.ConflitException;
+import com.djimgou.core.export.DataExportParser;
 import com.djimgou.core.infra.CustomPageable;
+import com.djimgou.tenantmanager.exceptions.ForbidenDeleteException;
 import com.djimgou.tenantmanager.exceptions.PaysNotFoundException;
 import com.djimgou.tenantmanager.exceptions.TenantNotFoundException;
 import com.djimgou.tenantmanager.model.Pays;
@@ -16,12 +20,14 @@ import com.querydsl.jpa.JPAQueryBase;
 import com.querydsl.jpa.impl.JPAQuery;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -51,11 +57,13 @@ public class TenantService {
 
     @PersistenceContext
     private EntityManager em;
+    private DataExportParser dataExportParser;
 
     @Autowired
-    public TenantService(TenantRepo repo, PaysRepo paysRepo) {
+    public TenantService(TenantRepo repo, PaysRepo paysRepo, DataExportParser dataExportParser) {
         this.repo = repo;
         this.paysRepo = paysRepo;
+        this.dataExportParser = dataExportParser;
     }
 
     public Page<Tenant> findBySearchText(String text, Pageable pg) {
@@ -64,11 +72,26 @@ public class TenantService {
     }
 
     @Transactional(/*propagation = Propagation.NESTED*/)
-    public Tenant saveTenant(UUID id, TenantDto tenantDto) throws TenantNotFoundException, PaysNotFoundException {
+    public Tenant saveTenant(UUID id, TenantDto tenantDto) throws TenantNotFoundException, PaysNotFoundException, ConflitException {
         Tenant tenant = new Tenant();
         if (has(id)) {
             tenant = repo.findById(id).orElseThrow(TenantNotFoundException::new);
+            if (tenant.getReadonlyValue() != null && tenant.getReadonlyValue()) {
+                tenantDto.setCode(tenant.getCode());
+            }
+        } else {
+            Optional<Tenant> paysOld = repo.findOneByCode(tenantDto.getCode());
+            if (paysOld.isPresent()) {
+                throw new ConflitException("Erreur un centre de même code existe déjà");
+            }
+            Optional<Tenant> paysOld2 = repo.findOneByNom(tenantDto.getNom());
+            if (paysOld2.isPresent()) {
+                throw new ConflitException("Erreur un centre de même Nom existe déjà");
+            }
         }
+//        if(isReadOnly!=null && isReadOnly){
+//            throw new AppException("La modification de ce pays n'est pas autorisée, car il est très utile pour le bon fonctionnement du système");
+//        }
         tenant.setCode(tenantDto.getCode());
         tenant.setNom(tenantDto.getNom());
         tenant.setVille(tenantDto.getVille());
@@ -76,18 +99,19 @@ public class TenantService {
             Pays pays = paysRepo.findById(tenantDto.getPaysId()).orElseThrow(PaysNotFoundException::new);
             tenant.setPays(pays);
         }
-        try{
+        try {
             return repo.save(tenant);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public Tenant createTenant(TenantDto tenantDto) throws TenantNotFoundException, PaysNotFoundException {
+    public Tenant createTenant(TenantDto tenantDto) throws TenantNotFoundException, PaysNotFoundException, ConflitException {
         return saveTenant(null, tenantDto);
     }
+
 
     /**
      * Recherche avec pagination et filtre
@@ -131,6 +155,7 @@ public class TenantService {
         }
         return page;
     }
+
     @Transactional
     public SearchResult<Tenant> search(TenantFindDto findDto) {
         String[] fieldsSplit;
@@ -167,8 +192,18 @@ public class TenantService {
         return repo.findById(tenantId);
     }
 
-    public void deleteById(UUID tenantId) {
-        repo.deleteById(tenantId);
+    @Transactional
+    public void deleteById(UUID tenantId) throws AppException {
+        Tenant pays = repo.findById(tenantId).orElseThrow(TenantNotFoundException::new);
+
+        if (pays.getReadonlyValue() != null && pays.getReadonlyValue()) {
+            throw new AppException("La suppression de ce centre n'est pas autorisée car, il est très utile pour le bon fonctionnement du système");
+        }
+        try {
+            repo.deleteById(tenantId);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new AppException("Impossible de supprimer ce centre car, il est utilisé par un ou plusieurs utilisateurs ");
+        }
     }
 
     @Transactional
@@ -185,12 +220,13 @@ public class TenantService {
     public Page<Tenant> searchPageable(TenantFindDto findDto) {
         // long totalHitCount = result.total().hitCount();
         if (!has(findDto.getSearchKeys())) {
-            findDto.setSearchKeys(new String[]{"code", "nom","ville"});
+            findDto.setSearchKeys(new String[]{"code", "nom", "ville"});
         }
         SearchResult<Tenant> res = search(findDto);
         Page<Tenant> p = toPage(new CustomPageable(findDto), res.hits(), (int) res.total().hitCount());
         return p;
     }
+
     @Transactional
     public Page<Tenant> searchPageable2(TenantFindDto filter) throws Exception {
         CustomPageable cpg = new CustomPageable(filter);
@@ -222,5 +258,9 @@ public class TenantService {
             page = repo.findAll(cpg);
         }
         return page;
+    }
+
+    public List<List<?>> exporter() {
+        return dataExportParser.parse(repo.exporter());
     }
 }

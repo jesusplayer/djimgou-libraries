@@ -46,7 +46,7 @@ public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
         System.out.println("JWTLoginFilter.successfulAuthentication:");
 
         // Write Authorization to Headers of Response.
-        TokenAuthenticationService.addAuthentication(response, authResult.getName());
+        TokenAuthenticationService.addAuthentication(response, authResult.getName(),null);
 
         String authorizationString = response.getHeader("Authorization");
 

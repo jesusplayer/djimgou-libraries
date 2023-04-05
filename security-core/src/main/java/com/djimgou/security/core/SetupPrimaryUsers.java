@@ -171,18 +171,19 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
         /*Privilege writePrivilege
                 = createPrivilegeIfNotFound("WRITE_PRIVILEGE");*/
 
-            Privilege paramPrivilege
-                    = createPrivilegeIfNotFound("PrivParametresVoir");
+          /*  Privilege paramPrivilege
+                    = createPrivilegeIfNotFound("PrivParametresVoir");*/
 
 
-            Set<Privilege> adminPrivileges = SetUtils.hashSet(paramPrivilege, fullPrivilege);
-            Role userAuth = createAuthorityIfNotFound("ROLE_USER", SetUtils.hashSet(paramPrivilege), null);
-            createAuthorityIfNotFound("ROLE_ADMIN", adminPrivileges, userAuth);
+            //Set<Privilege> adminPrivileges = SetUtils.hashSet(paramPrivilege, fullPrivilege);
+            //Role userAuth = createAuthorityIfNotFound("ROLE_USER", SetUtils.hashSet(paramPrivilege), null);
+            createAuthorityIfNotFound(Role.ROLE_ADMIN, null, null);
+            createAuthorityIfNotFound(Role.ROLE_READONLY, null, null);
 
 
-            Role adminRole = roleRepository.findByName("ROLE_ADMIN");
+            Role adminRole = roleRepository.findByName(Role.ROLE_ADMIN);
 
-            Role userRole = roleRepository.findByName("ROLE_USER");
+            //Role userRole = roleRepository.findByName("ROLE_USER");
 
             Utilisateur admin = createUserIfNotFound("admin", "admin", "admin@actsarl.com",
                     "admin", SetUtils.hashSet(adminRole), Boolean.TRUE);
@@ -190,17 +191,19 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
             Utilisateur admin2 = createUserIfNotFound("admin2", "admin2", "admin2@actsarl.com",
                     "admin", SetUtils.hashSet(adminRole), Boolean.TRUE);
 
-            Utilisateur user = createUserIfNotFound("user", "user", "user@actsarl.com", "user",
+            Role redOnlyRole = roleRepository.findByName(Role.ROLE_READONLY);
+            Utilisateur readonly = createUserIfNotFound("readonly", "readonly", "readonly@actsarl.com",
+                    "readonly", SetUtils.hashSet(redOnlyRole), Boolean.TRUE);
+
+            /*Utilisateur user = createUserIfNotFound("user", "user", "nono", "nono",
                     SetUtils.hashSet(userRole), Boolean.TRUE);
 
-            Utilisateur dan = createUserIfNotFound("dany", "marc", "danmfacto@gmail.com", "user",
-                    SetUtils.hashSet(userRole), Boolean.FALSE);
+            Utilisateur dan = createUserIfNotFound("dany", "marc", "djimgou", "djimgou",
+                    SetUtils.hashSet(userRole), Boolean.FALSE);*/
 
-            ConfirmationToken ct = new ConfirmationToken(dan);
+            /*ConfirmationToken ct = new ConfirmationToken(dan);
             ct.setConfirmationToken("b326bebc-0498-4561-b0ed-099f31f2b193");
-        /*LocalDateTime ldt = LocalDateTime.now().minusDays(2);
-        ct.setCreatedDate(Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant()));*/
-            confirmationTokenRepo.save(ct);
+            confirmationTokenRepo.save(ct);*/
 
             if (defaultPrivilegesCreation.equals("deleteAndCreate")) {
                 String msg = "Vous avez configuré la propriété auth.defaultPrivilegesCreation=deleteAndCreate " +
@@ -239,11 +242,11 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
             userDto.setEmail(username);
             userDto.setPassword(password);
             userDto.setPasswordConfirm(password);
-            userDto.setAuthorities(authorities.stream().map(role -> {
+            userDto.setAuthorities(has(authorities)?authorities.stream().map(role -> {
                 IdDto is = new IdDto();
                 is.setId(role.getId());
                 return is;
-            }).collect(Collectors.toSet()));
+            }).collect(Collectors.toSet()):null);
             try {
                 userDto.setEncodedPasswd(passwordEncoder().encode(password));
                 user = getService().createUtilisateurGeneric(userDto);

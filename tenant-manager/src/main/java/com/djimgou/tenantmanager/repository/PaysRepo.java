@@ -1,6 +1,7 @@
 package com.djimgou.tenantmanager.repository;
 
 import com.djimgou.tenantmanager.model.Pays;
+import com.djimgou.tenantmanager.views.IPaysExport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,7 +34,12 @@ public interface PaysRepo extends JpaRepository<Pays, UUID>, QuerydslPredicateEx
     Page<Pays> findByNomContaining(String nom, Pageable pageRequest);
 
     Page<Pays> findAll(Specification<Pays> spec, Pageable pageRequest);
-
+    @Query("SELECT " +
+            "v.code AS code, " +
+            "v.nom AS nom " +
+            "FROM Pays v " +
+            "")
+    List<IPaysExport> exporter();
     /**
      * long countByDept(String deptName);
      * long countBySalaryGreaterThanEqual(int salary);

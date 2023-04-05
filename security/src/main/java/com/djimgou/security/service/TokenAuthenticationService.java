@@ -3,13 +3,18 @@ package com.djimgou.security.service;
 import com.djimgou.session.enums.SessionKeys;
 import io.jsonwebtoken.*;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 
+import static com.djimgou.core.util.AppUtils.has;
+
 @Log4j2
+@Component
 public class TokenAuthenticationService {
     //static final long EXPIRATIONTIME = 864_000_000; // 10 days
     static final long EXPIRATIONTIME = 2_592_000_000L; // 30 days
@@ -20,19 +25,40 @@ public class TokenAuthenticationService {
 
     public static final String HEADER_STRING = "Authorization";
 
-    public static String addAuthentication(HttpServletResponse res, String username) {
-        return addAuthentication(res, username,null);
+    private Long tokenExpireTime;
+
+    public TokenAuthenticationService(@Value("${auth.jwt.tokenExpireTime:}") String tokenExpireTime) {
+        this.tokenExpireTime = has(tokenExpireTime) ? Long.valueOf(tokenExpireTime.replaceAll("[L_]", "")) : null;
     }
 
-    public static String addAuthentication(HttpServletResponse res, String username, String tenantId) {
+    public static String addAuthentication(HttpServletResponse res, String username, Long tokenExpireTime) {
+        return addAuthentication(res, username, null, tokenExpireTime);
+    }
+
+    public String addAuthentication2(HttpServletResponse res, String username) {
+        return addAuthentication2(res, username, null, tokenExpireTime);
+    }
+
+    public String addAuthentication2(HttpServletResponse res, String username, String tenantId, Long tokenExpireTime) {
+        return addAuthentication(res, username, tenantId, tokenExpireTime);
+    }
+
+    public String addAuthentication2(HttpServletResponse res, String username, String tenantId) {
+        return addAuthentication(res, username, tenantId, tokenExpireTime);
+    }
+
+    public static String addAuthentication(HttpServletResponse res, String username, String tenantId, Long tokenExpireTime) {
         final JwtBuilder jwtBuilder = Jwts.builder().setSubject(username);
         String jwt = jwtBuilder.claim(SessionKeys.TENANT_ID, tenantId)
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATIONTIME))
+                .setExpiration(new Date(System.currentTimeMillis() + (tokenExpireTime != null ? tokenExpireTime : EXPIRATIONTIME)))
                 .signWith(SignatureAlgorithm.HS512, SECRET).compact();
         res.addHeader(HEADER_STRING, TOKEN_PREFIX + " " + jwt);
         return jwt;
     }
 
+    public String parseJwt2(HttpServletRequest request) {
+        return parseJwt(request);
+    }
 
     public static String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader(TokenAuthenticationService.HEADER_STRING);

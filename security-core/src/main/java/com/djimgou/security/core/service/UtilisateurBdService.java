@@ -2,6 +2,7 @@ package com.djimgou.security.core.service;
 
 import com.djimgou.core.exception.ConflitException;
 import com.djimgou.core.exception.NotFoundException;
+import com.djimgou.core.export.DataExportParser;
 import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.CustomPageable;
 import com.djimgou.security.core.exceptions.BadConfirmPasswordException;
@@ -59,17 +60,18 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
 
     private SecuritySessionService securitySessionService;
 
-
+    private DataExportParser dataExportParser;
     public UtilisateurBdService(
             @Qualifier(APP_UTILISATEUR_REPO) Optional<UtilisateurBaseRepo<Utilisateur, UUID>> customRepo,
             @Qualifier("appDefaultUtilisateurRepo") UtilisateurBaseRepo<Utilisateur, UUID> repo,
             ApplicationContext appContext,
-            TenantRepo tenantRepo, RoleRepo roleRepo, SecuritySessionService sessionService) {
+            TenantRepo tenantRepo, RoleRepo roleRepo, SecuritySessionService sessionService, DataExportParser dataExportParser) {
         super(repo);
         this.repo = repo;
         this.tenantRepo = tenantRepo;
         this.roleRepo = roleRepo;
         this.securitySessionService = sessionService;
+        this.dataExportParser = dataExportParser;
 
         if (customRepo.isPresent()) {
             this.customRepo = customRepo.get();
@@ -79,7 +81,10 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
             }
         }
     }
-
+    public List<List<?>> exporter() {
+        List<List<?>> er = dataExportParser.parse(repo.exporter());
+        return er;
+    }
     @Transactional
     public Utilisateur createUtilisateur(UtilisateurDto utilisateurDto) throws BadConfirmPasswordException, ConflitException, UtilisateurNotFoundException {
         return saveUtilisateur(null, utilisateurDto);
