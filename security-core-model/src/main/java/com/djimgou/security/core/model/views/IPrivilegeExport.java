@@ -10,7 +10,10 @@ public interface IPrivilegeExport {
     @ColumnExport(value = "Nom", order = 2)
     String getName();
 
-    @ColumnExport(value = "Description", order = 3)
+    @ColumnExport(value = "Url de la ressource", order = 3)
+    String getUrl();
+
+    @ColumnExport(value = "Description", order = 4)
     String getDescription();
 
 }

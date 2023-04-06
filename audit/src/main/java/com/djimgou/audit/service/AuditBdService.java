@@ -9,6 +9,7 @@ import com.djimgou.audit.model.dto.AuditFilterDto;
 import com.djimgou.audit.model.dto.AuditFindDto;
 import com.djimgou.audit.repository.AuditRepo;
 import com.djimgou.core.exception.AppException;
+import com.djimgou.core.export.DataExportParser;
 import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.CustomPageable;
 import com.djimgou.core.service.AbstractDomainService;
@@ -51,11 +52,19 @@ public class AuditBdService extends AbstractDomainServiceV2<Audit, AuditFindDto,
 
     @Getter
     private AuditRepo repo;
+    private DataExportParser dataExportParser;
 
-    public AuditBdService(AuditRepo repo, SessionService sessionService) {
+
+    public AuditBdService(AuditRepo repo, SessionService sessionService, DataExportParser dataExportParser) {
         super(repo, QAudit.audit);
         this.sessionService = sessionService;
         this.repo = repo;
+        this.dataExportParser = dataExportParser;
+    }
+
+    public List<List<?>> exporter() {
+        List<List<?>> er = dataExportParser.parse(repo.exporter());
+        return er;
     }
     /**
      * Ajoute une entité dans l'audit

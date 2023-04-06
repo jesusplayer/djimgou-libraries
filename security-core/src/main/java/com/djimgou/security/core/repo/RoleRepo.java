@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,8 +26,9 @@ public interface RoleRepo extends JpaRepository<Role, UUID>, QuerydslPredicateEx
             ")")
     Page<Role> findBySearchText(@Param("searchText") String searchText, Pageable pageRequest);
 
-
-    Role findByName(String authority);
+    /*@Query("SELECT d FROM Role d WHERE " +
+            "LOWER(d.name) LIKE LOWER(CONCAT('%',:name, '%')) ")*/
+    Role findByName(String name);
 
     List<Role> findByParentId(UUID parentId);
 
@@ -34,13 +36,17 @@ public interface RoleRepo extends JpaRepository<Role, UUID>, QuerydslPredicateEx
 
     List<Role> findByPrivilegesCodeIn(List<String> privilegeCodes);
 
-    Optional<Role> findOneByName(String authority);
+    /*@Query("SELECT d FROM Role d WHERE " +
+            "LOWER(d.name) LIKE LOWER(CONCAT('%',:name, '%')) ")*/
+    Optional<Role> findOneByName(String name);
 
+    @Transactional
     @Query("SELECT " +
             "v.name AS name, " +
             "v.description AS description, " +
-            "v.parent.name AS nomParent " +
+            "parent.name AS nomParent " +
             "FROM Role v " +
+            "LEFT join v.parent parent" +
             "")
     List<IRoleExport> exporter();
 

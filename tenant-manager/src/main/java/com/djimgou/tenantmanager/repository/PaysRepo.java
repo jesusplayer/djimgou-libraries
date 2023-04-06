@@ -23,9 +23,13 @@ public interface PaysRepo extends JpaRepository<Pays, UUID>, QuerydslPredicateEx
 
     Page<Pays> findByCodeContaining(String code, Pageable pageRequest);
 
-
+    @Query("SELECT d FROM Pays d WHERE " +
+            "LOWER(d.code) LIKE LOWER(CONCAT('%',:code, '%')) ")
     Optional<Pays> findOneByCode(String code);
-    Optional<Pays> findOneByNom(String code);
+
+    @Query("SELECT d FROM Pays d WHERE " +
+            "LOWER(d.nom) LIKE LOWER(CONCAT('%',:nomPays, '%')) ")
+    Optional<Pays> findOneByNom(String nomPays);
 
     boolean existsByCodeOrNom(String codePays, String nomPays);
 
@@ -34,6 +38,7 @@ public interface PaysRepo extends JpaRepository<Pays, UUID>, QuerydslPredicateEx
     Page<Pays> findByNomContaining(String nom, Pageable pageRequest);
 
     Page<Pays> findAll(Specification<Pays> spec, Pageable pageRequest);
+
     @Query("SELECT " +
             "v.code AS code, " +
             "v.nom AS nom " +

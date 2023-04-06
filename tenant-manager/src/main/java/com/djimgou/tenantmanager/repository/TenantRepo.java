@@ -26,9 +26,12 @@ public interface TenantRepo extends JpaRepository<Tenant, UUID>, QuerydslPredica
             "LOWER(d.nom) LIKE LOWER(CONCAT('%',:searchText, '%')) ORDER BY d.nom")
     Page<Tenant> findBySearchText(@Param("searchText") String searchText, Pageable pageRequest);
 
-
+    @Query("SELECT d FROM Tenant d WHERE " +
+            "LOWER(d.code) LIKE LOWER(CONCAT('%',:code, '%')) ")
     Optional<Tenant> findOneByCode(String code);
 
+    @Query("SELECT d FROM Tenant d WHERE " +
+            "LOWER(d.nom) LIKE LOWER(CONCAT('%',:nom, '%')) ")
     Optional<Tenant> findOneByNom(String nom);
 
     Page<Tenant> findByVilleContaining(String code, Pageable pageRequest);

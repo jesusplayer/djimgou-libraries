@@ -59,6 +59,7 @@ public interface UtilisateurBaseRepo<T extends Utilisateur, I> extends JpaReposi
             " where u.id = :#{#user.id}")
     void updateProfil(@Param("user") T user);
 
+
     Optional<T> findByUsername(@Param("username") String username);
 
     Optional<T> findByUsernameAndIdNot(String username, UUID id);
@@ -128,7 +129,7 @@ public interface UtilisateurBaseRepo<T extends Utilisateur, I> extends JpaReposi
 
 
     @Query("SELECT " +
-            "v.username AS codeSecteur, " +
+            "v.username AS username, " +
             "v.enabled AS enabled, " +
             "v.email AS email, " +
             "concat(v.nom,' ',v.prenom) AS fullName, " +

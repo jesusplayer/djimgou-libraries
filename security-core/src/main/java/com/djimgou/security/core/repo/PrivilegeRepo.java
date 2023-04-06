@@ -26,12 +26,17 @@ public interface PrivilegeRepo extends JpaRepository<Privilege, UUID>, QuerydslP
             "(LOWER(d.name) LIKE LOWER(CONCAT('%',:searchText, '%')))")
     Page<Privilege> findBySearchText(@Param("searchText") String searchText, Pageable pageRequest);
 
+    /*@Query("SELECT d FROM Privilege d WHERE " +
+            "LOWER(d.name) LIKE LOWER(CONCAT('%',:nom, '%')) ")*/
     Optional<Privilege> findByName(String nom);
 
-    Optional<Privilege> findByCode(String nom);
+   /* @Query("SELECT d FROM Privilege d WHERE " +
+            "LOWER(d.code) LIKE LOWER(CONCAT('%',:code, '%')) ")*/
+    Optional<Privilege> findByCode(String code);
 
     /**
      * Liste des enfants d'un privilège
+     *
      * @param parentId
      * @return
      */
@@ -45,6 +50,7 @@ public interface PrivilegeRepo extends JpaRepository<Privilege, UUID>, QuerydslP
     @Query("SELECT " +
             "v.code AS code, " +
             "v.name AS name, " +
+            "v.url AS url, " +
             "v.description AS description " +
             "FROM Privilege v " +
             "")
