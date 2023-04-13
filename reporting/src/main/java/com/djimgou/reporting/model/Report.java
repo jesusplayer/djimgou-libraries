@@ -12,7 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.Transient;
 
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.has;
 
 /**
  * https://medium.com/@ahmedgrati1999/an-easier-way-to-upload-retrieve-images-with-spring-boot-2-0-angular-8-400d1a51dccb

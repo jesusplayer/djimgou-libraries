@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Objects;
 
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.has;
 
 /**
  * DJIMGOU NKENNE DANY MARC 08/2020- 09/2021

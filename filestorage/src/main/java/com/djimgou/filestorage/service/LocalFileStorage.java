@@ -22,7 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.has;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter

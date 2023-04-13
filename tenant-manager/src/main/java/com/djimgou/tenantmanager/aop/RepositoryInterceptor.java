@@ -19,7 +19,7 @@ import javax.persistence.EntityManager;
 import javax.servlet.http.HttpSession;
 import java.util.Optional;
 
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.has;
 
 @Log4j2
 @Aspect()

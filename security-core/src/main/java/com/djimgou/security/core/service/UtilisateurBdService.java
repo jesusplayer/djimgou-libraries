@@ -1,5 +1,6 @@
 package com.djimgou.security.core.service;
 
+import com.djimgou.core.exception.AppException;
 import com.djimgou.core.exception.ConflitException;
 import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.core.export.DataExportParser;
@@ -36,7 +37,7 @@ import javax.persistence.PersistenceContext;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.has;
 
 /**
  * @author DJIMGOU NKENNE DANY MARC 08/2020
@@ -61,6 +62,7 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
     private SecuritySessionService securitySessionService;
 
     private DataExportParser dataExportParser;
+
     public UtilisateurBdService(
             @Qualifier(APP_UTILISATEUR_REPO) Optional<UtilisateurBaseRepo<Utilisateur, UUID>> customRepo,
             @Qualifier("appDefaultUtilisateurRepo") UtilisateurBaseRepo<Utilisateur, UUID> repo,
@@ -81,10 +83,12 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
             }
         }
     }
+
     public List<List<?>> exporter() {
         List<List<?>> er = dataExportParser.parse(repo.exporter());
         return er;
     }
+
     @Transactional
     public Utilisateur createUtilisateur(UtilisateurDto utilisateurDto) throws BadConfirmPasswordException, ConflitException, UtilisateurNotFoundException {
         return saveUtilisateur(null, utilisateurDto);
@@ -400,6 +404,20 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
             entity.getTenants().clear();
         }
         getRepo().delete(entity);
+    }
+
+    @Transactional
+    @Override
+    public void deleteById(UUID uuid) throws AppException {
+        Utilisateur user = getRepo().findById(uuid).orElseThrow(UtilisateurNotFoundException::new);
+        if (has(user.getAuthorities())) {
+            user.getAuthorities().clear();
+        }
+        if (has(user.getTenants())) {
+            user.getTenants().clear();
+        }
+        save(user);
+        getRepo().deleteById(uuid);
     }
 
     /**

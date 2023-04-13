@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationListener;
 import java.util.List;
 import java.util.Map;
 
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.has;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 

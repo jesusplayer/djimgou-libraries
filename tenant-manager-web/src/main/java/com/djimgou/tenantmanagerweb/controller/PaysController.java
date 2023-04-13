@@ -2,6 +2,7 @@ package com.djimgou.tenantmanagerweb.controller;
 
 import com.djimgou.core.annotations.Endpoint;
 import com.djimgou.core.exception.AppException;
+import com.djimgou.core.exception.ConflitException;
 import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.tenantmanager.exceptions.PaysNotFoundException;
 import com.djimgou.tenantmanager.model.Pays;
@@ -36,14 +37,14 @@ public class PaysController {
 
     @PostMapping("/creer")
     @Endpoint("Créer un pays")
-    public Pays create(@RequestBody @Valid PaysDto paysDto) throws PaysNotFoundException, AppException {
+    public Pays create(@RequestBody @Valid PaysDto paysDto) throws AppException, ConflitException {
         return paysService.createPays(paysDto);
     }
 
     @PutMapping("/modifier/{paysId}")
     @Endpoint("Modifier un pays")
     public Pays update(
-            @PathVariable("paysId") final UUID paysId, @RequestBody @Valid final PaysDto agentDto) throws PaysNotFoundException, AppException {
+            @PathVariable("paysId") final UUID paysId, @RequestBody @Valid final PaysDto agentDto) throws AppException, ConflitException {
         return paysService.savePays(paysId, agentDto);
     }
 

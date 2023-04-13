@@ -1,9 +1,8 @@
 package com.djimgou.core.infra;
 
-import com.djimgou.core.util.AppUtils;
+import com.djimgou.core.util.AppUtils2;
 import lombok.AccessLevel;
 import lombok.Data;
-import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +11,7 @@ import org.springframework.data.domain.Sort;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.has;
 
 // https://dzone.com/articles/pagination-in-springboot-applications
 
@@ -75,7 +74,7 @@ public class CustomBasePageable<T> implements Pageable {
                 }
             }
 
-            sort = Sort.by(b.stream().filter(AppUtils::
+            sort = Sort.by(b.stream().filter(AppUtils2::
                     has).collect(Collectors.toList()));
         }
         return sort;

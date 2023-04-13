@@ -1,9 +1,7 @@
 package com.djimgou.tenantmanager.service;
 
 import com.djimgou.core.exception.AppException;
-import com.djimgou.core.exception.BadRequestException;
 import com.djimgou.core.exception.ConflitException;
-import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.core.export.DataExportParser;
 import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.CustomPageable;
@@ -39,7 +37,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.has;
 
 /**
  * @author djimgou

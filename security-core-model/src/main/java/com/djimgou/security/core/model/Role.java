@@ -1,7 +1,9 @@
 package com.djimgou.security.core.model;
 
 import com.djimgou.audit.model.EntityListener;
-import com.djimgou.core.util.AppUtils;
+import com.djimgou.core.coolvalidation.annotations.Unique;
+import com.djimgou.core.coolvalidation.annotations.Validations;
+import com.djimgou.core.util.AppUtils2;
 import com.djimgou.security.core.model.dto.role.AuthorityDto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
@@ -12,11 +14,12 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.has;
 
 /**
  * @author DJIMGOU NKENNE DANY MARC 08/2020
  */
+@Validations
 @Entity
 @Data
 @Table(name = "authorities"//,
@@ -29,6 +32,7 @@ public class Role extends SecurityBaseEntity {
     public static final String ROLE_READONLY = "ROLE_READONLY";
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
 
+    @Unique(ignoreCase = true, message = "Impossible d'enregistrer ce rôle car un rôle de même nom existe déjà")
     @Column(name = "name", nullable = false, length = 128, unique = true)
     private String name;
 
@@ -66,10 +70,10 @@ public class Role extends SecurityBaseEntity {
         Set<String> roles = new HashSet<>();
         roles.add(name);
 
-        if (AppUtils.has(parent)) {
+        if (AppUtils2.has(parent)) {
             roles.addAll(parent.getAllRolesAndPriv());
         }
-        if (AppUtils.has(privileges)) {
+        if (AppUtils2.has(privileges)) {
             privileges.forEach(privilege -> {
                 roles.addAll(privilege.getAllPriv());
             });
@@ -82,10 +86,10 @@ public class Role extends SecurityBaseEntity {
         Set<AuthorityDto> roles = new HashSet<>();
 //        roles.add(name);
 
-        if (AppUtils.has(parent)) {
+        if (AppUtils2.has(parent)) {
             roles.addAll(parent.getAllAuthoritiesDto());
         }
-        if (AppUtils.has(privileges)) {
+        if (AppUtils2.has(privileges)) {
             privileges.forEach(privilege -> {
                 roles.addAll(privilege.getAllAuthoritiesDto());
             });
@@ -122,13 +126,13 @@ public class Role extends SecurityBaseEntity {
     }
 
     public void clear() {
-        if (AppUtils.has(privileges)) {
+        if (AppUtils2.has(privileges)) {
             privileges.clear();
         }
-        if (AppUtils.has(enfants)) {
+        if (AppUtils2.has(enfants)) {
             enfants.clear();
         }
-        if (AppUtils.has(enfants)) {
+        if (AppUtils2.has(enfants)) {
             enfants.clear();
         }
     }

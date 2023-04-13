@@ -1,6 +1,8 @@
 package com.djimgou.tenantmanagerweb.controller;
 
 import com.djimgou.core.annotations.Endpoint;
+import com.djimgou.core.exception.AppException;
+import com.djimgou.core.exception.ConflitException;
 import com.djimgou.session.enums.SessionKeys;
 import com.djimgou.tenantmanager.exceptions.PaysNotFoundException;
 import com.djimgou.tenantmanager.exceptions.TenantNotFoundException;
@@ -43,14 +45,14 @@ public class TenantController {
 
     @PostMapping("/creer")
     @Endpoint("Créer un tenant")
-    public Tenant create(@RequestBody @Valid TenantDto tenantDto) throws TenantNotFoundException, PaysNotFoundException {
+    public Tenant create(@RequestBody @Valid TenantDto tenantDto) throws TenantNotFoundException, PaysNotFoundException, ConflitException {
         return tenantService.createTenant(tenantDto);
     }
 
     @PutMapping("/modifier/{tenantId}")
     @Endpoint("Modifier un tenant")
     public Tenant update(
-            @PathVariable("tenantId") final UUID tenantId, @RequestBody @Valid final TenantDto tenantDto) throws TenantNotFoundException, PaysNotFoundException {
+            @PathVariable("tenantId") final UUID tenantId, @RequestBody @Valid final TenantDto tenantDto) throws TenantNotFoundException, PaysNotFoundException, ConflitException {
         return tenantService.saveTenant(tenantId, tenantDto);
     }
 
@@ -63,7 +65,7 @@ public class TenantController {
 
     @DeleteMapping("supprimer/{tenantId}")
     @Endpoint("supprimer d'un tenant")
-    public void delete(@PathVariable("tenantId") UUID tenantId) {
+    public void delete(@PathVariable("tenantId") UUID tenantId) throws AppException {
         tenantService.deleteById(tenantId);
     }
 

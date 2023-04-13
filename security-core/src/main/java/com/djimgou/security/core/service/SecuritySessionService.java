@@ -1,6 +1,5 @@
 package com.djimgou.security.core.service;
 
-import com.djimgou.core.util.AppUtils;
 import com.djimgou.security.core.UtilisateurDetails;
 import com.djimgou.security.core.model.Utilisateur;
 import com.djimgou.security.core.model.dto.utilisateur.UtilisateurFilterDto;
@@ -19,7 +18,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.has;
 
 @Log4j2
 @Component

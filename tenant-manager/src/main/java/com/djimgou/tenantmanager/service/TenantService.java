@@ -4,7 +4,6 @@ import com.djimgou.core.exception.AppException;
 import com.djimgou.core.exception.ConflitException;
 import com.djimgou.core.export.DataExportParser;
 import com.djimgou.core.infra.CustomPageable;
-import com.djimgou.tenantmanager.exceptions.ForbidenDeleteException;
 import com.djimgou.tenantmanager.exceptions.PaysNotFoundException;
 import com.djimgou.tenantmanager.exceptions.TenantNotFoundException;
 import com.djimgou.tenantmanager.model.Pays;
@@ -20,14 +19,12 @@ import com.querydsl.jpa.JPAQueryBase;
 import com.querydsl.jpa.impl.JPAQuery;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -40,8 +37,8 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.djimgou.core.util.AppUtils.has;
-import static com.djimgou.core.util.AppUtils.toPage;
+import static com.djimgou.core.util.AppUtils2.has;
+import static com.djimgou.core.util.AppUtils2.toPage;
 
 /**
  * @author djimgou

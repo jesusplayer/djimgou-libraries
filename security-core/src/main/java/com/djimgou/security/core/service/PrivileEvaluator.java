@@ -1,6 +1,6 @@
 package com.djimgou.security.core.service;
 
-import com.djimgou.core.util.AppUtils;
+import com.djimgou.core.util.AppUtils2;
 import com.djimgou.security.core.model.Privilege;
 import lombok.Getter;
 import lombok.Setter;
@@ -68,7 +68,7 @@ public class PrivileEvaluator {
 
     private void init(Class c) {
         this.c = c;
-        name = AppUtils.localizeClassName(c.getSimpleName());
+        name = AppUtils2.localizeClassName(c.getSimpleName());
         pageUrlPrefix = "/" + toUrlPrefix();
         final String prefix = "Priv";
         READ = prefix + name + "Voir";

@@ -42,8 +42,8 @@ import javax.persistence.PersistenceContext;
 import java.io.IOException;
 import java.util.*;
 
-import static com.djimgou.core.util.AppUtils.fileExt;
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.fileExt;
+import static com.djimgou.core.util.AppUtils2.has;
 
 
 @Getter

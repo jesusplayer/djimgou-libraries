@@ -1,7 +1,5 @@
 package com.djimgou.security;
 
-import com.djimgou.audit.model.AuditAction;
-import com.djimgou.audit.service.AuditBdService;
 import com.djimgou.security.core.AppSecurityConfig;
 import com.djimgou.security.service.TokenAuthenticationService;
 import com.djimgou.session.context.SessionContext;
@@ -10,18 +8,13 @@ import com.djimgou.tenantmanager.aop.TenantContext;
 import com.djimgou.tenantmanager.exceptions.TenantSessionNotFoundException;
 import com.djimgou.tenantmanager.model.Tenant;
 import com.djimgou.tenantmanager.service.TenantSessionService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -30,10 +23,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Optional;
 
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.has;
 
 @Log4j2
 public class AuthTokenFilter extends OncePerRequestFilter {

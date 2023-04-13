@@ -41,6 +41,12 @@
             <version>0.0.4-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+       <dependency>
+            <groupId>com.djimgou</groupId>
+            <artifactId>core-coolvalidation</artifactId>
+            <version>0.0.4-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>com.djimgou</groupId>
             <artifactId>core-test</artifactId>

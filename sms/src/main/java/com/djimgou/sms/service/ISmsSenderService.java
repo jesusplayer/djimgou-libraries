@@ -6,7 +6,7 @@ import com.djimgou.sms.model.dto.SmsSimpleMassageDto;
 import com.djimgou.sms.model.dto.sms.SmsDto;
 import org.springframework.scheduling.annotation.Async;
 
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.has;
 
 /**
  * @author DJIMGOU NKENNE DANY MARC

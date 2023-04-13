@@ -40,7 +40,7 @@ import java.util.stream.Stream;
 
 @Service
 @Log4j2
-public class AppUtils {
+public class AppUtils2 {
     public static UUID fromString(String uuid) {
         return UUID.fromString(uuid);
     }

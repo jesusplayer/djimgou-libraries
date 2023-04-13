@@ -1166,13 +1166,24 @@ public class AppUtils {
         return new PageImpl<>(newContent);
     }
 
-    public static <T> Page<T> toPage(Pageable pageable, List<T> newContent, int totalAmount) {
+    /*public static <T> Page<T> toPage(Pageable pageable, List<T> newContent, int totalAmount) {
         final int start = (int) pageable.getOffset();
         final int end = Math.min((start + pageable.getPageSize()), totalAmount);
         final Page<T> page = new PageImpl<>(newContent.subList(start, end), pageable, totalAmount);
         return page;
-    }
+    }*/
 
+    public static <T> Page<T> toPage(Pageable pageable, List<T> newContent, long totalAmount) {
+        final long start = pageable.getOffset();
+        final long end = Math.min((start + pageable.getPageSize()), totalAmount);
+        final Page<T> page = new PageImpl<>(newContent, pageable, totalAmount);
+        return page;
+    }
+    public static <T, M> Page<M> mapPage(Page<T> page, Function<T, M> mapFunction) {
+        List<M> res = page.getContent().stream().map(mapFunction).collect(Collectors.toList());
+        final Page<M> newPage = new PageImpl<>(res, page.getPageable(), page.getTotalElements());
+        return newPage;
+    }
     /**
      * @param clazz
      * @param predicate

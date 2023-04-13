@@ -7,7 +7,7 @@ package com.djimgou.security.controller;
 import com.djimgou.core.annotations.Endpoint;
 import com.djimgou.core.exception.ConflitException;
 import com.djimgou.core.exception.NotFoundException;
-import com.djimgou.core.util.AppUtils;
+import com.djimgou.core.util.AppUtils2;
 import com.djimgou.security.core.exceptions.BadConfirmPasswordException;
 import com.djimgou.security.core.exceptions.UtilisateurNotFoundException;
 import com.djimgou.security.core.model.Utilisateur;
@@ -30,7 +30,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.has;
 
 /**
  * Classe Manage Bean permettant l'Edition d'un secteur
@@ -164,7 +164,7 @@ public class UtilisateurController {
         if(appContext.containsBean(APP_UTILISATEUR_SERVICE) && !has(customBdService)){
             customBdService = appContext.getBean(APP_UTILISATEUR_SERVICE,UtilisateurBdServiceBase.class);
         }
-        return AppUtils.has(customBdService) ? (UtilisateurBdServiceBase<Utilisateur, UtilisateurFindDto, UtilisateurFilterDto, UtilisateurDto, ModifierProfilDto>) customBdService : utilisateurBdService;
+        return AppUtils2.has(customBdService) ? (UtilisateurBdServiceBase<Utilisateur, UtilisateurFindDto, UtilisateurFilterDto, UtilisateurDto, ModifierProfilDto>) customBdService : utilisateurBdService;
     }
 
 }

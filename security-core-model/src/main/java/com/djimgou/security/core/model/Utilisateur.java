@@ -1,7 +1,9 @@
 package com.djimgou.security.core.model;
 
 import com.djimgou.audit.model.EntityListener;
-import com.djimgou.core.util.AppUtils;
+import com.djimgou.core.coolvalidation.annotations.Unique;
+import com.djimgou.core.coolvalidation.annotations.Validations;
+import com.djimgou.core.util.AppUtils2;
 import com.djimgou.tenantmanager.model.Tenant;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
@@ -12,8 +14,9 @@ import javax.validation.constraints.Email;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.has;
 
+//@Validations
 @Entity
 @Data
 @Table(name = "users")
@@ -22,6 +25,7 @@ import static com.djimgou.core.util.AppUtils.has;
 @EntityListeners({EntityListener.class})
 public class Utilisateur extends SecurityBaseEntity {
 
+//    @Unique(ignoreCase = true, message = "Impossible d'enregistrer cet utilisateur car un utilisateur de même nom d'utilisateur(login) existe déjà")
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
@@ -101,7 +105,7 @@ public class Utilisateur extends SecurityBaseEntity {
     String passwordPart2;
 
     public String getRoles() {
-        if (AppUtils.has(authorities)) {
+        if (AppUtils2.has(authorities)) {
             roles = authorities.stream().map(a -> a.getName())
                     .collect(Collectors.joining(","));
         }
@@ -116,7 +120,7 @@ public class Utilisateur extends SecurityBaseEntity {
     }
 
     public String fullname() {
-        return (AppUtils.has(nom) ? nom : "") + " " + (AppUtils.has(prenom) ? prenom : "");
+        return (AppUtils2.has(nom) ? nom : "") + " " + (AppUtils2.has(prenom) ? prenom : "");
     }
 
     /*@ManyToMany(fetch = FetchType.EAGER)

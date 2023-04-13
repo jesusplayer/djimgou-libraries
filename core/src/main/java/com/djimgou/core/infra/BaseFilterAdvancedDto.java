@@ -5,7 +5,7 @@ import lombok.Setter;
 
 import java.util.List;
 
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.has;
 
 /**
  * Mettre

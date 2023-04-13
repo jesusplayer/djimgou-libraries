@@ -8,11 +8,9 @@ import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.CustomPageable;
 import com.djimgou.security.core.exceptions.PrivilegeNotFoundException;
 import com.djimgou.security.core.exceptions.ReadOnlyException;
-import com.djimgou.security.core.exceptions.RoleNotFoundException;
 import com.djimgou.security.core.model.Privilege;
 import com.djimgou.security.core.model.QPrivilege;
 import com.djimgou.security.core.model.Role;
-import com.djimgou.security.core.model.Utilisateur;
 import com.djimgou.security.core.model.dto.privilege.PrivilegeDto;
 import com.djimgou.security.core.model.dto.privilege.PrivilegeFilterDto;
 import com.djimgou.security.core.model.dto.privilege.PrivilegeFindDto;
@@ -34,7 +32,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.has;
 
 /**
  * @author DJIMGOU NKENNE DANY MARC 08/2020

@@ -1,7 +1,6 @@
 package com.djimgou.tenantmanager.repository;
 
 import com.djimgou.tenantmanager.model.Tenant;
-import com.djimgou.tenantmanager.views.IPaysExport;
 import com.djimgou.tenantmanager.views.ITenantExport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

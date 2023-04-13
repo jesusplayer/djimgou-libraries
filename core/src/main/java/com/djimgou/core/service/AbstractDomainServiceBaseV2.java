@@ -11,7 +11,7 @@ import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.core.exception.UnknowQueryFilterOperator;
 import com.djimgou.core.infra.*;
 import com.djimgou.core.repository.BaseJpaRepository;
-import com.djimgou.core.util.AppUtils;
+import com.djimgou.core.util.AppUtils2;
 import com.djimgou.core.util.model.IBaseEntity;
 import com.querydsl.core.support.QueryBase;
 import com.querydsl.core.types.*;
@@ -35,7 +35,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Predicate;
 
-import static com.djimgou.core.util.AppUtils.*;
+import static com.djimgou.core.util.AppUtils2.*;
 
 
 /**
@@ -45,7 +45,8 @@ import static com.djimgou.core.util.AppUtils.*;
  * @author djimgou
  */
 
-@Getter@Setter
+@Getter
+@Setter
 @Log4j2
 public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DTO extends BaseFindDto, FILTER_DTO extends BaseFilterDto, DTO extends IEntityDto, DETAIL_DTO extends IEntityDetailDto, ID>
         extends AbstractDomainServiceBase<T, FIND_DTO, FILTER_DTO, ID> {
@@ -56,6 +57,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
 
     @Autowired
     private DtoSerializerService dtoSerializer;
+
 
     @Getter
     private BaseJpaRepository<T, ID> repo;
@@ -174,7 +176,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
 
         injectReferencedField(id, entityDto, entity);*/
         dtoSerializer.serialize(entityDto, entity);
-
+        //getEm().detach(entity);
         T saved = persist(id, entity, entityDto);
         return saved;
     }
@@ -187,13 +189,31 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
      * @param dto
      * @return
      */
-    public final T persist(ID id, T entity, DTO dto) throws NotFoundException, DtoMappingException, AppException {
+    @Transactional
+    public  T persist(ID id, T entity, DTO dto) throws NotFoundException, DtoMappingException, AppException {
         if (this instanceof IBeforeSave) {
-            entity = ((IBeforeSave<T, ID, DTO>) this).beforeSave(id, entity, dto);
+            try {
+                entity = ((IBeforeSave<T, ID, DTO>) this).beforeSave(id, entity, dto);
+            } catch (Throwable e) {
+                if (has(id)) {
+                    getEm().detach(entity);
+                }
+                throw e;
+            }
         }
+        /*try {
+            validationParser.validate(entity);
+        } catch (CoolValidationException e) {
+            throw new AppException(e.getMessage());
+        }*/
         T saved = save(entity);
         if (this instanceof IAfterSave) {
+//            try {
             saved = ((IAfterSave<T, ID, DTO>) this).afterSave(id, saved, dto);
+//            } catch (Throwable e) {
+//                getEm().detach(entity);
+//                throw e;
+//            }
         }
         return saved;
     }
@@ -218,7 +238,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
         if (!has(fieldFilter)) {
             fieldFilter = (t) -> true;
         }
-        List<Field> dtoIdFields = AppUtils.getFields(
+        List<Field> dtoIdFields = AppUtils2.getFields(
                 entityDto.getClass(), fieldFilter.and(f -> Objects.equals(f.getType().getName(), UUID.class.getName())
                         && !Objects.equals("id", f.getName())
                         && f.getName().endsWith("Id")
@@ -227,7 +247,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
         );
 
         for (Field field : dtoIdFields) {
-            UUID dtoId = (UUID) AppUtils.getField(field.getName(), entityDto);
+            UUID dtoId = (UUID) AppUtils2.getField(field.getName(), entityDto);
 
             String objName1 = field.getName();
             String objName2 = field.getName().substring(0, field.getName().length() - 2);
@@ -235,9 +255,9 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
 
             String choosedKey = objName2;
 
-            boolean childOb1 = AppUtils.hasField(entity.getClass(), objName1);
-            boolean childOb2 = AppUtils.hasField(entity.getClass(), objName2);
-            boolean childOb3 = AppUtils.hasField(entity.getClass(), objName3);
+            boolean childOb1 = AppUtils2.hasField(entity.getClass(), objName1);
+            boolean childOb2 = AppUtils2.hasField(entity.getClass(), objName2);
+            boolean childOb3 = AppUtils2.hasField(entity.getClass(), objName3);
             // lordre est important
             if (childOb3) {
                 choosedKey = objName3;
@@ -248,17 +268,17 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
             }
 
             if (childOb1 || childOb2 || childOb3) {
-                Object childObj = AppUtils.getField(choosedKey, entity);
+                Object childObj = AppUtils2.getField(choosedKey, entity);
                 String finalChoosedKey = choosedKey;
 
                 UUID childObId = null;
                 if (has(childObj)) {
-                    childObId = (UUID) AppUtils.getField("id", childObj);
+                    childObId = (UUID) AppUtils2.getField("id", childObj);
                 }
                 final boolean existChildId = has(id) && Objects.equals(childObId, dtoId);
                 if (!existChildId) {
-                    Field childObjField = AppUtils.getFields(entity.getClass(), field1 ->
-                                    Objects.equals(finalChoosedKey, field1.getName()))
+                    Field childObjField = AppUtils2.getFields(entity.getClass(), field1 ->
+                            Objects.equals(finalChoosedKey, field1.getName()))
                             .stream().findFirst().orElse(null);
 
                     Class key = childObjField.getType();
@@ -268,7 +288,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
                                 id + " N'existe pas"
                         );
                     }
-                    AppUtils.setField(choosedKey, entity, childDbValue);
+                    AppUtils2.setField(choosedKey, entity, childDbValue);
                 }
             } else {
                 throw new DtoChildFieldNotFound(entityDto, entity, field);

@@ -10,19 +10,15 @@ import com.djimgou.audit.model.dto.AuditFindDto;
 import com.djimgou.audit.repository.AuditRepo;
 import com.djimgou.core.exception.AppException;
 import com.djimgou.core.export.DataExportParser;
-import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.CustomPageable;
-import com.djimgou.core.service.AbstractDomainService;
 import com.djimgou.core.service.AbstractDomainServiceV2;
-import com.djimgou.core.util.AppUtils;
+import com.djimgou.core.util.AppUtils2;
 import com.djimgou.session.service.SessionService;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.JPAQueryBase;
-import com.querydsl.jpa.impl.JPAQuery;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -32,13 +28,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-import static com.djimgou.core.util.AppUtils.*;
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.has;
 
 
 /**
@@ -94,7 +87,7 @@ public class AuditBdService extends AbstractDomainServiceV2<Audit, AuditFindDto,
             String str = objectMapper.writeValueAsString(entity);
            
             audit = new Audit(Calendar.getInstance().getTime(), str,
-                    AppUtils.localizeClassName(entity.getClass().getSimpleName()), action,
+                    AppUtils2.localizeClassName(entity.getClass().getSimpleName()), action,
                     userId,
                     username
             );

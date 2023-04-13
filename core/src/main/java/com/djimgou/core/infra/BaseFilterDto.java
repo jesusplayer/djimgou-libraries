@@ -3,7 +3,7 @@ package com.djimgou.core.infra;
 import lombok.Getter;
 import lombok.Setter;
 
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.has;
 
 /**
  * Mettre

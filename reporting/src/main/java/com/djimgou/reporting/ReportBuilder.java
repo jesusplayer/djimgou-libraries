@@ -28,7 +28,7 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.has;
 
 /**
  * https://www.baeldung.com/spring-jasper

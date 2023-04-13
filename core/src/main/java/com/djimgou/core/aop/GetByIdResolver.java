@@ -16,7 +16,7 @@ import javax.persistence.metamodel.Type;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.has;
 
 public class GetByIdResolver implements HandlerMethodArgumentResolver {
     EntityRepository er;

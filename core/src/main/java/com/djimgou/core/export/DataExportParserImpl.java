@@ -1,12 +1,9 @@
 package com.djimgou.core.export;
 
 import com.djimgou.core.annotations.ColumnExport;
-import com.djimgou.core.util.AppUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

@@ -3,7 +3,7 @@ package com.djimgou.core.service;
 import com.djimgou.core.exception.AppException;
 import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.core.infra.Filter;
-import com.djimgou.core.util.AppUtils;
+import com.djimgou.core.util.AppUtils2;
 import com.djimgou.core.util.MessageService;
 import com.djimgou.core.util.model.IUuidBaseEntity;
 import lombok.Getter;
@@ -133,7 +133,7 @@ public abstract class AbstractBdServiceOld<T extends IUuidBaseEntity> implements
         try {
             item = getRepo().save(entity);
         } catch (Exception e) {
-            if (AppUtils.has(entity)) {
+            if (AppUtils2.has(entity)) {
                 e.printStackTrace();
                 MessageService.errorMessage("Erreur d'enregistrement de l'objet " + e.getMessage(), log);
             } else {

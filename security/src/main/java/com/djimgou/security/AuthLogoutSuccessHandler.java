@@ -3,7 +3,7 @@ package com.djimgou.security;
 
 import com.djimgou.audit.model.AuditAction;
 import com.djimgou.audit.service.AuditBdService;
-import com.djimgou.core.util.AppUtils;
+import com.djimgou.core.util.AppUtils2;
 import com.djimgou.security.core.UtilisateurDetails;
 import com.djimgou.security.core.model.Utilisateur;
 import com.djimgou.security.core.service.MyVoter;
@@ -24,9 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
-import java.util.UUID;
 
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.has;
 
 /**
  * @author DJIMGOU NKENNE DANY MARC 08/2020
@@ -73,7 +72,7 @@ public class AuthLogoutSuccessHandler implements org.springframework.security.we
             UtilisateurDetails uDetail = sessionService.currentUser(authentication);
             utilisa = uDetail.getUtilisateur();
         }
-        if (AppUtils.has(utilisa)) {
+        if (AppUtils2.has(utilisa)) {
             Utilisateur user = utilisa.singleInfo();
             auditBdService.add(user, AuditAction.DECONNEXION);
             MyVoter.userSessionToUpdate.remove(user.getUsername());

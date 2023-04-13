@@ -1,9 +1,13 @@
 package com.djimgou.core.service;
 
+//import com.djimgou.core.coolvalidation.exception.CoolValidationException;
+import com.djimgou.core.coolvalidation.exception.CoolValidationException;
+import com.djimgou.core.coolvalidation.processors.ValidationParser;
+//import com.djimgou.core.coolvalidation.processors.ValidationParserImpl;
 import com.djimgou.core.exception.AppException;
 import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.core.infra.Filter;
-import com.djimgou.core.util.AppUtils;
+import com.djimgou.core.util.AppUtils2;
 import com.djimgou.core.util.MessageService;
 import com.djimgou.core.util.model.IBaseEntity;
 import lombok.Getter;
@@ -19,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.io.Serializable;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -39,6 +44,8 @@ public abstract class AbstractBdServiceBase<T extends IBaseEntity, ID> implement
 
     @Getter
     private JpaRepository<T, ID> repo;
+
+    private ValidationParser validationParser;
 
     /**
      * Permet d'enregister la premiere page chargée de requetes pour eviter le
@@ -131,13 +138,28 @@ public abstract class AbstractBdServiceBase<T extends IBaseEntity, ID> implement
     public T save(T entity) throws AppException {
         T item = null;
         try {
+
+            /*if (validationParser == null && em != null) {
+                validationParser = new ValidationParserImpl(em);
+            }
+            if (validationParser != null) {
+                validationParser.validate(entity);
+            }*/
             item = getRepo().save(entity);
-        } catch (Exception e) {
-            if (AppUtils.has(entity)) {
+        } catch (Throwable e) {
+            if (AppUtils2.has(entity)) {
                 MessageService.errorMessage("Erreur d'enregistrement de l'objet " + e.getMessage(), log);
             }
-            e.printStackTrace();
-            throw new AppException(e);
+            String message;
+            if (e instanceof UndeclaredThrowableException) {// généralement les exceptions qui viennent de l'AOP
+                message = ((UndeclaredThrowableException) e).getUndeclaredThrowable().getMessage();
+            } else {
+                message = e.getMessage();
+                if (!(e instanceof CoolValidationException)) {
+                    e.printStackTrace();
+                }
+            }
+            throw new AppException(message);
         }
         return item;
     }

@@ -1,9 +1,8 @@
 package com.djimgou.security.core;
 
-import com.djimgou.core.util.AppUtils;
+import com.djimgou.core.util.AppUtils2;
 import com.djimgou.security.core.enpoints.EndPointsRegistry;
 import com.djimgou.security.core.enpoints.SecuredEndPoint;
-import com.djimgou.security.core.model.ConfirmationToken;
 import com.djimgou.security.core.model.Privilege;
 import com.djimgou.security.core.model.Role;
 import com.djimgou.security.core.model.Utilisateur;
@@ -41,7 +40,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.has;
 
 
 /**
@@ -88,7 +87,7 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
         if (appContext.containsBean(APP_UTILISATEUR_SERVICE) && !has(customBdService)) {
             customBdService = appContext.getBean(APP_UTILISATEUR_SERVICE, UtilisateurBdServiceBase.class);
         }
-        return AppUtils.has(customBdService) ? (UtilisateurBdServiceBase<Utilisateur, UtilisateurFindDto, UtilisateurFilterDto, UtilisateurDto, ModifierProfilDto>) customBdService : utilisateurBdService;
+        return AppUtils2.has(customBdService) ? (UtilisateurBdServiceBase<Utilisateur, UtilisateurFindDto, UtilisateurFilterDto, UtilisateurDto, ModifierProfilDto>) customBdService : utilisateurBdService;
     }
 
     public void initDefaultPriv2() {

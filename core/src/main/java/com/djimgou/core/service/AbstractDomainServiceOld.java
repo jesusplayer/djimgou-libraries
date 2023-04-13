@@ -4,7 +4,7 @@ import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.BaseFindDto;
 import com.djimgou.core.infra.CustomPageable;
 import com.djimgou.core.infra.Filter;
-import com.djimgou.core.util.AppUtils;
+import com.djimgou.core.util.AppUtils2;
 import com.djimgou.core.util.model.IUuidBaseEntity;
 import lombok.extern.log4j.Log4j2;
 import org.hibernate.search.engine.search.query.SearchResult;
@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.djimgou.core.util.AppUtils.has;
+import static com.djimgou.core.util.AppUtils2.has;
 
 
 /**
@@ -68,7 +68,7 @@ public abstract class AbstractDomainServiceOld<T extends IUuidBaseEntity, FIND_D
     public Page<T> searchPageable(FIND_DTO findDto) {
         // long totalHitCount = result.total().hitCount();
         SearchResult<T> res = search(findDto);
-        Page<T> p = AppUtils.toPage(new CustomPageable(findDto), res.hits(), (int) res.total().hitCount());
+        Page<T> p = AppUtils2.toPage(new CustomPageable(findDto), res.hits(), (int) res.total().hitCount());
         return p;
     }
 

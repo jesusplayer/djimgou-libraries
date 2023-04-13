@@ -24,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 
+import javax.persistence.metamodel.EntityType;
 import javax.servlet.ServletContext;
 import java.util.*;
 
@@ -42,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.*;
 //@AutoConfigureMockMvc()
 */
 
-@Rollback
+//@Rollback
 @SpringBootTest(classes = MaincoreTestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:application-inTest.properties")
 //@Sql({ "schema.sql", "data.sql" })
@@ -187,6 +188,9 @@ public class FilterTest {
         List<List<?>> res = dataExportParser.parse(list);
         assertFalse(res.isEmpty());
     }
+    
+    
+
 
 
 }
