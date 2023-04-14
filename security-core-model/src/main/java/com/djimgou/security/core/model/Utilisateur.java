@@ -8,6 +8,9 @@ import com.djimgou.tenantmanager.model.Tenant;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -17,6 +20,14 @@ import java.util.stream.Collectors;
 import static com.djimgou.core.util.AppUtils2.has;
 
 //@Validations
+@FilterDef(name = "logicalDeleteFilter",
+        parameters = {
+                @ParamDef(name = "deleted", type = "boolean")
+        },
+        defaultCondition = "deleted = :deleted OR deleted IS NULL"
+)
+
+@Filter(name = "logicalDeleteFilter")
 @Entity
 @Data
 @Table(name = "users")

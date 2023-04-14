@@ -15,4 +15,5 @@ import javax.persistence.MappedSuperclass;
 @MappedSuperclass
 public abstract class SecurityBaseEntity extends BaseBdEntity {
     Boolean readonlyValue = Boolean.FALSE;
+    Boolean deleted = Boolean.FALSE;
 }
