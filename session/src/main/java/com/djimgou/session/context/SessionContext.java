@@ -11,6 +11,7 @@ public class SessionContext {
      */
     private static ThreadLocal<String> currentSessionId = new InheritableThreadLocal<>();
     private static ThreadLocal<String> currentTenantId = new InheritableThreadLocal<>();
+    private static ThreadLocal<String> currentuserId = new InheritableThreadLocal<>();
     private static ThreadLocal<String> currentUsername = new InheritableThreadLocal<>();
     //private static ThreadLocal<String> currentUserId = new InheritableThreadLocal<>();
     private static ThreadLocal<HttpSession> currentSession = new InheritableThreadLocal<>();
@@ -18,6 +19,10 @@ public class SessionContext {
 
     public static String getCurrentUsername() {
         return currentUsername.get();
+    }
+
+    public static String getCurrentUserId() {
+        return currentuserId.get();
     }
 
 /*    public static String getCurrentUserId() {
@@ -32,6 +37,9 @@ public class SessionContext {
 
     public static void setCurrentUsername(String username) {
         currentUsername.set(username);
+    }
+    public static void setCurrentUserId(String userId) {
+        currentUsername.set(userId);
     }
 
 /*    public static void setCurrentUserId(String userId) {
@@ -49,6 +57,7 @@ public class SessionContext {
     }
 
     public static void clear() {
+        currentuserId.set(null);
         currentUsername.set(null);
         currentSessionId.set(null);
         currentTenantId.set(null);

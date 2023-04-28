@@ -147,11 +147,11 @@ public class UtilisateurController {
         return getService().findBy(utilisateurFilterDto);
     }
 
-    @GetMapping("/search")
+/*    @GetMapping("/search")
     @Endpoint("Recherche sur les utilisateurs")
     public List<Utilisateur> searchUtilisateurs(UtilisateurFindDto utilisateurFindDto) throws Exception {
         return getService().search(utilisateurFindDto).hits();
-    }
+    }*/
 
     @GetMapping("/find")
     @Endpoint("Recherche sur les utilisateurs avec pagination")

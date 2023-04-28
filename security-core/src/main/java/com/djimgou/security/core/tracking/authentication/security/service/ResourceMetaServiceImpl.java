@@ -31,7 +31,7 @@ public class ResourceMetaServiceImpl implements ResourceMetaService {
             if (authorities != null) {
                 authorities.stream().forEach(userRoleDto -> {
                     log.info("role name {}", userRoleDto.getName());
-                    log.info("url {}", userRoleDto.getUrl());
+                    log.info("url {}", String.join(", ", userRoleDto.getUrls()));
                 });
             }
             applicationContext.publishEvent(new CacheEventMessage(this, authorities));

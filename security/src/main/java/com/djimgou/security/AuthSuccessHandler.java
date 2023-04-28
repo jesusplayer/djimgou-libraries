@@ -93,6 +93,7 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
             //session.setAttribute(SessionKeys.CONNECTED_USER, uSess);
             SessionContext.setCurrentSessionId(session.getId());
             SessionContext.setCurrentUsername(uSess.getUsername());
+            SessionContext.setCurrentUserId(uSess.getId().toString());
 
             session.setAttribute(SessionKeys.USERNAME, uSess.getUsername());
             session.setAttribute(SessionKeys.USER_ID, uSess.getId().toString());

@@ -4,9 +4,8 @@ import com.djimgou.security.core.UtilisateurDetails;
 import com.djimgou.security.core.model.Utilisateur;
 import com.djimgou.security.core.model.dto.utilisateur.UtilisateurFilterDto;
 import com.djimgou.security.core.model.dto.utilisateur.UtilisateurFindDto;
-import com.djimgou.session.service.SessionService;
+import com.djimgou.session.context.SessionContext;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -29,16 +28,16 @@ public class SecuritySessionService {
 
 /*    @Autowired(required = false)
     SessionRegistry sessionRegistry;*/
-
-    @Autowired
-    SessionService sessionService;
+//
+//    @Autowired
+//    SessionService sessionService;
 
     // @Autowired
     // WebInvocationPrivilegeEvaluator evaluator;
 
-    public SessionService getSession() {
-        return sessionService;
-    }
+//    public SessionService getSession() {
+//        return sessionService;
+//    }
 
     public UtilisateurDetails currentUser() {
         SecurityContext context = SecurityContextHolder.getContext();
@@ -56,7 +55,7 @@ public class SecuritySessionService {
 
 
     public String username() {
-        return sessionService.username();
+        return SessionContext.getCurrentUsername();
     }
 
 

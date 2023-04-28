@@ -72,6 +72,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 final HttpSession session = request.getSession();
                 SessionContext.setCurrentSessionId(session.getId());
                 SessionContext.setCurrentUsername(username);
+                //SessionContext.setCurrentUsername(username);
 
                 session.setAttribute(SessionKeys.USERNAME, username);
                 session.setAttribute(SessionKeys.SESSION_ID, session.getId());

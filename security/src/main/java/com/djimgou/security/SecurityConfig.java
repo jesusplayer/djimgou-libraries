@@ -1,11 +1,16 @@
 package com.djimgou.security;
 
 import com.djimgou.audit.service.AuditBdService;
+import com.djimgou.core.util.AppUtils;
 import com.djimgou.security.core.AppSecurityConfig;
 import com.djimgou.security.core.enpoints.EndPointsRegistry;
+import com.djimgou.security.core.enpoints.SecuredEndPoint;
+import com.djimgou.security.core.model.Privilege;
 import com.djimgou.security.core.model.Role;
 import com.djimgou.security.core.model.UrlsAuthorized;
+import com.djimgou.security.core.model.dto.role.AuthorityDto;
 import com.djimgou.security.core.service.PrivileEvaluator;
+import com.djimgou.security.service.AuthoritiesRepo;
 import com.djimgou.tenantmanager.service.TenantSessionService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +34,17 @@ import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import static com.djimgou.core.util.AppUtils2.has;
 
 //import org.springframework.session.web.http.SessionRepositoryFilter;
 
-//import scx.beac.etransfert.tracking.authentication.dao.ResourceRepository;
-//import scx.beac.etransfert.tracking.authentication.security.com.djimgou.audit.service.myVoter;
 
 /**
+ * https://www.springcloud.io/post/2022-05/spring-security-accessdecisionvoter/#gsc.tab=0
  * BASSANGONEN HERVE LUDOVIC 26.08.2019 ..
  * DJIMGOU NKENNE DANY MARC 08/2020- 09/2021
  */
@@ -49,6 +57,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         WebInvocationPrivilegeEvaluator evaluator;*/
     @Value("${auth.jwt.enabled:}")
     Boolean jwtEnabled = false;
+
+    @Value("${auth.gateway:}")
+    Boolean isGateway = false;
 
     @Autowired
     AppSecurityConfig appSecurityConfig;
@@ -95,10 +106,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     AuditBdService auditBdService;
 
+    @Autowired
+    AuthoritiesRepo authoritiesRepo;
+
     @Bean
     public InitializingBean initializingBean() {
         return () -> SecurityContextHolder.setStrategyName(
                 SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+    }
+
+    List<String> of(String... strings) {
+        return new ArrayList() {{
+            addAll(Arrays.asList(strings));
+        }};
     }
 
     @Override
@@ -117,41 +137,76 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         };
 
 
-        if (has(endPointsRegistry.getEndpointsMap())) {
-            endPointsRegistry.getEndpointsMap().values().forEach(endPoint -> {
+        if (appSecurityConfig.permitAll()) {
+            rule[0].antMatchers("*").permitAll();
+            rule[0].antMatchers("**/**").permitAll();
+            rule[0].antMatchers("/**/**").permitAll();
+            rule[0].antMatchers("/**/*").permitAll();
+        } else {
+            final Map<String, SecuredEndPoint> endpointsMap = endPointsRegistry.getEndpointsMap();
 
-                final ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl authorizedUrl =
-                        rule[0].antMatchers(endPoint.getHttpMethod(), endPoint.toSecurityUrl());
-                if (appSecurityConfig.permitAll()) {
-                    authorizedUrl.permitAll();
-                } else {
-                    authorizedUrl.hasAnyAuthority(endPoint.getName(), Role.ROLE_ADMIN);
-                    if (endPoint.getIsReadOnlyMethod()) {
-                   /*     rule[0].antMatchers(endPoint.getHttpMethod(), endPoint.toSecurityUrl()).hasAnyRole(Role.ROLE_READONLY.replaceAll("ROLE_",""),
-                                Role.ROLE_ADMIN.replaceAll("ROLE_",""));*/
-                        rule[0].antMatchers(endPoint.getHttpMethod(), endPoint.toSecurityUrl()).hasAnyAuthority(Role.ROLE_ADMIN, Role.ROLE_READONLY);
+            Stream<AuthorityDto> streamEndp = has(endpointsMap) ?
+                    endpointsMap.values().stream().filter(AppUtils::has)
+                            .map(endPoint -> new AuthorityDto(endPoint.getName(), endPoint.getUrl(), endPoint.getHttpMethod()))
+                    : Stream.empty();
+
+            final Set<AuthorityDto> authorities =
+                    (isGateway != null && isGateway) ? authoritiesRepo.getAuthorities(streamEndp)
+                            : streamEndp.sorted().collect(Collectors.toCollection(LinkedHashSet::new));
+
+            authorities.forEach(endPoint -> {
+
+                final String AUTHORITY_NAME = endPoint.getName();
+
+                if (endPoint.hasHttpMethod()) {
+                    final ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl authorizedUrl =
+                            rule[0].antMatchers(endPoint.getHttpMethod(), endPoint.getUrls());
+
+                    if (Objects.equals(endPoint.getHttpMethod(), HttpMethod.GET) || Objects.equals(Privilege.READ_ONLY_PRIV, endPoint.getName())) {
+                        authorizedUrl.hasAnyAuthority(AUTHORITY_NAME, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS, Privilege.READ_ONLY_PRIV, Role.ROLE_READONLY);
+                    } else {
+                        authorizedUrl.hasAnyAuthority(AUTHORITY_NAME, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
                     }
+                } else {
+                    rule[0].antMatchers(endPoint.getUrls()).hasAnyAuthority(AUTHORITY_NAME, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
                 }
             });
-        } else {
-            if (appSecurityConfig.permitAll()) {
-                rule[0].antMatchers("*").permitAll();
-                rule[0].antMatchers("**/**").permitAll();
-                rule[0].antMatchers("/**/**").permitAll();
-                rule[0].antMatchers("/**/*").permitAll();
-            } else {
-                rule[0].antMatchers("*").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
-                rule[0].antMatchers("**/**").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
-                rule[0].antMatchers("/**/**").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
-                rule[0].antMatchers("/**/*").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+
+            rule[0].antMatchers(HttpMethod.GET, "*").hasAnyAuthority(Privilege.READ_ONLY_PRIV, Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            rule[0].antMatchers(HttpMethod.GET, "**/**").hasAnyAuthority(Privilege.READ_ONLY_PRIV, Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            rule[0].antMatchers(HttpMethod.GET, "/**/**").hasAnyAuthority(Privilege.READ_ONLY_PRIV, Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            rule[0].antMatchers(HttpMethod.GET, "/**/*").hasAnyAuthority(Privilege.READ_ONLY_PRIV, Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+
+            rule[0].antMatchers(HttpMethod.POST, "*").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            rule[0].antMatchers(HttpMethod.POST, "**/**").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            rule[0].antMatchers(HttpMethod.POST, "/**/**").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            rule[0].antMatchers(HttpMethod.POST, "/**/*").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+
+            rule[0].antMatchers(HttpMethod.PUT, "*").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            rule[0].antMatchers(HttpMethod.PUT, "**/**").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            rule[0].antMatchers(HttpMethod.PUT, "/**/**").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            rule[0].antMatchers(HttpMethod.PUT, "/**/*").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+
+            rule[0].antMatchers(HttpMethod.OPTIONS, "*").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            rule[0].antMatchers(HttpMethod.OPTIONS, "**/**").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            rule[0].antMatchers(HttpMethod.OPTIONS, "/**/**").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            rule[0].antMatchers(HttpMethod.OPTIONS, "/**/*").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+
+            rule[0].antMatchers(HttpMethod.DELETE, "*").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            rule[0].antMatchers(HttpMethod.DELETE, "**/**").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            rule[0].antMatchers(HttpMethod.DELETE, "/**/**").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            rule[0].antMatchers(HttpMethod.DELETE, "/**/*").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+
+            rule[0].antMatchers(HttpMethod.PATCH, "*").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            rule[0].antMatchers(HttpMethod.PATCH, "**/**").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            rule[0].antMatchers(HttpMethod.PATCH, "/**/**").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            rule[0].antMatchers(HttpMethod.PATCH, "/**/*").hasAnyAuthority(Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+
+//            if (!has(endpointsMap)) {
+
+////            }
 
 
-                rule[0].antMatchers(HttpMethod.GET, "*").hasAnyAuthority(Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
-                rule[0].antMatchers(HttpMethod.GET, "**/**").hasAnyAuthority(Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
-                rule[0].antMatchers(HttpMethod.GET, "/**/**").hasAnyAuthority(Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
-                rule[0].antMatchers(HttpMethod.GET, "/**/*").hasAnyAuthority(Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
-
-            }
         }
 
 
@@ -163,8 +218,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             rule[0] = rule[0].antMatchers(url.toString()).permitAll();
         }
 
-        rule[0].anyRequest().authenticated()
-                .and()
+//        rule[0].anyRequest().authenticated()
+        rule[0].anyRequest().authenticated().and()
 
                 //
                 // Add Filter 1 - JWTLoginFilter
@@ -204,8 +259,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .clearAuthentication(true)
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID");
-               /* .and()
-                .addFilter(filterSecurityInterceptor());*/
+
+        // rule[0].anyRequest().access("@jdbcRoleChecker.check(authentication,request)");
+
+//        appSecurityConfig.setUrlExpression(rule[0]);
         appSecurityConfig.configure(http);
     }
 

@@ -175,7 +175,7 @@ public abstract class AbstractBdServiceBase<T extends IBaseEntity, ID> implement
         });
     }
 
-    @Transactional
+    ///@Transactional
     public T save(T entity, T oldEntity) throws AppException {
         T item = null;
         try {

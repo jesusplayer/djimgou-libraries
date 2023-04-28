@@ -151,11 +151,11 @@ public class ReportController {
         return reportService.findBy(reportFilterDto);
     }
 
-    @GetMapping("/search")
+/*    @GetMapping("/search")
     @Endpoint("Recherche sur les reports")
     public List<Report> searchReportTemplates(@Valid ReportFindDto reportFindDto) throws Exception {
         return reportService.search(reportFindDto).hits();
-    }
+    }*/
 
    /* @GetMapping("/find")
     @ResponseStatus(HttpStatus.OK)

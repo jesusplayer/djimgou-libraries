@@ -7,8 +7,6 @@ import com.djimgou.core.util.model.BaseBdEntity;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -16,7 +14,7 @@ import javax.validation.constraints.NotBlank;
 @Validations
 @Data
 @Entity
-@Indexed
+//@Indexed
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EntityListeners(EntityListener.class)
 public class Tenant extends BaseBdEntity {
@@ -27,7 +25,7 @@ public class Tenant extends BaseBdEntity {
     @Unique(ignoreCase = true, message = "Impossible d'enregistrer ce centre car un centre de même code existe déjà")
     @Column(unique = true)
     @NotBlank()
-    @KeywordField
+//    @KeywordField
     String code;
 
     /**
@@ -36,17 +34,17 @@ public class Tenant extends BaseBdEntity {
     @Unique(ignoreCase = true, message = "Impossible d'enregistrer ce centre car un centre de même nom existe déjà")
     @Column(unique = true, nullable = false)
     @NotBlank()
-    @FullTextField
+//    @FullTextField
     String nom;
 
     @Column(nullable = false)
     @NotBlank()
-    @FullTextField
+//    @FullTextField
     String ville;
 
     @ManyToOne(optional = false)
-    @IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
-    @IndexedEmbedded
+//    @IndexingDependency(reindexOnUpdate = ReindexOnUpdate.SHALLOW)
+//    @IndexedEmbedded
     Pays pays;
 
     Boolean actif = Boolean.TRUE;

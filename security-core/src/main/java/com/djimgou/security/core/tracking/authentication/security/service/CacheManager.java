@@ -30,8 +30,8 @@ public class CacheManager implements ApplicationListener<CacheEventMessage> {
 
     @Override
     public void onApplicationEvent(CacheEventMessage event) {
-        authorities = event.getAuthoritiesDto()
-                .stream().collect(groupingBy(AuthorityDto::getUrl, toList()));
-        log.info("Cache Manager - OnApplicationEvent {}", authorities);
+        /*authorities = event.getAuthoritiesDto()
+                .stream().collect(groupingBy(AuthorityDto::getUrlsJoin, toList()));
+        log.info("Cache Manager - OnApplicationEvent {}", authorities);*/
     }
 }

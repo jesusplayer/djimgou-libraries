@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.springframework.http.HttpMethod;
 
 import javax.persistence.*;
 import java.util.Arrays;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 @JsonIgnoreProperties(value = {"enfants"})
 @EntityListeners({EntityListener.class})
 public class Privilege extends SecurityBaseEntity {
+    public static String READ_ONLY_PRIV = "PrivReadOnly";
     // TODO Attention!! l'ajout de la contrainte unique peut empieter sur les tests
     @Unique(ignoreCase = true, message = "Impossible d'enregistrer ce privilège car un privilège de même code existe déjà")
     @Column(name = "code", nullable = false/*, unique = true*/)
@@ -48,6 +50,9 @@ public class Privilege extends SecurityBaseEntity {
     @Column(name = "url")
     private String url;
 
+    @Enumerated(EnumType.STRING)
+    private HttpMethod httpMethod;
+
     @ManyToOne
     @JoinColumn(name = "parent_id")
     //@JsonManagedReference
@@ -61,6 +66,9 @@ public class Privilege extends SecurityBaseEntity {
     public Privilege() {
     }
 
+    public boolean hasUrl() {
+        return url != null && !url.isEmpty();
+    }
 
     public void fetchPriv(Set<String> tre) {
         if (AppUtils2.has(enfants)) {
@@ -83,7 +91,7 @@ public class Privilege extends SecurityBaseEntity {
                 e.fetchAuthorityDto(tre);
             });
         } else {
-            AuthorityDto authorityDto = new AuthorityDto(code, url);
+            AuthorityDto authorityDto = new AuthorityDto(code, url, httpMethod);
             tre.add(authorityDto);
         }
     }

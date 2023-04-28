@@ -1,6 +1,7 @@
 package com.djimgou.security.core;
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +12,11 @@ import java.util.stream.Stream;
  * Interface implémenté par chaque applications qui utilise le module de sécurité
  */
 public interface AppSecurityConfig {
+
+//    void setUrlExpression(ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry httpSecurity);
+//
+//    ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry getUrlExpression();
+
     boolean permitAll();
 
     /**

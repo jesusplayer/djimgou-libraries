@@ -5,18 +5,14 @@ import com.djimgou.core.infra.BaseFilterDto;
 import com.djimgou.core.infra.BaseFindDto;
 import com.djimgou.core.service.AbstractDomainService;
 import com.djimgou.security.core.model.SecurityBaseEntity;
-import com.djimgou.session.service.SessionService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
-
-import static com.djimgou.core.util.AppUtils2.has;
 
 
 @Log4j2
@@ -25,26 +21,23 @@ import static com.djimgou.core.util.AppUtils2.has;
 public abstract class AbstractSecurityBdService<T extends SecurityBaseEntity, S extends BaseFindDto, F extends BaseFilterDto>
         extends AbstractDomainService<T, S, F> {
 
-    @Autowired(/*required = false*/)
-    private SessionService httpSession;
-
 
     public AbstractSecurityBdService(JpaRepository<T, UUID> repo/*, SessionService httpSession*/) {
         super(repo);
         //this.httpSession = httpSession;
     }
 
-    public UUID currentUserId() {
-
-        Object uid = null;
-        if (has(httpSession)) {
-            uid = httpSession.currentUserId();
-        }
-        if (has(uid)) {
-            return UUID.fromString((String) uid);
-        }
-        return null;
-    }
+//    public UUID currentUserId() {
+//
+//        Object uid = null;
+//        if (has(httpSession)) {
+//            uid = httpSession.currentUserId();
+//        }
+//        if (has(uid)) {
+//            return UUID.fromString((String) uid);
+//        }
+//        return null;
+//    }
 
     public T save(T entity) {
         T item = null;

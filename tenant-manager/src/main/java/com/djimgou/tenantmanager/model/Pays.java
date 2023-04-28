@@ -7,9 +7,7 @@ import com.djimgou.core.util.model.BaseBdEntity;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
+
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,7 +19,7 @@ import javax.validation.constraints.NotBlank;
 @Data
 @Validations
 @Entity
-@Indexed
+//@Indexed
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @EntityListeners(EntityListener.class)
 public class Pays extends BaseBdEntity {
@@ -30,13 +28,13 @@ public class Pays extends BaseBdEntity {
     @Unique(ignoreCase = true, message = "Impossible d'enregistrer ce pays car un pays de même code existe déjà")
     @Column(unique = true)
     @NotBlank()
-    @KeywordField
+//    @KeywordField
     String code;
 
     @Unique(ignoreCase = true, message = "Impossible d'enregistrer ce pays car un pays de même nom existe déjà")
     @Column(unique = true, nullable = false)
     @NotBlank()
-    @FullTextField
+//    @FullTextField
     String nom;
 
     Boolean readonlyValue = Boolean.FALSE;

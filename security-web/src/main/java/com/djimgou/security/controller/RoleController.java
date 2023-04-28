@@ -118,11 +118,11 @@ public class RoleController {
         return roleService.findBy(roleFilterDto);
     }
 
-    @GetMapping("/search")
+  /*  @GetMapping("/search")
     @Endpoint("Recherche sur les rôles")
     public List<Role> searchRoles(RoleFindDto roleFindDto) throws Exception {
         return roleService.search(roleFindDto).hits();
-    }
+    }*/
 
     @GetMapping("/find")
     @Endpoint("Recherche sur les rôles avec pagination")

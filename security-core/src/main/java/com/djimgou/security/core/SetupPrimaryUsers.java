@@ -29,6 +29,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -95,10 +96,12 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
         if (has(securedEndPoints)) {
             securedEndPoints.stream().map(endPoint -> {
                 Privilege fullAccess = new Privilege();
+
                 fullAccess.setCode(endPoint.getName());
                 fullAccess.setName(endPoint.getName());
                 fullAccess.setUrl(endPoint.toSecurityUrl());
                 fullAccess.setDescription(endPoint.getDescription());
+                fullAccess.setHttpMethod(endPoint.getHttpMethod());
                 return fullAccess;
             }).forEach(this::createPrivilegeIfNotFound);
         }
@@ -165,10 +168,16 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
             initDefaultPriv2();
 
             PrivileEvaluator pe = new PrivileEvaluator(Privilege.class);
-            Privilege fullPrivilege
-                    = privilegeRepository.findByCode(PrivileEvaluator.FULL_ACCESS).orElse(null);
-        /*Privilege writePrivilege
-                = createPrivilegeIfNotFound("WRITE_PRIVILEGE");*/
+
+            Privilege fullPrivilege = privilegeRepository.findByCode(PrivileEvaluator.FULL_ACCESS).orElse(null);
+
+            Privilege readPriv = createPrivilegeIfNotFound(
+                    Privilege.READ_ONLY_PRIV,
+                    Privilege.READ_ONLY_PRIV,
+                    "Privilège ayant tous les droits de lecture seule dans le système",
+                    null,
+                    HttpMethod.GET
+            );
 
           /*  Privilege paramPrivilege
                     = createPrivilegeIfNotFound("PrivParametresVoir");*/
@@ -177,7 +186,8 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
             //Set<Privilege> adminPrivileges = SetUtils.hashSet(paramPrivilege, fullPrivilege);
             //Role userAuth = createAuthorityIfNotFound("ROLE_USER", SetUtils.hashSet(paramPrivilege), null);
             createAuthorityIfNotFound(Role.ROLE_ADMIN, null, null);
-            createAuthorityIfNotFound(Role.ROLE_READONLY, null, null);
+
+            createAuthorityIfNotFound(Role.ROLE_READONLY, SetUtils.hashSet(readPriv), null);
 
 
             Role adminRole = roleRepository.findByName(Role.ROLE_ADMIN);
@@ -192,7 +202,7 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
 
             Role redOnlyRole = roleRepository.findByName(Role.ROLE_READONLY);
             Utilisateur readonly = createUserIfNotFound("readonly", "readonly", "readonly@actsarl.com",
-                    "readonly", SetUtils.hashSet(redOnlyRole), Boolean.TRUE);
+                    "readonly", SetUtils.hashSet(redOnlyRole), Boolean.FALSE);
 
             /*Utilisateur user = createUserIfNotFound("user", "user", "nono", "nono",
                     SetUtils.hashSet(userRole), Boolean.TRUE);
@@ -241,11 +251,11 @@ class SetupPrimaryUsers implements ApplicationListener<ContextRefreshedEvent> {
             userDto.setEmail(username);
             userDto.setPassword(password);
             userDto.setPasswordConfirm(password);
-            userDto.setAuthorities(has(authorities)?authorities.stream().map(role -> {
+            userDto.setAuthorities(has(authorities) ? authorities.stream().map(role -> {
                 IdDto is = new IdDto();
                 is.setId(role.getId());
                 return is;
-            }).collect(Collectors.toSet()):null);
+            }).collect(Collectors.toSet()) : null);
             try {
                 userDto.setEncodedPasswd(passwordEncoder().encode(password));
                 user = getService().createUtilisateurGeneric(userDto);
@@ -289,28 +299,31 @@ en);
 
     @Transactional
     Privilege createPrivilegeIfNotFound(String code, String name, String description, Privilege parent) {
+        return createPrivilegeIfNotFound(code, name, description, parent, null);
+    }
+
+    @Transactional
+    Privilege createPrivilegeIfNotFound(String code, String name, String description, Privilege parent, HttpMethod httpMethod) {
         Optional<Privilege> opt = privilegeRepository.findByCode(name);
-        Privilege privilege;
-        if (opt.isPresent()) {
-            privilege = opt.get();
-            /*if (defaultPrivilegesCreation.equals("deleteAndCreate")) {
-                privilegeRepository.delete(privilege);
-                privilege = createPrivilege(code, name, description, parent);
-            }*/
-        } else {
-            privilege = createPrivilege(code, name, description, parent);
-        }
+        Privilege privilege = opt.orElseGet(() -> createPrivilege(code, name, description, parent, httpMethod));
         return privilege;
     }
 
     @Transactional
     Privilege createPrivilege(String code, String name, String description, Privilege parent) {
+
+        return createPrivilege(code, name, description, parent, null);
+    }
+
+    @Transactional
+    Privilege createPrivilege(String code, String name, String description, Privilege parent, HttpMethod httpMethod) {
         Privilege p = new Privilege();
         p.setName(name);
         p.setCode(code);
         p.setReadonlyValue(true);
         p.setDescription(description);
         p.setParent(parent);
+        p.setHttpMethod(httpMethod);
         return privilegeRepository.save(p);
     }
 
@@ -320,15 +333,25 @@ en);
         Privilege privilege = null;
         if (opt.isPresent()) {
             Privilege oldPriv = opt.get();
+            boolean changed = false;
             if (!Objects.equals(oldPriv.getDescription(), priv.getDescription())) {
                 oldPriv.setDescription(priv.getDescription());
+                changed = true;
                 log.info("Modification de l'Url du priv: " + priv.getDescription());
             }
             if (!Objects.equals(oldPriv.getUrl(), priv.getUrl())) {
                 oldPriv.setUrl(priv.getUrl());
+                changed = true;
                 log.info("Modification de la description du priv: " + priv.getUrl());
             }
-            privilege = oldPriv;
+            if (!Objects.equals(oldPriv.getHttpMethod(), priv.getHttpMethod())) {
+                oldPriv.setHttpMethod(priv.getHttpMethod());
+                changed = true;
+                log.info("Modification de la méthode Http du priv: " + priv.getHttpMethod());
+            }
+            if (changed) {
+                privilege = privilegeRepository.save(oldPriv);
+            }
         } else {
             priv.setReadonlyValue(true);
             try {
@@ -351,6 +374,11 @@ en);
             role.setParent(parent);
             role.setReadonlyValue(true);
             roleRepository.save(role);
+        } else {
+            if (!role.hasPrivileges() && has(privileges)) {
+                role.addAllPrivileges(privileges);
+                roleRepository.save(role);
+            }
         }
         return role;
     }

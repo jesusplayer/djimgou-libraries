@@ -53,6 +53,7 @@ public class RoleService extends AbstractSecurityBdService<Role, RoleFindDto, Ro
 
     private UtilisateurRepo utilisateurRepo;
     private DataExportParser dataExportParser;
+
     public RoleService(RoleRepo repo, SessionManager sessionManager, PrivilegeRepo privilegeRepo, UtilisateurRepo utilisateurRepo, DataExportParser dataExportParser) {
         super(repo);
         this.repo = repo;
@@ -61,10 +62,12 @@ public class RoleService extends AbstractSecurityBdService<Role, RoleFindDto, Ro
         this.utilisateurRepo = utilisateurRepo;
         this.dataExportParser = dataExportParser;
     }
+
     public List<List<?>> exporter() {
         List<List<?>> er = dataExportParser.parse(repo.exporter());
         return er;
     }
+
     @Override
     public Page<Role> advancedSearchBy(BaseFilterDto baseFilter) throws Exception {
         return null;
@@ -180,6 +183,8 @@ public class RoleService extends AbstractSecurityBdService<Role, RoleFindDto, Ro
         if (has(dto.getParentId())) {
             Role parent = repo.findById(dto.getParentId()).orElseThrow(() -> new RoleNotFoundException("ce Rôle parent est inexistant"));
             role.setParent(parent);
+        } else {
+            role.setParent(null);
         }
         Role r = save(role);
         afterDataSaved(r);

@@ -23,14 +23,14 @@ public class LogicalDeleteInterceptor {
     @Autowired
     EntityManager em;
 /*
-    @Around("execution(* org.springframework.data.jpa.repository.JpaRepository+.*(..)))) && @target(com.djimgou.core.annotations.LogicalDelete)")
+    @Around("execution(* org.springframework.data.jpa.repository.JpaRepository+.*(..))))")
     public Object interceptList(ProceedingJoinPoint joinPoint) throws Throwable {
         Object entity = joinPoint.getArgs()[0];
         //if (deleteLogicaly(entity)) return null;
         Session session = em.unwrap(Session.class);
         session.enableFilter("logicalDeleteFilter");
 
-        return joinPoint.proceed();
+        return joinsPoint.proceed();
     }*/
 
   /*  @Around("execution(* org.springframework.data.jpa.repository.JpaRepository+.delete(..))))")

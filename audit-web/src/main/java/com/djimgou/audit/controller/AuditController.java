@@ -77,13 +77,13 @@ public class AuditController {
         return auditService.advancedFindBy(auditFilterDto);
     }
 
-    @GetMapping("/search")
+  /*  @GetMapping("/search")
     @Endpoint("Recherche sur les audits")
     public List<Audit> searchAudits(AuditFindDto auditFindDto) throws Exception {
         //auditService.findByDto()
         return auditService.search(auditFindDto).hits();
     }
-
+*/
     @GetMapping("/find")
     @Endpoint("Recherche sur les audits avec pagination")
     public Page<Audit> findAudits(AuditFindDto auditFindDto) throws Exception {

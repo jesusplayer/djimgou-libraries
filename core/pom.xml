@@ -77,30 +77,30 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
+       <!-- <dependency>
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-mapper-orm</artifactId>
             <version>6.0.3.Final</version>
-        </dependency>
+        </dependency>-->
 
-        <dependency>
+       <!-- <dependency>
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-backend-lucene</artifactId>
             <version>6.0.3.Final</version>
-        </dependency>
+        </dependency>-->
         <!-- https://mvnrepository.com/artifact/com.querydsl/querydsl-hibernate-search -->
-        <dependency>
+       <!-- <dependency>
             <groupId>com.querydsl</groupId>
             <artifactId>querydsl-hibernate-search</artifactId>
             <version>5.0.0</version>
-        </dependency>
+        </dependency>-->
 
         <!-- https://mvnrepository.com/artifact/com.querydsl/querydsl-lucene5 -->
-        <dependency>
+       <!-- <dependency>
             <groupId>com.querydsl</groupId>
             <artifactId>querydsl-lucene5</artifactId>
             <version>5.0.0</version>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>com.lmax</groupId>

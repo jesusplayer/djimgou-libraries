@@ -43,6 +43,8 @@
         <module>act-app-starter-parent-redis-ms</module>
         <module>djimgou-app-starter-parent-ms</module>
         <module>core-coolvalidation</module>
+<!--        <module>session-token</module>-->
+        <!--        <module>core-coolfilter</module>-->
         <!--        <module>appsepla</module>-->
 <!--        <module>apprayaleauto</module>-->
     </modules>

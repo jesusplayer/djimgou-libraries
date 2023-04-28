@@ -1,6 +1,7 @@
 package com.djimgou.security.core.model.views;
 
 import com.djimgou.core.annotations.ColumnExport;
+import org.springframework.http.HttpMethod;
 
 public interface IPrivilegeExport {
 
@@ -15,5 +16,8 @@ public interface IPrivilegeExport {
 
     @ColumnExport(value = "Description", order = 4)
     String getDescription();
+
+    @ColumnExport(value = "Méthode Http", order = 5)
+    HttpMethod getHttpMethod();
 
 }

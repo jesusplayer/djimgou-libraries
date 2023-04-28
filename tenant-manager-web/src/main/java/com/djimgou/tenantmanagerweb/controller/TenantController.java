@@ -97,12 +97,12 @@ public class TenantController {
         return tenantService.findBy(tenantFilterDto);
     }
 
-    @GetMapping("/search")
+  /*  @GetMapping("/search")
     @Endpoint("Recherche sur les tenants")
     public List<Tenant> searchTenants(@Valid TenantFindDto tenantFindDto) {
         return tenantService.search(tenantFindDto).hits();
     }
-
+*/
     @GetMapping("/find")
     @Endpoint("Recherche sur les tenants avec pagination")
     public Page<Tenant> findTenants(@Valid TenantFindDto tenantFindDto) throws Exception {

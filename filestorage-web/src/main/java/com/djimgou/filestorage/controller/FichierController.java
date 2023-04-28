@@ -140,11 +140,11 @@ public class FichierController {
         return fichierService.advancedFindBy(fichierFilterDto);
     }
 
-    @GetMapping("/search")
+/*    @GetMapping("/search")
     @Endpoint("Recherche sur les fichiers")
     public List<Fichier> searchFichiers(FichierFindDto fichierFindDto) throws Exception {
         return fichierService.search(fichierFindDto).hits();
-    }
+    }*/
 
     @GetMapping("/find")
     @Endpoint("Recherche sur les fichiers avec pagination")

@@ -2,6 +2,7 @@ package com.djimgou.audit.repository;
 
 import com.djimgou.audit.model.Audit;
 import com.djimgou.audit.model.AuditAction;
+import com.djimgou.audit.views.AuditListView;
 import com.djimgou.audit.views.IAuditExport;
 import com.djimgou.core.repository.BaseJpaRepository;
 import org.springframework.data.domain.Page;
@@ -46,6 +47,15 @@ public interface AuditRepo extends BaseJpaRepository<Audit, UUID> {
     Page<Audit> findByAction(UUID utilisateurId, Pageable pageRequest);
 
     Page<Audit> findAll(Specification<Audit> spec, Pageable pageRequest);
+
+    @Query("SELECT " +
+            "v.username AS username, " +
+            "v.action AS action, " +
+            "v.date AS date, " +
+            "v.nomEntite AS nomEntite " +
+            "FROM Audit v " +
+            "")
+    Page<AuditListView> listView(Pageable pg);
 
     @Query("SELECT " +
             "v.username AS username, " +

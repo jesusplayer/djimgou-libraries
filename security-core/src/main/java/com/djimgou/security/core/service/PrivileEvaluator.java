@@ -26,6 +26,7 @@ public class PrivileEvaluator {
     Authentication authentication;
     Collection<? extends GrantedAuthority> authorities = new HashSet<>();
     public static String FULL_ACCESS = "PrivFullApplicationPrivileges";
+    public static String READ_ONLY_PRIV = "PrivReadOnly";
     public String READ;
     // a tous les droits sur la ressource
     public String DO_ALL;

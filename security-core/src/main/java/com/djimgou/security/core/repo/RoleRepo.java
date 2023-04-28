@@ -2,6 +2,8 @@ package com.djimgou.security.core.repo;
 
 import com.djimgou.security.core.model.Role;
 import com.djimgou.security.core.model.views.IRoleExport;
+import com.djimgou.security.core.model.views.RoleListview;
+import com.djimgou.security.core.model.views.UtilisateurListview;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -39,6 +41,19 @@ public interface RoleRepo extends JpaRepository<Role, UUID>, QuerydslPredicateEx
     /*@Query("SELECT d FROM Role d WHERE " +
             "LOWER(d.name) LIKE LOWER(CONCAT('%',:name, '%')) ")*/
     Optional<Role> findOneByName(String name);
+
+    @Query("SELECT " +
+            "v.id as id," +
+            "v.name AS name, " +
+            "v.description AS description, " +
+            "v.parent.id AS parentId, " +
+            "v.parent.name AS nameParent, " +
+            "v.deleted AS deleted, " +
+            "v.readonlyValue AS readonlyValue " +
+            "FROM Role v " +
+            "LEFT join v.parent parent" +
+            "")
+    Page<RoleListview> listView(Pageable pageable);
 
     @Transactional
     @Query("SELECT " +

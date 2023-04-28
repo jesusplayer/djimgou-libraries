@@ -102,6 +102,9 @@ public class Role extends SecurityBaseEntity {
         //privileges = new HashSet<>();
     }
 
+    public boolean hasPrivileges() {
+        return has(privileges);
+    }
 
     @Override
     public String toString() {
@@ -134,6 +137,14 @@ public class Role extends SecurityBaseEntity {
         }
         if (AppUtils2.has(enfants)) {
             enfants.clear();
+        }
+    }
+
+    public void addAllPrivileges(Set<Privilege> privileges) {
+        if (this.privileges == null) {
+            setPrivileges(privileges);
+        } else {
+            this.privileges.addAll(privileges);
         }
     }
 

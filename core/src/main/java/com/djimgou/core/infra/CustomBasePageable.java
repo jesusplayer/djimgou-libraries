@@ -3,6 +3,7 @@ package com.djimgou.core.infra;
 import com.djimgou.core.util.AppUtils2;
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +29,11 @@ public class CustomBasePageable<T> implements Pageable {
     Filter<T> filter;
     boolean notPaged = false;
 
+    public CustomBasePageable() {
+        notPaged = true;
+        pg = Pageable.unpaged();
+    }
+
     public CustomBasePageable(Pageable pg) {
         this.pg = pg;
         this.notPaged = pg.isUnpaged();
@@ -35,13 +41,20 @@ public class CustomBasePageable<T> implements Pageable {
 
     // TODO A ameliorer le trie de la page
     public CustomBasePageable(BasePageableDto pg) {
-        Sort sort1 = buildSort(pg.getSort());
-        if (has(sort1)) {
-            this.pg = PageRequest.of(pg.getPage(), pg.getSize(), sort1);
+        if (pg != null && pg.getSize() > 0 && pg.getPage() >= 0) {
+            Sort sort1 = buildSort(pg.getSort());
+
+            if (has(sort1)) {
+                this.pg = PageRequest.of(pg.getPage(), pg.getSize(), sort1);
+            } else {
+                this.pg = PageRequest.of(pg.getPage(), pg.getSize());
+            }
+            this.notPaged = pg.isUnpaged();
         } else {
-            this.pg = PageRequest.of(pg.getPage(), pg.getSize());
+            this.pg = Pageable.unpaged();
+            this.notPaged = true;
         }
-        this.notPaged = pg.isUnpaged();
+
         /*if (has(pg.getSearchText())) {
             if (!has(filter)) {
                 filter = new Filter<>(pg.getSearchText(), null);
@@ -96,8 +109,6 @@ public class CustomBasePageable<T> implements Pageable {
         return o;
     }
 
-    public CustomBasePageable() {
-    }
 
     @Override
     public boolean isPaged() {
@@ -106,61 +117,61 @@ public class CustomBasePageable<T> implements Pageable {
 
     @Override
     public boolean isUnpaged() {
-        return pg.isUnpaged();
+        return has(pg) && pg.isUnpaged();
     }
 
     @Override
     public int getPageNumber() {
-        return pg.getPageNumber();
+        return has(pg) ? pg.getPageNumber() : -1;
     }
 
     @Override
     public int getPageSize() {
-        return pg.getPageSize();
+        return has(pg) ? pg.getPageSize() : -1;
     }
 
     @Override
     public long getOffset() {
-        return pg.getOffset();
+        return has(pg) ? pg.getOffset() : -1;
     }
 
     @Override
     public Sort getSort() {
-        return has(sort) ? sort : pg.getSort();
+        return has(pg) ? (has(sort) ? sort : pg.getSort()) : Sort.unsorted();
     }
 
     @Override
     public Sort getSortOr(Sort sort) {
-        return pg.getSortOr(sort);
+        return has(pg) ? pg.getSortOr(sort) : getSort();
     }
 
     @Override
     public Pageable next() {
-        return pg.next();
+        return has(pg) ? pg.next() : null;
     }
 
     @Override
     public Pageable previousOrFirst() {
-        return pg.previousOrFirst();
+        return has(pg) ? pg.previousOrFirst() : null;
     }
 
     @Override
     public Pageable first() {
-        return pg.first();
+        return has(pg) ? pg.first() : null;
     }
 
     @Override
     public Pageable withPage(int i) {
-        return pg.withPage(i);
+        return has(pg) ? pg.withPage(i) : null;
     }
 
     @Override
     public boolean hasPrevious() {
-        return pg.hasPrevious();
+        return has(pg) && pg.hasPrevious();
     }
 
     @Override
     public Optional<Pageable> toOptional() {
-        return pg.toOptional();
+        return has(pg) ? pg.toOptional() : Optional.empty();
     }
 }

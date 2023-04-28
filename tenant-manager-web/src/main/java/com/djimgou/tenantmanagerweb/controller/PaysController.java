@@ -79,11 +79,13 @@ public class PaysController {
         return paysService.findBy(paysFilterDto);
     }
 
+/*
     @GetMapping("/search")
     @Endpoint("Recherche sur les pays")
     public List<Pays> searchPayss(@Valid PaysFindDto agentFindDto) {
         return paysService.search(agentFindDto).hits();
     }
+*/
 
     @GetMapping("/find")
     @Endpoint("Recherche sur les pays avec pagination")

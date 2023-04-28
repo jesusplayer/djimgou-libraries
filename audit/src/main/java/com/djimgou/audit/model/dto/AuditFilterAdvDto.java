@@ -15,7 +15,6 @@ public class AuditFilterAdvDto extends BaseFilterAdvancedDto {
     AuditAction action;
     String nomEntite;
     UUID utilisateurId;
-    QueryFieldFilter<String> name;
     QueryFieldFilter<String> username;
     QueryFieldFilter<String> date;
 }

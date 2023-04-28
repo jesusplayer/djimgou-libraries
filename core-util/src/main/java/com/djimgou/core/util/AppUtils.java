@@ -1308,4 +1308,15 @@ public class AppUtils {
         }
         return cc;
     }
+
+    public static int pageSart(Pageable pageRequest) {
+        pageRequest.getPageNumber();
+        pageRequest.getPageSize();
+        pageRequest.getOffset();
+        return pageRequest.getPageNumber() * pageRequest.getPageSize();
+    }
+
+    public static int pageEnd(Pageable pageRequest) {
+        return pageSart(pageRequest) + pageRequest.getPageSize();
+    }
 }

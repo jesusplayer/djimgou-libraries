@@ -2,7 +2,6 @@ package com.djimgou.session.redis;
 
 import com.djimgou.session.context.SessionContext;
 import com.djimgou.session.enums.SessionKeys;
-import com.djimgou.session.service.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.session.Session;
 import org.springframework.session.SessionRepository;
@@ -21,7 +20,7 @@ import java.util.UUID;
  * J'utilise Redis
  */
 @Component
-public class SessionServiceImpl implements SessionService {
+public class SessionServiceImpl {
 
     @Autowired
     SessionRepository sessionRepo;
@@ -29,17 +28,14 @@ public class SessionServiceImpl implements SessionService {
     @Autowired(required = false)
     HttpSession httpSession;
 
-    @Override
     public boolean hasUser() {
         return false;
     }
 
-    @Override
     public Optional<UUID> currentUserId() {
         return Optional.empty();
     }
 
-    @Override
     public String username() {
         return SessionContext.getCurrentUsername();
     }
@@ -49,7 +45,6 @@ public class SessionServiceImpl implements SessionService {
      *
      * @return
      */
-    @Override
     public HttpSession getSession() {
         if (null == httpSession || httpSession.getAttribute(SessionKeys.USERNAME) == null) {
             if (SessionContext.getCurrentSessionId() == null) {

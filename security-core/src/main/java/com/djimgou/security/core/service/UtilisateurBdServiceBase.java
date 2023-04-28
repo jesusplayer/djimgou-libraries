@@ -12,7 +12,7 @@ import com.djimgou.security.core.model.dto.utilisateur.UtilisateurFilterDto;
 import com.djimgou.security.core.model.dto.utilisateur.UtilisateurFindDto;
 import com.djimgou.security.core.repo.UtilisateurBaseRepo;
 import com.djimgou.tenantmanager.exceptions.TenantNotFoundException;
-import org.hibernate.search.engine.search.query.SearchResult;
+//import org.hibernate.search.engine.search.query.SearchResult;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,7 +52,7 @@ public interface UtilisateurBdServiceBase<U extends Utilisateur, D extends Utili
 
     Optional<U> findById(UUID id) throws NotFoundException;
 
-    SearchResult<U> search(D utilisateurFindDto);
+//    SearchResult<U> search(D utilisateurFindDto);
 
     Page<U> searchPageable2(D filter) throws Exception;
 

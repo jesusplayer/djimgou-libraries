@@ -50,13 +50,21 @@ public class DataExportParserImpl implements DataExportParser {
 
     @Override
     public List<List<?>> parse(List<?> list) {
+        return parse(list, false);
+    }
+
+    @Override
+    public List<List<?>> parse(List<?> list, boolean ignoreHeader) {
         List<List<?>> results = new ArrayList<>();
         if (list == null || list.isEmpty()) {
             return new ArrayList<>();
         }
-        List<ExportHeader> columns = parseColumn(list.get(0).getClass());
 
-        results.add(columns.stream().map(ExportHeader::getText).collect(Collectors.toList()));
+
+        List<ExportHeader> columns = parseColumn(list.get(0).getClass());
+        if (!ignoreHeader) {
+            results.add(columns.stream().map(ExportHeader::getText).collect(Collectors.toList()));
+        }
 
         List<List<?>> res1 = list.stream().map(o ->
                 columns.stream().map(exportHeader -> exportHeader.peekValue(o)

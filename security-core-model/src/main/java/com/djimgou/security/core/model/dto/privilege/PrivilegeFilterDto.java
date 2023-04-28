@@ -2,6 +2,7 @@ package com.djimgou.security.core.model.dto.privilege;
 
 import com.djimgou.core.infra.BaseFilterDto;
 import lombok.Data;
+import org.springframework.http.HttpMethod;
 
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
@@ -14,5 +15,7 @@ public class PrivilegeFilterDto extends BaseFilterDto {
     private String name;
 
     UUID parentId;
+
+    HttpMethod httpMethod;
 }
 

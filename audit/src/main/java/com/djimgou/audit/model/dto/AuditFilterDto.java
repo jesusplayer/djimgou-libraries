@@ -12,7 +12,6 @@ public class AuditFilterDto extends BaseFilterDto {
     AuditAction action;
     String nomEntite;
     UUID utilisateurId;
-    String name;
     String username;
     Date dateDebut;
     Date dateFin;

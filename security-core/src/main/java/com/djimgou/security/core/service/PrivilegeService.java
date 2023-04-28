@@ -14,15 +14,19 @@ import com.djimgou.security.core.model.Role;
 import com.djimgou.security.core.model.dto.privilege.PrivilegeDto;
 import com.djimgou.security.core.model.dto.privilege.PrivilegeFilterDto;
 import com.djimgou.security.core.model.dto.privilege.PrivilegeFindDto;
+import com.djimgou.security.core.model.views.PrivilegeListview;
 import com.djimgou.security.core.repo.PrivilegeRepo;
 import com.djimgou.security.core.repo.RoleRepo;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAQueryBase;
 import com.querydsl.jpa.impl.JPAQuery;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +44,7 @@ import static com.djimgou.core.util.AppUtils2.has;
 @Log4j2
 @Service
 public class PrivilegeService extends AbstractSecurityBdService<Privilege, PrivilegeFindDto, PrivilegeFilterDto> {
+    @Getter
     private PrivilegeRepo repo;
 
     @PersistenceContext
@@ -93,6 +98,10 @@ public class PrivilegeService extends AbstractSecurityBdService<Privilege, Privi
         return page;
     }
 
+    public Page<PrivilegeListview> listView(Pageable pageable) {
+        return repo.listView(pageable);
+    }
+
     @Override
     public Page<Privilege> advancedSearchBy(BaseFilterDto baseFilter) throws Exception {
         return null;
@@ -109,6 +118,7 @@ public class PrivilegeService extends AbstractSecurityBdService<Privilege, Privi
         String name = baseFilter.getName();
         String code = baseFilter.getCode();
         UUID parentId = baseFilter.getParentId();
+        HttpMethod httpMethod = baseFilter.getHttpMethod();
 
         QPrivilege qDevise = QPrivilege.privilege;
 
@@ -120,6 +130,9 @@ public class PrivilegeService extends AbstractSecurityBdService<Privilege, Privi
         }
         if (has(code)) {
             expressionList.add(qDevise.code.containsIgnoreCase(code));
+        }
+        if (has(httpMethod)) {
+            expressionList.add(qDevise.httpMethod.eq(httpMethod));
         }
         if (has(parentId)) {
             expressionList.add(qDevise.parent.id.eq(parentId));

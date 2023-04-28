@@ -101,12 +101,12 @@ public class PrivilegeController {
         return privilegeService.findBy(privilegeFilterDto);
     }
 
-    @GetMapping("/search")
+/*    @GetMapping("/search")
     @Endpoint("Recherche sur les privilèges")
     public List<Privilege> searchPrivileges(PrivilegeFindDto privilegeFindDto) throws Exception {
         //privilegeService.findByDto()
         return privilegeService.search(privilegeFindDto).hits();
-    }
+    }*/
 
     @GetMapping("/find")
     @Endpoint("Recherche sur les privilèges avec pagination")

@@ -19,11 +19,6 @@ import com.querydsl.jpa.JPAQueryBase;
 import com.querydsl.jpa.impl.JPAQuery;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.search.engine.search.query.SearchResult;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
-import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
-import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,12 +28,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.lang.reflect.Field;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.djimgou.core.util.AppUtils2.has;
-import static com.djimgou.core.util.AppUtils2.toPage;
 
 /**
  * @author djimgou
@@ -153,7 +145,7 @@ public class TenantService {
         return page;
     }
 
-    @Transactional
+    /*@Transactional
     public SearchResult<Tenant> search(TenantFindDto findDto) {
         String[] fieldsSplit;
         final Class filterDtoClass = TenantFilterDto.class;
@@ -183,7 +175,7 @@ public class TenantService {
             result = query.fetch(offset, findDto.getSize());
         }
         return result;
-    }
+    }*/
 
     public Optional<Tenant> findById(UUID tenantId) {
         return repo.findById(tenantId);
@@ -216,12 +208,12 @@ public class TenantService {
     @Transactional
     public Page<Tenant> searchPageable(TenantFindDto findDto) {
         // long totalHitCount = result.total().hitCount();
-        if (!has(findDto.getSearchKeys())) {
+      /*  if (!has(findDto.getSearchKeys())) {
             findDto.setSearchKeys(new String[]{"code", "nom", "ville"});
         }
         SearchResult<Tenant> res = search(findDto);
         Page<Tenant> p = toPage(new CustomPageable(findDto), res.hits(), (int) res.total().hitCount());
-        return p;
+        */return Page.empty();
     }
 
     @Transactional

@@ -49,12 +49,12 @@
             <version>0.0.4-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.djimgou</groupId>
-            <artifactId>session-jdbc</artifactId>
-            <version>0.0.4-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.djimgou</groupId>-->
+<!--            <artifactId>session-jdbc</artifactId>-->
+<!--            <version>0.0.4-SNAPSHOT</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
         <!--  <dependency>
               <groupId>org.springframework.kafka</groupId>
               <artifactId>spring-kafka</artifactId>

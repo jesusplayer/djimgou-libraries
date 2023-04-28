@@ -1,7 +1,6 @@
 package com.djimgou.tenantmanager.aop;
 
 import com.djimgou.session.enums.SessionKeys;
-import com.djimgou.session.service.SessionService;
 import com.djimgou.tenantmanager.exceptions.TenantSessionNotFoundException;
 import com.djimgou.tenantmanager.model.Tenant;
 import com.djimgou.tenantmanager.repository.TenantRepo;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
-import javax.servlet.http.HttpSession;
 import java.util.Optional;
 
 import static com.djimgou.core.util.AppUtils2.has;
@@ -28,8 +26,6 @@ public class RepositoryInterceptor {
     @Autowired
     TenantSessionService tenantSessionService;
 
-    @Autowired
-    SessionService sessionService;
 
     @Autowired
     private EntityManager entityManager;
@@ -51,11 +47,11 @@ public class RepositoryInterceptor {
             }
         }
         if (checkTenant) {
-            HttpSession httpSession = sessionService.getSession();
             //HttpSession httpSession = sessionService.getSession();
-            String tenantId = (String) httpSession.getAttribute(SessionKeys.TENANT_ID);
-            Optional<Tenant> tenant = tenantSessionService.putTenant(tenantId);
-            TenantContext.setCurrentTenant(tenant.orElseThrow(TenantSessionNotFoundException::new));
+            //HttpSession httpSession = sessionService.getSession();
+//            String tenantId = (String) httpSession.getAttribute(SessionKeys.TENANT_ID);
+//            Optional<Tenant> tenant = tenantSessionService.putTenant(tenantId);
+//            TenantContext.setCurrentTenant(tenant.orElseThrow(TenantSessionNotFoundException::new));
             Session session = entityManager.unwrap(Session.class);
             String id = TenantContext.getCurrentTenantId();
             if (has(id)) {

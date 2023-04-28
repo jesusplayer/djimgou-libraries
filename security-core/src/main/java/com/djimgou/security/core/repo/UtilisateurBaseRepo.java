@@ -3,6 +3,7 @@ package com.djimgou.security.core.repo;
 import com.djimgou.security.core.model.Utilisateur;
 import com.djimgou.security.core.model.dto.utilisateur.IUsernameDto;
 import com.djimgou.security.core.model.views.IUtilisateurExport;
+import com.djimgou.security.core.model.views.UtilisateurListview;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -79,6 +80,9 @@ public interface UtilisateurBaseRepo<T extends Utilisateur, I> extends JpaReposi
     Optional<T> findOneByEmail(String email);
 
     @Transactional
+    Optional<T> findByEmail(String email);
+
+    @Transactional
     Page<T> findByEnabledTrue(Pageable pageRequest);
 
     @Transactional
@@ -127,6 +131,20 @@ public interface UtilisateurBaseRepo<T extends Utilisateur, I> extends JpaReposi
             @Param("username") String username
     );
 
+
+    @Query("SELECT " +
+            "v.id as id," +
+            "v.username AS username, " +
+            "v.enabled AS enabled, " +
+            "v.email AS email, " +
+            "concat(v.nom,' ',v.prenom) AS noms, " +
+            "v.telephone AS telephone, " +
+            "v.fonction AS fonction, " +
+            "v.deleted AS deleted, " +
+            "v.readonlyValue AS readonlyValue " +
+            "FROM Utilisateur v " +
+            "")
+    Page<UtilisateurListview> listView(Pageable pageable);
 
     @Query("SELECT " +
             "v.username AS username, " +

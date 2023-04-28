@@ -90,8 +90,12 @@ public class AppCorsFilter extends GenericFilterBean /*implements WebMvcConfigur
         } catch (Throwable e) {
             e.printStackTrace();
         }
+        try {
+            filterChain.doFilter(servletRequest, servletResponse);
 
-        filterChain.doFilter(servletRequest, servletResponse);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
 
 
         //System.out.println("WebConfig; "+request.getRequestURI());
