@@ -193,7 +193,7 @@ public abstract class AbstractBdServiceBase<T extends IBaseEntity, ID> implement
             if (!getRepo().existsById((ID) entity.getId())) {
                 throw new NotFoundException("Elément à supprimer inexistant");
             }
-            getRepo().deleteById((ID) entity.getId());
+            getRepo().delete(entity);
         } catch (Exception e) {
             throw e;
         }
@@ -204,7 +204,8 @@ public abstract class AbstractBdServiceBase<T extends IBaseEntity, ID> implement
             if (!getRepo().existsById(id)) {
                 throw new NotFoundException("Elément à supprimer inexistant");
             }
-            getRepo().deleteById(id);
+            T ent = getRepo().getById(id);
+            getRepo().delete(ent);
         } catch (Exception e) {
             throw e;
         }

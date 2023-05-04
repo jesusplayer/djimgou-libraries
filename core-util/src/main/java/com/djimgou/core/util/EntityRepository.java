@@ -9,19 +9,22 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.persistence.*;
 import javax.persistence.metamodel.EntityType;
+import javax.persistence.metamodel.Metamodel;
 import javax.persistence.metamodel.Type;
 import java.lang.reflect.Field;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.djimgou.core.util.AppUtils.getField;
 import static com.djimgou.core.util.AppUtils.has;
 
 @Component
-@Getter@Setter
+@Getter
+@Setter
 public class EntityRepository {
     @PersistenceContext
     private EntityManager em;
@@ -121,6 +124,11 @@ public class EntityRepository {
         return entityMap.get(entityClass).getId(entityMap.get(entityClass).getIdType().getJavaType()).getName();
     }
 
+    public Object getIdValue(Object entity) throws NotManagedEntityException {
+        String idkey = getIdKey(entity.getClass());
+        return AppUtils.getDeepProperty(entity, idkey);
+    }
+
     public boolean isManagedEntity(Class targetEntityClass) {
         return entityMap.containsKey(targetEntityClass);
     }
@@ -137,4 +145,63 @@ public class EntityRepository {
         em.persist(entity);
         return entity;
     }
+
+    @Transactional
+    public <T> String getTableName(Class entityClass) {
+
+        Metamodel meta = em.getMetamodel();
+        EntityType<T> entityType = meta.entity(entityClass);
+
+        //Check whether @Table annotation is present on the class.
+        Table t = (Table) entityClass.getAnnotation(Table.class);
+
+        String tableName = (t == null)
+                ? entityType.getName().toUpperCase()
+                : t.name();
+        return tableName;
+    }
+
+    public String datebaseType() {
+        org.hibernate.engine.spi.SessionImplementor sessionImp =
+                (org.hibernate.engine.spi.SessionImplementor) em.getDelegate();
+        DatabaseMetaData metadata = null;
+        try {
+            metadata = sessionImp.connection().getMetaData();
+            return metadata.getDatabaseProductName();
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
+//do whatever you need with the metadata object...
+    }
+     /*  @Transactional
+    public String[] getTableNames(EntityManager em, Class entityClass) {
+
+        Object entityExample;
+        try {
+            entityExample = entityClass.newInstance();
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
+
+        SessionImpl session = em.unwrap(SessionImpl.class);
+
+        EntityPersister persister = session.getEntityPersister(null, entityExample);
+
+        if (persister instanceof AbstractEntityPersister) {
+            AbstractEntityPersister persisterImpl = (AbstractEntityPersister) persister;
+
+            String tableName = persisterImpl.getTableName();
+
+            String rootTableName = persisterImpl.getRootTableName();
+
+            return new String[] {rootTableName, tableName};
+
+        } else {
+            throw new RuntimeException("Unexpected persister type; a subtype of AbstractEntityPersister expected.");
+        }
+    }*/
 }
+
+

@@ -49,6 +49,7 @@ public interface AuditRepo extends BaseJpaRepository<Audit, UUID> {
     Page<Audit> findAll(Specification<Audit> spec, Pageable pageRequest);
 
     @Query("SELECT " +
+            "v.id as id," +
             "v.username AS username, " +
             "v.action AS action, " +
             "v.date AS date, " +

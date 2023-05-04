@@ -398,18 +398,7 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
     }
 
     @Override
-    public void delete(Utilisateur entity) throws NotFoundException {
-        entity.getAuthorities().clear();
-        if (has(entity.getTenants())) {
-            entity.getTenants().clear();
-        }
-        getRepo().delete(entity);
-    }
-
-    @Transactional
-    @Override
-    public void deleteById(UUID uuid) throws AppException {
-        Utilisateur user = getRepo().findById(uuid).orElseThrow(UtilisateurNotFoundException::new);
+    public void delete(Utilisateur user) throws NotFoundException {
         if (has(user.getAuthorities())) {
             user.getAuthorities().clear();
         }
@@ -417,7 +406,14 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
             user.getTenants().clear();
         }
         save(user);
-        getRepo().deleteById(uuid);
+        getRepo().delete(user);
+    }
+
+    @Transactional
+    @Override
+    public void deleteById(UUID uuid) throws AppException {
+        Utilisateur user = getRepo().findById(uuid).orElseThrow(UtilisateurNotFoundException::new);
+        delete(user);
     }
 
     /**

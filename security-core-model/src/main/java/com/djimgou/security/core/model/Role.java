@@ -1,5 +1,6 @@
 package com.djimgou.security.core.model;
 
+import com.djimgou.audit.annotations.IgnoreOnAudit;
 import com.djimgou.audit.model.EntityListener;
 import com.djimgou.core.coolvalidation.annotations.Unique;
 import com.djimgou.core.coolvalidation.annotations.Validations;
@@ -48,15 +49,18 @@ public class Role extends SecurityBaseEntity {
 
     @OneToMany(mappedBy = "parent"/*, orphanRemoval = true*/)
     //@JoinColumn(name = "parent_id")
+    @IgnoreOnAudit
     private Set<Role> enfants;
 
     @ManyToMany(mappedBy = "authorities")
+    @IgnoreOnAudit
     private Set<Utilisateur> utilisateurs;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE})
     @JoinTable(name = "authorities_privilege",
             joinColumns = @JoinColumn(name = "authority_id"),
             inverseJoinColumns = @JoinColumn(name = "privilege_id"))
+    @IgnoreOnAudit
     Set<Privilege> privileges = new HashSet<>();
 
 

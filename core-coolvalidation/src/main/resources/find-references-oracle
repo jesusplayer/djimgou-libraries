@@ -1,12 +1,17 @@
-select table_name, constraint_name, status, owner
-from all_constraints
-where r_owner = 'PREVIDEV'
-and constraint_type = 'R'
-and r_constraint_name in
- (
-   select constraint_name from all_constraints
-   where constraint_type in ('P', 'U')
-   and table_name = 'USERS'
-   and owner = 'PREVIDEV'
- )
-order by table_name, constraint_name
+SELECT
+    CONS.CONSTRAINT_NAME constraint_name ,
+    CONS.TABLE_NAME table_name,
+    COLS.COLUMN_NAME column_name ,
+    CONS.R_CONSTRAINT_NAME r_constraint_name,
+    CONS_R.TABLE_NAME r_table_name,
+    COLS_R.COLUMN_NAME r_column_name
+
+FROM USER_CONSTRAINTS CONS
+    LEFT JOIN USER_CONS_COLUMNS COLS ON COLS.CONSTRAINT_NAME = CONS.CONSTRAINT_NAME
+    LEFT JOIN USER_CONSTRAINTS CONS_R ON CONS_R.CONSTRAINT_NAME = CONS.R_CONSTRAINT_NAME
+    LEFT JOIN USER_CONS_COLUMNS COLS_R ON COLS_R.CONSTRAINT_NAME = CONS.R_CONSTRAINT_NAME
+
+-- returns only foreign key constraints
+WHERE CONS.CONSTRAINT_TYPE = 'R' AND CONS_R.TABLE_NAME='USERS'
+
+ORDER BY CONS.TABLE_NAME, COLS.COLUMN_NAME

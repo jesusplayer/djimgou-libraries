@@ -39,6 +39,18 @@
             <version>0.0.4-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.djimgou</groupId>
+            <artifactId>core-test</artifactId>
+            <version>0.0.4-SNAPSHOT</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.djimgou</groupId>
+                    <artifactId>core-util</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <!-- <dependency>
              <groupId>com.querydsl</groupId>
              <artifactId>querydsl-jpa</artifactId>

@@ -1,5 +1,6 @@
 package com.djimgou.security.core.model;
 
+import com.djimgou.audit.annotations.IgnoreOnAudit;
 import com.djimgou.audit.model.EntityListener;
 import com.djimgou.core.coolvalidation.annotations.Unique;
 import com.djimgou.core.coolvalidation.annotations.Validations;
@@ -88,10 +89,12 @@ public class Utilisateur extends SecurityBaseEntity {
             inverseJoinColumns = @JoinColumn(
                     name = "authority_id", referencedColumnName = "id")
     )
+    @IgnoreOnAudit
     Set<Role> authorities;
 
     //@JsonManagedReference(value = "utilisateur-token")
     @OneToOne(orphanRemoval = true)
+    @IgnoreOnAudit
     ConfirmationToken confirmationToken;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE})
@@ -102,6 +105,7 @@ public class Utilisateur extends SecurityBaseEntity {
             inverseJoinColumns = @JoinColumn(
                     name = "tenant_id", referencedColumnName = "id")
     )
+    @IgnoreOnAudit
     Set<Tenant> tenants;
 
     @Transient

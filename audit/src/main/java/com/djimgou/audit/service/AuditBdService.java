@@ -1,5 +1,6 @@
 package com.djimgou.audit.service;
 
+import com.djimgou.audit.annotations.MyAnnotationIntrospector;
 import com.djimgou.audit.model.Audit;
 import com.djimgou.audit.model.AuditAction;
 import com.djimgou.audit.model.QAudit;
@@ -87,6 +88,7 @@ public class AuditBdService extends AbstractDomainServiceV2<Audit, AuditFindDto,
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.setAnnotationIntrospector(new MyAnnotationIntrospector());
         Audit audit = null;
         try {
             String str = objectMapper.writeValueAsString(entity);

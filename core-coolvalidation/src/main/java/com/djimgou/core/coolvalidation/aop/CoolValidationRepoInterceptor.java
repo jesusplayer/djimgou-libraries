@@ -22,5 +22,10 @@ public class CoolValidationRepoInterceptor {
     public void beforeSave(JoinPoint joinPoint) throws Throwable {
         validationParser.validate(joinPoint.getArgs()[0]);
     }
+
+   /* @Before("execution(* org.springframework.data.jpa.repository.JpaRepository+.delete(..))))")
+    public void beforeDelete(JoinPoint joinPoint) throws Throwable {
+        validationParser.checkBeforeDelete(joinPoint.getArgs()[0]);
+    }*/
 }
 

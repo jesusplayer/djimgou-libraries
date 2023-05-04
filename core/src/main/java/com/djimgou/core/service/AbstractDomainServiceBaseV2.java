@@ -32,9 +32,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static com.djimgou.core.util.AppUtils2.*;
 
@@ -51,6 +54,29 @@ import static com.djimgou.core.util.AppUtils2.*;
 @Log4j2
 public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DTO extends BaseFindDto, FILTER_DTO extends BaseFilterDto, DTO extends IEntityDto, DETAIL_DTO extends IEntityDetailDto, ID>
         extends AbstractDomainServiceBase<T, FIND_DTO, FILTER_DTO, ID> {
+    static Map<Class<? extends Annotation>, Ops> map = new HashMap<>();
+
+    static {
+        map.putAll(Map.of(
+                Eq.class, Ops.EQ,
+                EqIc.class, Ops.EQ_IGNORE_CASE,
+                Gt.class, Ops.GT,
+                Goe.class, Ops.GOE,
+                Lt.class, Ops.LT,
+                Loe.class, Ops.LOE,
+                In.class, Ops.IN,
+                StrContains.class, Ops.STRING_CONTAINS,
+                StrContainsIc.class, Ops.STRING_CONTAINS_IC
+        ));
+        map.putAll(Map.of(
+                Like.class, Ops.LIKE,
+                LikeIc.class, Ops.LIKE_IC,
+                StartWith.class, Ops.STARTS_WITH,
+                StartWithIc.class, Ops.STARTS_WITH_IC,
+                EndWith.class, Ops.ENDS_WITH,
+                EndWithIc.class, Ops.ENDS_WITH_IC
+        ));
+    }
 
     @Getter
     @PersistenceContext
@@ -453,18 +479,69 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
     private String extractUnaryOpAnotations(List<BooleanExpression> expressionList, Path<T> p, Field field, Object fieldValue) {
         String newName = field.getName();
         Ops ops = null;
+
         if (field.isAnnotationPresent(DtoField.class)) {
             DtoField an = field.getAnnotation(DtoField.class);
             if (an != null && has(an.value())) {
                 newName = an.value()[0];
             }
         }
-        if (field.isAnnotationPresent(Eq.class)) {
+
+
+        for (Annotation annotation : field.getDeclaredAnnotations()) {
+            if(map.containsKey(annotation.annotationType())){
+                Annotation an = field.getAnnotation(annotation.annotationType());
+                ops = map.get(annotation.annotationType());
+                try {
+                    if (an != null) {
+                        Object value = an.getClass().getMethod("value").invoke(an);
+                        if (value != null) {
+                            newName = value.toString();
+                        }
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        /*for (Map.Entry<Class<? extends Annotation>,Ops> opsClassEntry : map.entrySet()) {
+            if (field.isAnnotationPresent(opsClassEntry.getKey())) {
+                Annotation an = field.getAnnotation(opsClassEntry.getKey());
+                ops = opsClassEntry.getValue();
+                try {
+                    if (an != null) {
+                        Object value = an.getClass().getMethod("value").invoke(an);
+                        if (value != null) {
+                            newName = value.toString();
+                        }
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                }
+            }
+        }*/
+        /*if (field.isAnnotationPresent(Eq.class)) {
             Eq an = field.getAnnotation(Eq.class);
             if (an != null && has(an.value())) {
                 newName = an.value();
             }
             ops = Ops.EQ;
+        }
+        if (field.isAnnotationPresent(EqIc.class)) {
+            EqIc an = field.getAnnotation(EqIc.class);
+            if (an != null && has(an.value())) {
+                newName = an.value();
+            }
+            ops = Ops.EQ_IGNORE_CASE;
         }
         if (field.isAnnotationPresent(Lt.class)) {
             Lt an = field.getAnnotation(Lt.class);
@@ -474,8 +551,8 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
             }
         }
 
-        if (field.isAnnotationPresent(Le.class)) {
-            Le an = field.getAnnotation(Le.class);
+        if (field.isAnnotationPresent(Loe.class)) {
+            Loe an = field.getAnnotation(Loe.class);
             if (an != null && has(an.value())) {
                 newName = an.value();
                 ops = Ops.LOE;
@@ -488,8 +565,8 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
                 ops = Ops.GT;
             }
         }
-        if (field.isAnnotationPresent(Ge.class)) {
-            Ge an = field.getAnnotation(Ge.class);
+        if (field.isAnnotationPresent(Goe.class)) {
+            Goe an = field.getAnnotation(Goe.class);
             if (an != null && has(an.value())) {
                 newName = an.value();
                 ops = Ops.GOE;
@@ -518,13 +595,37 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
                 ops = Ops.STRING_CONTAINS;
             }
         }
+
+        if (field.isAnnotationPresent(StartWith.class)) {
+            StartWith an = field.getAnnotation(StartWith.class);
+            if (an != null && has(an.value())) {
+                newName = an.value();
+                ops = Ops.STARTS_WITH;
+            }
+        }
+
+        if (field.isAnnotationPresent(EndWith.class)) {
+            EndWith an = field.getAnnotation(EndWith.class);
+            if (an != null && has(an.value())) {
+                newName = an.value();
+                ops = Ops.ENDS_WITH;
+            }
+        }
+        if (field.isAnnotationPresent(EndWithIc.class)) {
+            EndWithIc an = field.getAnnotation(EndWithIc.class);
+            if (an != null && has(an.value())) {
+                newName = an.value();
+                ops = Ops.ENDS_WITH;
+            }
+        }
+
         if (field.isAnnotationPresent(StrContainsIc.class)) {
             StrContainsIc an = field.getAnnotation(StrContainsIc.class);
             if (an != null && has(an.value())) {
                 newName = an.value();
                 ops = Ops.STRING_CONTAINS_IC;
             }
-        }
+        }*/
 
         if (has(ops) && has(fieldValue)) {
             Path fName = Expressions.path(field.getType(), p, newName);
