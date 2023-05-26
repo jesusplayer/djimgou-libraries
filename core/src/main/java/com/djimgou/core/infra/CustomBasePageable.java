@@ -1,6 +1,7 @@
 package com.djimgou.core.infra;
 
 import com.djimgou.core.util.AppUtils2;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,11 +23,16 @@ import static com.djimgou.core.util.AppUtils2.has;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Data
 public class CustomBasePageable<T> implements Pageable {
+    @JsonIgnore
     Pageable pg;
 
+    @JsonIgnore
     Sort sort;
 
+    @JsonIgnore
     Filter<T> filter;
+
+    @JsonIgnore
     boolean notPaged = false;
 
     public CustomBasePageable() {
