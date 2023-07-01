@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 import static com.djimgou.core.util.AppUtils.has;
 
 @Entity
-@Data
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @EqualsAndHashCode(callSuper = false)
@@ -163,5 +162,170 @@ public class Utilisateur extends SecurityBaseEntity {
             return "";
         }
         return getTelephone().replaceAll("\\+","").replaceAll("\\s","");
+    }
+
+    @Transient
+    public Set<String> getAllUrls(){
+        if(has(authorities)){
+            return authorities.stream().flatMap(role -> role.getAllUrls().stream()).collect(Collectors.toSet());
+        }
+        return new HashSet<>();
+    }
+
+    @Transient
+    public Set<String> getAllRolesAndPriv(){
+        if(has(authorities)){
+            return authorities.stream().flatMap(role -> role.getAllRolesAndPriv().stream()).collect(Collectors.toSet());
+        }
+        return new HashSet<>();
+    }
+
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public String getPrenom() {
+        return prenom;
+    }
+
+    public void setPrenom(String prenom) {
+        this.prenom = prenom;
+    }
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
+    }
+
+    public String getFonction() {
+        return fonction;
+    }
+
+    public void setFonction(String fonction) {
+        this.fonction = fonction;
+    }
+
+    public Boolean getIsInvitationPending() {
+        return isInvitationPending;
+    }
+
+    public void setIsInvitationPending(Boolean invitationPending) {
+        isInvitationPending = invitationPending;
+    }
+
+    public boolean isAccountNonExpired() {
+        return isAccountNonExpired;
+    }
+
+    public void setIsAccountNonExpired(boolean accountNonExpired) {
+        isAccountNonExpired = accountNonExpired;
+    }
+
+    public boolean getIsAccountLocked() {
+        return isAccountLocked;
+    }
+
+    public void setIsAccountLocked(boolean accountLocked) {
+        isAccountLocked = accountLocked;
+    }
+
+    public boolean getIsCredentialsExpired() {
+        return isCredentialsExpired;
+    }
+
+    public void setIsCredentialsExpired(boolean credentialsExpired) {
+        isCredentialsExpired = credentialsExpired;
+    }
+
+    public Boolean getIsPasswordChangedByUser() {
+        return isPasswordChangedByUser;
+    }
+
+    public void setIsPasswordChangedByUser(Boolean passwordChangedByUser) {
+        isPasswordChangedByUser = passwordChangedByUser;
+    }
+
+    public Set<Role> getAuthorities() {
+        return authorities;
+    }
+
+    public void setAuthorities(Set<Role> authorities) {
+        this.authorities = authorities;
+    }
+
+    public ConfirmationToken getConfirmationToken() {
+        return confirmationToken;
+    }
+
+    public void setConfirmationToken(ConfirmationToken confirmationToken) {
+        this.confirmationToken = confirmationToken;
+    }
+
+    public Set<Tenant> getTenants() {
+        return tenants;
+    }
+
+    public void setTenants(Set<Tenant> tenants) {
+        this.tenants = tenants;
+    }
+
+    public void setRoles(String roles) {
+        this.roles = roles;
+    }
+
+    public String getPasswordPart1() {
+        return passwordPart1;
+    }
+
+    public void setPasswordPart1(String passwordPart1) {
+        this.passwordPart1 = passwordPart1;
+    }
+
+    public String getPasswordPart2() {
+        return passwordPart2;
+    }
+
+    public void setPasswordPart2(String passwordPart2) {
+        this.passwordPart2 = passwordPart2;
     }
 }

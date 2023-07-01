@@ -9,9 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -23,7 +21,6 @@ import java.util.stream.Collectors;
 @Table(name = "privilege"
         , uniqueConstraints = @UniqueConstraint(name = "UK_privileges_parent", columnNames = {"id", "parent_id"})
 )
-@EqualsAndHashCode(callSuper = false, exclude = {"enfants", "parent"})
 @JsonIgnoreProperties(value = {"enfants"})
 @EntityListeners({EntityListener.class})
 public class Privilege extends SecurityBaseEntity {
@@ -63,8 +60,23 @@ public class Privilege extends SecurityBaseEntity {
             });
         } else {
             tre.add(getCode());
+            /*  if (AppUtils.has(url)) {
+                    tre.addAll(Arrays.stream(url.split(",")).filter(AppUtils::has)
+                        .collect(Collectors.toList())
+                );
+            }*/
+        }
+    }
+
+    public void fetchUrls(Set<String> tre) {
+        if (AppUtils.has(enfants)) {
+            enfants.forEach(e -> {
+                e.fetchUrls(tre);
+            });
+        } else {
+            //tre.add(getCode());
             if (AppUtils.has(url)) {
-                tre.addAll(Arrays.asList(url.split(",")).stream().filter(s -> AppUtils.has(s))
+                tre.addAll(Arrays.stream(url.split(",")).filter(AppUtils::has)
                         .collect(Collectors.toList())
                 );
             }
@@ -104,4 +116,39 @@ public class Privilege extends SecurityBaseEntity {
         return getId().toString();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Privilege privilege = (Privilege) o;
+
+        if (getId() != null && privilege.getId() != null) {
+            return Objects.equals(getId(), privilege.getId());
+        }
+        if (name != null && privilege.name != null) {
+            return Objects.equals(name, privilege.name);
+        }
+        if (code != null && privilege.code != null) {
+            return Objects.equals(code, privilege.code);
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        if (getId() != null ) {
+            return getId().hashCode();
+        }
+        if (name != null ) {
+            return name.hashCode();
+        }
+        if (code != null) {
+            return code.hashCode();
+        }
+        return new Random().nextInt();
+
+    }
 }

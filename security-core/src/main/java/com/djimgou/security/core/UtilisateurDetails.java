@@ -58,12 +58,12 @@ public class UtilisateurDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return !utilisateur.isAccountLocked();
+        return !utilisateur.getIsAccountLocked();
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return !utilisateur.isCredentialsExpired();
+        return !utilisateur.getIsCredentialsExpired();
     }
 
     @Override
