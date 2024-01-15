@@ -5,6 +5,7 @@
 package com.djimgou.security.controller;
 
 import com.djimgou.core.annotations.Endpoint;
+import com.djimgou.core.exception.BadRequestException;
 import com.djimgou.core.exception.ConflitException;
 import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.security.core.exceptions.*;
@@ -76,9 +77,27 @@ public class CompteUtilisateurController {
     @PutMapping("/changerMotDePasse")
     @Endpoint("Changer le mot de passe")
     public void changePassword(@RequestBody @Valid PasswordChangeDto logininfo) throws NotFoundException, BadConfirmPasswordException, UnautorizedException {
+        logininfo.setPasswordEnc(bCryptPasswordEncoder.encode(logininfo.getPasswordConfirm()));
         authenticationService.changePassword(logininfo);
     }
 
+    @PostMapping("/envoyerEmailChangeMotDePasse")
+    @Endpoint("Envoyer l'email de changement de mot de passe")
+    public void sendChangePasswordEmail(@RequestBody @Valid final ChangePasswordEmailDto dto) throws NotFoundException, BadRequestException {
+        authenticationService.inviteChangePasswd(dto.getEmail());
+    }
+
+    @PostMapping("/changerMotDePasseViaEmail/{token}")
+    @Endpoint("Confirmer le changement de mot de passe par email via son token")
+    public Utilisateur confirmChangePassword(@PathVariable("token") final String token, @RequestBody @Valid  PasswordChangeByEmailDto dto) throws BadInvitationLinkException, NotFoundException {
+        String encPassword = null;
+        String password = dto.getNewPassword();
+        if(has(password)){
+            encPassword = bCryptPasswordEncoder.encode(password);
+            dto.setPasswordEnc(encPassword);
+        }
+        return authenticationService.confirmResetPassword(token, dto);
+    }
 /*    @PutMapping("/applyUserSession/{utilisateurId}")
     // @ResponseStatus(HttpStatus.OK)
     public void applyUserSession(@PathVariable("utilisateurId") final UUID id, HttpSession httpSession) throws NotFoundException, BadConfirmPasswordException {

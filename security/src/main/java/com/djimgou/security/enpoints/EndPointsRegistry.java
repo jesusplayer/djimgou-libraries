@@ -57,7 +57,7 @@ public class EndPointsRegistry {
             if (has(enAn) && has(enAn.value())) {
                 endPoint.setDescription(enAn.value());
             }
-            if (has(enAn) && has(enAn.readOnlyMethod())) {
+            if (has(enAn)) {
                 endPoint.setIsReadOnlyMethod(enAn.readOnlyMethod());
             }
             if (methodIterator.hasNext()) {

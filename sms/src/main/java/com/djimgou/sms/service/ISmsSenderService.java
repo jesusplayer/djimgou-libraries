@@ -44,6 +44,15 @@ public interface ISmsSenderService {
         return send(SmsSimpleMassageDto.builder().to(dto.getTo()).text(dto.getText()).build());
     }
 
+    @Async
+    default SmSResponse sendAsync(String to, String text) {
+        return send(SmsSimpleMassageDto.builder().to(to).text(text).build());
+    }
+
+    default SmSResponse send(String to, String text) {
+        return send(SmsSimpleMassageDto.builder().to(to).text(text).build());
+    }
+
     /**
      * Fonction appelée à chaque fois qu'on veux envoyer un SMS synchrone
      *

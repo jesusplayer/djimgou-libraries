@@ -32,4 +32,6 @@ public class Marque extends BaseBdEntity {
     public Marque() {
         this.categories = new ArrayList<>();
     }
+
+
 }

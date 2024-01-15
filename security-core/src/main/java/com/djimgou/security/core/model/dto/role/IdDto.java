@@ -1,9 +1,13 @@
 package com.djimgou.security.core.model.dto.role;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 public class IdDto {
     UUID id;

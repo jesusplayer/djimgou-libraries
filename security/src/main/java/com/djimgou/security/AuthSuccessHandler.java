@@ -9,6 +9,7 @@ import com.djimgou.security.core.model.Utilisateur;
 import com.djimgou.security.core.model.dto.utilisateur.UtilisateurSessionDto;
 import com.djimgou.security.core.service.MyVoter;
 import com.djimgou.security.core.service.SecuritySessionService;
+import com.djimgou.security.service.TokenAuthenticationService;
 import com.djimgou.session.context.SessionContext;
 import com.djimgou.session.enums.SessionKeys;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -16,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -66,7 +68,7 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
         if (AppUtils.has(uDetail)) {
             MyVoter.userSessionToUpdate.put(uDetail.getUsername(), Boolean.FALSE);
             String uId = uDetail.getUtilisateur().getId().toString();
-            final HttpSession session= request.getSession();
+            final HttpSession session = request.getSession();
             session.setAttribute(SessionKeys.USER_ID, uId);
 
             Utilisateur user = uDetail.getUtilisateur().singleInfo();
@@ -78,8 +80,13 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
             objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
             UtilisateurSessionDto uSess = new UtilisateurSessionDto();
             uSess.fromDto(uDetail.getUtilisateur());
-            String token = response.getHeader("Authorization");
+
+            String token = TokenAuthenticationService.addAuthentication(response, uSess.getUsername());
+
+            //String token = response.getHeader(TokenAuthenticationService.HEADER_STRING);
             uSess.setToken(token);
+
+
             String str = objectMapper.writeValueAsString(uSess);
             //session.setAttribute(SessionKeys.CONNECTED_USER, uSess);
             SessionContext.setCurrentSessionId(session.getId());
@@ -92,5 +99,18 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
             response.getWriter().flush();
             //redirectStrategy.sendRedirect(request, response, UrlsAuthorized.INDEX.toString());
         }
+    }
+
+    String generateJwt(Authentication auth, HttpServletResponse res) {
+        String token = TokenAuthenticationService.addAuthentication(res,
+                ((User) auth.getPrincipal()).getUsername());/*JWT.create()
+                .withSubject(((User) auth.getPrincipal()).getUsername())
+                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .sign(Algorithm.HMAC512(SECRET.getBytes()));
+
+        tokenService.a*/
+
+        //String body = ((User) auth.getPrincipal()).getUsername() + " " + token;
+        return token;
     }
 }

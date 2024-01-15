@@ -29,6 +29,7 @@ import static com.djimgou.core.util.AppUtils.has;
 @EntityListeners({EntityListener.class, AuthorityChangeListener.class})
 public class Role extends SecurityBaseEntity {
     public static final String ROLE_READONLY = "ROLE_READONLY";
+    public static final String ROLE_ADMIN = "ROLE_ADMIN";
 
     @Column(name = "name", nullable = false, length = 128)
     private String name;
@@ -62,6 +63,7 @@ public class Role extends SecurityBaseEntity {
         this.name = name;
     }
 
+
     @Transient
     public Set<String> getAllRolesAndPriv() {
         Set<String> roles = new HashSet<>();
@@ -78,6 +80,21 @@ public class Role extends SecurityBaseEntity {
         return roles;
     }
 
+    @Transient
+    public Set<String> getAllUrls() {
+        Set<String> urls = new HashSet<>();
+        if (AppUtils.has(parent)) {
+            urls.addAll(parent.getAllUrls());
+        }
+        if (AppUtils.has(privileges)) {
+            privileges.forEach(privilege -> {
+                privilege.fetchUrls(urls);
+            });
+        }
+        return urls;
+    }
+
+    @JsonIgnore
     @Transient
     public Set<AuthorityDto> getAllAuthoritiesDto() {
         Set<AuthorityDto> roles = new HashSet<>();

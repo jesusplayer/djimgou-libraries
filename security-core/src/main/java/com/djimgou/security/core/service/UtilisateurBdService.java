@@ -111,11 +111,11 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
     }
 
     public Utilisateur modifierProfil(ModifierProfilDto dto) throws UtilisateurNotFoundException, ConflitException, UnautorizedException {
-        Optional<UUID> optid = securitySessionService.currentUserId();
-        UUID id = optid.orElseThrow(UnautorizedException::new);
-        Utilisateur user = getRepo().findById(id).orElseThrow(UtilisateurNotFoundException::new);
-        checkDuplicate(id, dto);
-        user.fromDto(dto);
+        /*Optional<UUID> optid = securitySessionService.currentUserId();
+        UUID id = optid.orElseThrow(UnautorizedException::new);*/
+        Utilisateur user = getRepo().findById(dto.getId()).orElseThrow(UtilisateurNotFoundException::new);
+        checkDuplicate(dto.getId(), dto);
+        user.fromDto(dto,"id");
         return save(user);
     }
 

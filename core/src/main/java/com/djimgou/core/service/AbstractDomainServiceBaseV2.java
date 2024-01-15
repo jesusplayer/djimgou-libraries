@@ -14,14 +14,12 @@ import com.djimgou.core.util.AppUtils;
 import com.djimgou.core.util.model.IBaseEntity;
 import com.querydsl.core.support.QueryBase;
 import com.querydsl.core.types.*;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.BooleanOperation;
-import com.querydsl.core.types.dsl.EntityPathBase;
-import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.*;
 import com.querydsl.jpa.JPAQueryBase;
 import com.querydsl.jpa.impl.JPAQuery;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.util.ReflectionUtils;
@@ -30,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.lang.reflect.Field;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -59,6 +58,8 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
 
     @Getter
     private EntityPathBase<T> qEntity;
+
+    private T entityForFilter;
 
     public AbstractDomainServiceBaseV2(BaseJpaRepository<T, ID> repo, EntityPathBase<T> qEntity) {
         super(repo);
@@ -273,6 +274,41 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
         }
     }
 
+    public T deepCreate(Class<T> entityClass, T object, String path) {
+        T obj = object == null ? BeanUtils.instantiateClass(entityClass) : object;
+        String[] paths = path.split("\\.", 0);
+        if (paths.length > 0) {
+            deepCreate(obj, paths, 0);
+        }
+        return obj;
+    }
+
+    public T deepCreate(Class<T> entityClass, String path) {
+        T obj = BeanUtils.instantiateClass(entityClass);
+        String[] paths = path.split("\\.", 0);
+        if (paths.length > 0) {
+            deepCreate(obj, paths, 0);
+        }
+        return obj;
+    }
+
+    public void deepCreate(Object obj, String[] paths, int i) {
+        if (paths.length > 0 && i < paths.length) {
+            Object propValue = getDeepProperty(obj, paths[i]);
+            Class propType = getDeepPropertyType(obj, paths[i]);
+            if (propType == null || propType.isPrimitive() || propType.isArray() || propType.isEnum() ||
+                    Number.class.isAssignableFrom(propType)
+            ) {
+                return;
+            }
+            if (propValue == null) {
+                propValue = BeanUtils.instantiateClass(propType);
+            }
+            setDeepProperty(obj, paths[i], propValue);
+            deepCreate(getDeepProperty(obj, paths[i]), paths, i + 1);
+        }
+    }
+
     @Transactional
     @Override
     public Page<T> advancedFindBy(BaseFilterDto filter) throws Exception {
@@ -293,16 +329,18 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
         final String simpleName = entityClass.getSimpleName();
         String className = Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1);
         Path<T> p = Expressions.path(entityClass, className);
-
         processDefaultFilters(filter, expressionList, orders, fiels, p);
 
         if (filter instanceof BaseFilterAdvancedDto) {
             final BaseFilterAdvancedDto advancedDto = (BaseFilterAdvancedDto) filter;
-            if (advancedDto != null && advancedDto.hasOtherFilters()) {
-                processCustomFilters(advancedDto, expressionList, p);
+            if (advancedDto != null) {
+                if (advancedDto.hasOtherFilters()) {
+                    advancedDto.ignoreNullOtherFilter();
+                    processCustomFilters(advancedDto, expressionList, p, entityClass);
+                }
             }
         }
-        BooleanExpression exp = expressionList.stream().reduce(null, (old, newE) -> has(old) ? old.and(newE) : newE);
+        BooleanExpression exp = expressionList.stream().reduce(null, (old, newE) -> has(old) ? (has(filter.getSearchText()) ? old.and(newE) : old.or(newE)) : newE);
 
         final QueryBase exp3 = exp2.where(exp);
         if (has(orders)) {
@@ -407,16 +445,42 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
         }
     }
 
-    private void processCustomFilters(BaseFilterAdvancedDto filterDto, List<BooleanExpression> expressionList, Path<T> p) throws UnknowQueryFilterOperator {
+    private void processCustomFilters(BaseFilterAdvancedDto filterDto, List<BooleanExpression> expressionList, Path<T> p, Class<T> entityClass) throws UnknowQueryFilterOperator {
         for (QueryOperation operation : filterDto.getOtherFilters()) {
-            Path fName = Expressions.path(operation.getValue1().getClass(), p, operation.getKey());
             Expression<Object> constant1 = null;
             Expression<Object> constant2 = null;
+            this.entityForFilter = deepCreate(entityClass, this.entityForFilter, operation.getKey());
+            Objects.requireNonNull(this.entityForFilter);
+            Class dType = getDeepPropertyType(Objects.requireNonNull(this.entityForFilter, "la clé " + operation.getKey() + " n'a pas pu être résolue lor du filtre"), operation.getKey());
+            Path fName = Expressions.path(dType!=null?dType:operation.getValue1().getClass(), p, operation.getKey());
+
             if (has(operation.getValue1())) {
-                constant1 = Expressions.constant(operation.getValue1());
+                if (has(dType) && dType.getSuperclass().equals(Enum.class)) {
+                    Enum valEnum = Enum.valueOf(dType, (String) operation.getValue1());
+                    constant1 = Expressions.constant(valEnum);
+                } else {
+                    if (has(dType) && dType.equals(Date.class)) {
+                        Date date = Date.from(Instant.parse((String) operation.getValue1()));
+                        constant1 = Expressions.constant(date);
+                    } else {
+                        constant1 = Expressions.constant(operation.getValue1());
+                        fName = Expressions.path(operation.getValue1().getClass(), p, operation.getKey());
+
+                    }
+                }
             }
             if (has(operation.getValue2())) {
-                constant2 = Expressions.constant(operation.getValue2());
+                if (has(dType) && dType.getSuperclass().equals(Enum.class)) {
+                    Enum valEnum = Enum.valueOf(dType, (String) operation.getValue2());
+                    constant2 = Expressions.constant(valEnum);
+                } else {
+                    if (has(dType) && dType.equals(Date.class)) {
+                        Date date = Date.from(Instant.parse((String) operation.getValue2()));
+                        constant2 = Expressions.constant(date);
+                    } else {
+                        constant2 = Expressions.constant(operation.getValue2());
+                    }
+                }
             }
             BooleanOperation exp;
             if (QueryFilterOperator.between.equals(operation.getOperator())) {

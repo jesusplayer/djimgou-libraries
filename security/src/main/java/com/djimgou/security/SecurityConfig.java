@@ -8,6 +8,7 @@ import com.djimgou.security.core.tracking.authentication.dao.ResourceRepository;
 import com.djimgou.security.enpoints.EndPointsRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDecisionVoter;
@@ -29,6 +30,7 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.session.SessionManagementFilter;
@@ -36,6 +38,7 @@ import org.springframework.security.web.session.SessionManagementFilter;
 import javax.servlet.Filter;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 //import org.springframework.session.web.http.SessionRepositoryFilter;
@@ -52,7 +55,11 @@ import java.util.List;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    /*    @Autowired
+
+    @Value("${auth.jwt.enabled:}")
+    Boolean jwtEnabled = false;
+
+    /*  @Autowired
         WebInvocationPrivilegeEvaluator evaluator;*/
     @Autowired
     AppSecurityConfig appSecurityConfig;
@@ -67,9 +74,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private AuthenticationManager authenticationManager;
 
     @Qualifier("userDetailsServiceImpl")
-
     @Autowired
-    private UserDetailsService authenticationService;
+    private UserDetailsService userDetailsService;
 
     @Autowired
     private FilterInvocationSecurityMetadataSource filterInvocationSecurityMetadataSource;
@@ -108,25 +114,39 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         };
 
-        endPointsRegistry.getEndpointsMap().values().forEach(endPoint -> {
-            final ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl authorizedUrl =
-                    rule[0].antMatchers(endPoint.getHttpMethod(), endPoint.toSecurityUrl());
-            if (appSecurityConfig.permitAll()) {
-                authorizedUrl.permitAll();
-            } else {
-                authorizedUrl.hasAuthority(endPoint.getName());
+
+        if (appSecurityConfig.permitAll()) {
+            rule[0].antMatchers("*").permitAll();
+            rule[0].antMatchers("**/**").permitAll();
+            rule[0].antMatchers("/**/**").permitAll();
+            rule[0].antMatchers("/**/*").permitAll();
+        } else {
+            endPointsRegistry.getEndpointsMap().values().forEach(endPoint -> {
+                final ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl authorizedUrl =
+                        rule[0].antMatchers(endPoint.getHttpMethod(), endPoint.toSecurityUrl());
+               /* if (appSecurityConfig.permitAll()) {
+                    authorizedUrl.permitAll();
+                } else {*/
+                List<String> authorities = new ArrayList() {{
+                    addAll(Arrays.asList(endPoint.getName(), Role.ROLE_ADMIN, "ROLE_ADMINISTRATEUR"));
+                }};
                 if (endPoint.getIsReadOnlyMethod()) {
-                    rule[0].antMatchers(endPoint.getHttpMethod(), endPoint.toSecurityUrl()).hasRole(Role.ROLE_READONLY);
+                    authorities.add(Role.ROLE_READONLY);
                 }
+                authorizedUrl.hasAnyAuthority(authorities.toArray(new String[0]));
+                // }
+            });
+
+            for (String url : appSecurityConfig.authorizedUrls()) {
+                rule[0] = rule[0].antMatchers(url).permitAll();
             }
-        });
-        for (String url : appSecurityConfig.authorizedUrls()) {
-            rule[0] = rule[0].antMatchers(url).permitAll();
+
+            for (UrlsAuthorized url : UrlsAuthorized.values()) {
+                rule[0] = rule[0].antMatchers(url.toString()).permitAll();
+            }
+
         }
 
-        for (UrlsAuthorized url : UrlsAuthorized.values()) {
-            rule[0] = rule[0].antMatchers(url.toString()).permitAll();
-        }
 
         rule[0].anyRequest().authenticated()
                 .and()
@@ -135,9 +155,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // Add Filter 1 - JWTLoginFilter
                 //
                 .addFilterBefore(new CorsFilter(), ChannelProcessingFilter.class)
+                .addFilterBefore(new AuthTokenFilter(userDetailsService, jwtEnabled, appSecurityConfig),
+                        UsernamePasswordAuthenticationFilter.class
+                )
+
                 /*.addFilterBefore(new JWTLoginFilter(UrlsAuthorized.LOGIN.toString(), authenticationManager()),
                         UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new JWTAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)*/
+                .addFilterBefore(new AuthTokenFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)*/
 
 
                 //.addFilterAfter(expiredSessionFilter(), SessionManagementFilter.class)
@@ -173,7 +197,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(authenticationService).passwordEncoder(passwordEncoder);
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
 
     }
 

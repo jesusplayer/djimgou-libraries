@@ -30,7 +30,7 @@ public class UtilisateurDetails implements UserDetails {
         for (Role role : utilisateur.getAuthorities()) {
 
             List<SimpleGrantedAuthority> ganted = role.getAllRolesAndPriv().stream()
-                    .map(rolePriv -> new SimpleGrantedAuthority(rolePriv))
+                    .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
             authorities.addAll(ganted);
         }
@@ -58,12 +58,12 @@ public class UtilisateurDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return !utilisateur.isAccountLocked();
+        return !utilisateur.getIsAccountLocked();
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return !utilisateur.isCredentialsExpired();
+        return !utilisateur.getIsCredentialsExpired();
     }
 
     @Override

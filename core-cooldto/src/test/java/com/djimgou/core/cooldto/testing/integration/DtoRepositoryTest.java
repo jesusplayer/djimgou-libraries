@@ -35,14 +35,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(classes = CoreCoolDtoTestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:application-inTest.properties")
 //@Sql({ "schema.sql", "data.sql" })
-public class CoolDtoRepositoryTest {
+public class DtoRepositoryTest {
 
     private final CategorieRepo categorieRepo;
     private final CategorieRepo2 categorieRepo2;
 
     @Autowired
-    public CoolDtoRepositoryTest(GenericDbManager dbManager,
-                                 CategorieRepo categorieRepo, CategorieRepo2 categorieRepo2
+    public DtoRepositoryTest(GenericDbManager dbManager,
+                             CategorieRepo categorieRepo, CategorieRepo2 categorieRepo2
     ) {
         DbManagerConfig.initDb(dbManager);
         this.categorieRepo = categorieRepo;
