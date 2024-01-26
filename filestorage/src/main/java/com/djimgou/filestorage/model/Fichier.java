@@ -147,7 +147,7 @@ public class Fichier extends BaseBdEntity {
                 nom1 = multipartFiles[0].getOriginalFilename();
             }
             if (multipartFiles.length > 1) {
-                nom1 = multipartFiles[1].getOriginalFilename();
+                nom2 = multipartFiles[1].getOriginalFilename();
             }
             if (multipartFiles.length > 2) {
                 nom3 = multipartFiles[2].getOriginalFilename();

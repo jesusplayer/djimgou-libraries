@@ -5,7 +5,7 @@ import com.djimgou.core.exception.NotFoundException;
 
 public class UtilisateurNotFoundException extends NotFoundException {
     public UtilisateurNotFoundException() {
-        super("utilisateur inexistant");
+        super("notFound.user");
     }
 
     public UtilisateurNotFoundException(String message) {

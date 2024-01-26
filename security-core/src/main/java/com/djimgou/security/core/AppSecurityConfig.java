@@ -18,7 +18,7 @@ public interface AppSecurityConfig {
      *
      * @return
      */
-    List<String> authorizedUrls();
+    List<AuthorizedUrl> authorizedUrls();
 
     /**
      * Permet 'obtenir le package de la classe métier dans laquelle
@@ -47,7 +47,7 @@ public interface AppSecurityConfig {
      */
     default boolean match(List<String> authorizedUrls, String url) {
 
-        Optional<String> opt = Stream.concat(authorizedUrls.stream(), authorizedUrls().stream())
+        Optional<String> opt = Stream.concat(authorizedUrls.stream(), authorizedUrls().stream().map(AuthorizedUrl::getUrl))
                 .filter(u -> {
                     if (u.endsWith("/**")) {
                         String newUrl = u.substring(0, u.length() - 2);

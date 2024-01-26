@@ -1,16 +1,23 @@
 package com.djimgou.security;
 
+import com.djimgou.core.util.AppUtils;
 import com.djimgou.security.core.AppSecurityConfig;
+import com.djimgou.security.core.AuthorizedUrl;
+import com.djimgou.security.core.model.PrivileEvaluator;
 import com.djimgou.security.core.model.Role;
 import com.djimgou.security.core.model.UrlsAuthorized;
+import com.djimgou.security.core.model.dto.role.AuthorityDto;
 import com.djimgou.security.core.service.MyVoter;
 import com.djimgou.security.core.tracking.authentication.dao.ResourceRepository;
 import com.djimgou.security.enpoints.EndPointsRegistry;
+import com.djimgou.security.enpoints.SecuredEndPoint;
+import com.djimgou.tenantmanager.service.TenantSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
@@ -37,9 +44,11 @@ import org.springframework.security.web.session.SessionManagementFilter;
 
 import javax.servlet.Filter;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.djimgou.core.util.AppUtils.has;
 
 //import org.springframework.session.web.http.SessionRepositoryFilter;
 
@@ -98,64 +107,73 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     EndPointsRegistry endPointsRegistry;
 
+    @Autowired
+    AppliCorsFilter corsFilter;
+
+    @Autowired
+    TenantSessionService tenantSessionService;
+
+    //    @Autowired
+//    AuthoritiesRepo authoritiesRepo;
+    public static final String ROLE_ADMINISTRATEUR = "ROLE_ADMINISTRATEUR";
+    public static final String ROLE_PARTENAIRE = "ROLE_PARTENAIRE";
+    public static final String ROLE_CLIENT = "ROLE_CLIENT";
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
 
 
-        final ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry[] rule = new ExpressionUrlAuthorizationConfigurer.ExpressionInterceptUrlRegistry[]{
-                http.cors().and()
-                        .httpBasic()
-                        .and()
-                        .authorizeRequests()
-                        .antMatchers("/").permitAll()
-                        .filterSecurityInterceptorOncePerRequest(true)
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry req = http.cors().and()
+                .httpBasic()
+                .and()
+                .authorizeRequests();
 
-        };
+        req = req.antMatchers("/").permitAll();
+        for (AuthorizedUrl dto : appSecurityConfig.authorizedUrls()) {
 
-
-        if (appSecurityConfig.permitAll()) {
-            rule[0].antMatchers("*").permitAll();
-            rule[0].antMatchers("**/**").permitAll();
-            rule[0].antMatchers("/**/**").permitAll();
-            rule[0].antMatchers("/**/*").permitAll();
-        } else {
-            endPointsRegistry.getEndpointsMap().values().forEach(endPoint -> {
-                final ExpressionUrlAuthorizationConfigurer<HttpSecurity>.AuthorizedUrl authorizedUrl =
-                        rule[0].antMatchers(endPoint.getHttpMethod(), endPoint.toSecurityUrl());
-               /* if (appSecurityConfig.permitAll()) {
-                    authorizedUrl.permitAll();
-                } else {*/
-                List<String> authorities = new ArrayList() {{
-                    addAll(Arrays.asList(endPoint.getName(), Role.ROLE_ADMIN, "ROLE_ADMINISTRATEUR"));
-                }};
-                if (endPoint.getIsReadOnlyMethod()) {
-                    authorities.add(Role.ROLE_READONLY);
-                }
-                authorizedUrl.hasAnyAuthority(authorities.toArray(new String[0]));
-                // }
-            });
-
-            for (String url : appSecurityConfig.authorizedUrls()) {
-                rule[0] = rule[0].antMatchers(url).permitAll();
-            }
-
-            for (UrlsAuthorized url : UrlsAuthorized.values()) {
-                rule[0] = rule[0].antMatchers(url.toString()).permitAll();
-            }
-
+            req = (dto.hasHttpMethod() ?
+                    req.antMatchers(dto.getHttpMethod(), dto.getUrl()) :
+                    req.antMatchers(dto.getUrl())
+            ).permitAll();
         }
 
 
-        rule[0].anyRequest().authenticated()
-                .and()
+        for (UrlsAuthorized url : UrlsAuthorized.values()) {
+            req = req.antMatchers(url.toString()).permitAll();
+        }
+        req = req.filterSecurityInterceptorOncePerRequest(true);
+
+
+        if (appSecurityConfig.permitAll()) {
+            req.antMatchers("*").permitAll();
+            req.antMatchers("**/**").permitAll();
+            req.antMatchers("/**/**").permitAll();
+            req.antMatchers("/**/*").permitAll();
+        } else {
+            final Map<String, SecuredEndPoint> endpointsMap = endPointsRegistry.getEndpointsMap();
+
+            for (Map.Entry<String, SecuredEndPoint> entry : endpointsMap.entrySet()) {
+                SecuredEndPoint v = entry.getValue();
+                req.antMatchers(v.toSecurityUrl()).hasAnyAuthority(ROLE_CLIENT, ROLE_PARTENAIRE, ROLE_ADMINISTRATEUR, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            }
+
+            req.antMatchers("*").hasAnyAuthority(ROLE_CLIENT, ROLE_PARTENAIRE, ROLE_ADMINISTRATEUR, Role.ROLE_ADMIN, Role.ROLE_READONLY, PrivileEvaluator.FULL_ACCESS);
+            req.antMatchers("**/**").hasAnyAuthority(ROLE_CLIENT, ROLE_PARTENAIRE, ROLE_ADMINISTRATEUR, Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            req.antMatchers("/**/**").hasAnyAuthority(ROLE_CLIENT, ROLE_PARTENAIRE, ROLE_ADMINISTRATEUR, Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            req.antMatchers("/**/*").hasAnyAuthority(ROLE_CLIENT, ROLE_PARTENAIRE, ROLE_ADMINISTRATEUR, Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+
+        }
+
+//        req.anyRequest().authenticated()
+        req.anyRequest().authenticated().and()
 
                 //
                 // Add Filter 1 - JWTLoginFilter
                 //
-                .addFilterBefore(new CorsFilter(), ChannelProcessingFilter.class)
-                .addFilterBefore(new AuthTokenFilter(userDetailsService, jwtEnabled, appSecurityConfig),
+                .addFilterBefore(corsFilter, ChannelProcessingFilter.class)
+                .addFilterBefore(new AuthTokenFilter(userDetailsService,
+                                tenantSessionService, jwtEnabled, appSecurityConfig),
                         UsernamePasswordAuthenticationFilter.class
                 )
 
@@ -165,10 +183,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
                 //.addFilterAfter(expiredSessionFilter(), SessionManagementFilter.class)
-                .exceptionHandling()
-                .accessDeniedHandler(accessDeniedHandler())
-//                .exceptionHandling().accessDeniedPage(UrlsAuthorized.UNAUTHORIZED.toString())
-                .and()
+
                 .sessionManagement()
                 .invalidSessionStrategy(invalidSessionHandler)
                 .and()
@@ -181,6 +196,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .failureUrl(UrlsAuthorized.LOGIN_FAILURE.toString())
                 //.defaultSuccessUrl("/home")
 //                .defaultSuccessUrl("/index.jsf")
+                .and()
+                .exceptionHandling()
+                .accessDeniedHandler(accessDeniedHandler())
+//                .exceptionHandling().accessDeniedPage(UrlsAuthorized.UNAUTHORIZED.toString())
                 .and()
                 .logout()
                 //.logoutSuccessUrl(UrlsAuthorized.LOGIN.toString())
@@ -210,6 +229,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public FilterSecurityInterceptor filterSecurityInterceptor() {
         FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
         filterSecurityInterceptor.setAuthenticationManager(authenticationManager);
+
         filterSecurityInterceptor.setSecurityMetadataSource(filterInvocationSecurityMetadataSource);
         filterSecurityInterceptor.setAccessDecisionManager(affirmativeBased());
         return filterSecurityInterceptor;

@@ -3,7 +3,7 @@ package com.djimgou.security.core.exceptions;
 
 public class BadPasswordException extends Exception {
     public BadPasswordException() {
-        super("L'ancien mot de passe est invalide est invalide");
+        super("bad.oldPassword");
     }
 
     public BadPasswordException(String message) {

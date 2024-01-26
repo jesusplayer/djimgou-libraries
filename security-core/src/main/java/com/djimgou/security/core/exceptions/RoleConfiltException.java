@@ -3,7 +3,7 @@ package com.djimgou.security.core.exceptions;
 
 public class RoleConfiltException extends Exception {
     public RoleConfiltException() {
-        super("Ce rôle existe déjà dans le système");
+        super("conflict.role");
     }
 
     public RoleConfiltException(String message) {

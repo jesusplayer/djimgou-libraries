@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.BeanUtils;
+import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ public class DtoClassProcessor implements IDtoAnotationProcessor {
     @Override
     public List<Field> getFields() {
         return this.processors.stream().flatMap(processor -> processor.getFields().stream())
+                .filter(field -> !ReflectionUtils.isPublicStaticFinal(field))
                 .collect(Collectors.toList());
     }
 

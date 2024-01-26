@@ -3,7 +3,11 @@ package com.djimgou.security;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.server.PathContainer;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.web.util.pattern.PathPattern;
+import org.springframework.web.util.pattern.PathPatternParser;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -21,45 +25,78 @@ import static com.djimgou.core.util.AppUtils.has;
 /**
  * DJIMGOU NKENNE DANY MARC 08/2020- 09/2021
  */
+@Component
 @Log4j2
-public class CorsFilter extends GenericFilterBean {
-    @Value("#{'${auth.allowOrigins}'.split(',')}")
-    private final List<String> allowedOrigins = Arrays.asList("http://localhost:4200");
+public class AppliCorsFilter extends GenericFilterBean {
+    //    @Value("#{'${auth.allowOrigins}'.split(',')}")
+    private List<String> allowedOrigins;
 
     @Autowired
     HttpSession httpSession;
+
+    public AppliCorsFilter(@Value("${auth.allowOrigins:'http://localhost:4200'}") String allowedOrigins, HttpSession httpSession) {
+        this.allowedOrigins = Arrays.asList(allowedOrigins.split(","));
+        this.httpSession = httpSession;
+    }
+
+    boolean matchOrigin(String origin) {
+        if (origin == null || allowedOrigins.contains(origin) || allowedOrigins.contains("*")) {
+            return true;
+        }
+
+        return allowedOrigins.stream().anyMatch(s -> {
+            //AntPathRequestMatcher matcher = new AntPathRequestMatcher(s, s);
+          /*  AntPathMatcher matcher1 = new AntPathMatcher("/");
+            return matcher1.match(s, origin);*/
+
+            PathContainer.parsePath(origin);
+            PathPatternParser parser = new PathPatternParser();
+            PathPattern p = parser.parse(s);
+            return p.matches(PathContainer.parsePath(origin));
+        });
+    }
+
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         // https://stackoverflow.com/questions/43114750/header-in-the-response-must-not-be-the-wildcard-when-the-requests-credentia
         // Lets make sure that we are working with HTTP (that is, against HttpServletRequest and HttpServletResponse objects)
-        if (servletRequest instanceof HttpServletRequest && servletResponse instanceof HttpServletResponse) {
-            HttpServletRequest request = (HttpServletRequest) servletRequest;
-            HttpServletResponse response = (HttpServletResponse) servletResponse;
-            // request.getRequestURI().replace(request.getContextPath(),"")
-            // Access-Control-Allow-Origin
-            String origin = request.getHeader("Origin");
-            final String ACCES_CONTROL = "Access-Control-Allow-Origin";
-            if(!has(response.getHeader(ACCES_CONTROL))){
-                response.setHeader(ACCES_CONTROL, allowedOrigins.contains(origin) ? origin : "*");
-                response.setHeader("Vary", "Origin");
+        try {
+            if (servletRequest instanceof HttpServletRequest && servletResponse instanceof HttpServletResponse) {
+                HttpServletRequest request = (HttpServletRequest) servletRequest;
+                HttpServletResponse response = (HttpServletResponse) servletResponse;
+                // request.getRequestURI().replace(request.getContextPath(),"")
+                // Access-Control-Allow-Origin
+                String origin = request.getHeader("Origin");
+                final String ACCES_CONTROL = "Access-Control-Allow-Origin";
+                if (!has(response.getHeader(ACCES_CONTROL))) {
+                    response.setHeader(ACCES_CONTROL,"*" /*matchOrigin(origin) ? origin : ""*/);
+                    response.setHeader("Vary", "Origin");
+//                if(request.getContentType().contains(MediaType.MULTIPART_FORM_DATA_VALUE)){ }
+                    // Access-Control-Max-Age
+                    response.setHeader("Access-Control-Max-Age", "360000000");
 
-                // Access-Control-Max-Age
-                response.setHeader("Access-Control-Max-Age", "3600");
+                    // Access-Control-Allow-Credentials
+                    response.setHeader("Access-Control-Allow-Credentials", "true");
 
-                // Access-Control-Allow-Credentials
-                response.setHeader("Access-Control-Allow-Credentials", "true");
+                    // Access-Control-Allow-Methods
+                    response.setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, OPTIONS, DELETE, TRACES, PATCH");
 
-                // Access-Control-Allow-Methods
-                response.setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, OPTIONS, DELETE");
-
-                // Access-Control-Allow-Headers
-                response.setHeader("Access-Control-Allow-Headers",
-                        "Origin, X-Requested-With, Content-Type, Accept, X-CSRF-TOKEN, X-TenantId, X-SessionId, X-Username, X-Auth-With-Token");
+                    // Access-Control-Allow-Headers
+                    response.setHeader("Access-Control-Allow-Headers",
+                            "Origin, X-Requested-With, Content-Type, Accept, Authorization, X-CSRF-TOKEN, X-TenantId, X-SessionId, X-Username, X-Auth-With-Token, Accept-Language, ngrok-skip-browser-warning");
+                }
             }
-        }
 
-        filterChain.doFilter(servletRequest, servletResponse);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        try {
+            filterChain.doFilter(servletRequest, servletResponse);
+
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
 
 
         //System.out.println("WebConfig; "+request.getRequestURI());
@@ -103,5 +140,15 @@ public class CorsFilter extends GenericFilterBean {
             res.setHeader("Access-Control-Allow-Headers", "x-requested-with,Content-Type,Accept,x-auth-token,x-xsrf-token,Origin,Access-Control-Request-Method,Access-Control-Request-Headers,Access-Control-Allow-Origin");
             filterChain.doFilter(request, res);
         }*/
+
     }
+
+ /*   @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        if (has(allowedOriginsPaterns)) {
+            registry.addMapping("/*")
+                    .allowedOrigins(allowedOriginsPaterns.stream().collect(Collectors.joining(",")));
+        }
+
+    }*/
 }

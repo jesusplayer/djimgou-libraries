@@ -5,7 +5,7 @@ import com.djimgou.core.exception.NotFoundException;
 
 public class RoleNotFoundException extends NotFoundException {
     public RoleNotFoundException() {
-        super("Rôle inexistant");
+        super("notFound.role");
     }
 
     public RoleNotFoundException(String message) {
