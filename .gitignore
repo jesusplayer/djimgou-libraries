@@ -25,6 +25,7 @@
 # Maven
 
 target/
+*/target/
 
 
 
@@ -42,8 +43,6 @@ logs/
 
 
 *.log
-
-logs/
 
 #linux te files
 *~
