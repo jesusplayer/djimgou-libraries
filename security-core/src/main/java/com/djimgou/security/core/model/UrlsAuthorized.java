@@ -7,6 +7,7 @@ public enum UrlsAuthorized {
     LOGIN("/signin"),
     LOGIN_SUCCESS("/connected"),
     LOGIN_FAILURE("/?error=true"),
+    LOGIN_FAILURE_2("/?error"),
     //    REPORTS("/suivi-entite-list-risque-credit-export.jsf"),
     RESSOURCES("/files"),
     ALL_RESSOURCES("/files/**"),

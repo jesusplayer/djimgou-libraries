@@ -89,10 +89,10 @@ public class CompteUtilisateurController {
 
     @PostMapping("/changerMotDePasseViaEmail/{token}")
     @Endpoint("Confirmer le changement de mot de passe par email via son token")
-    public Utilisateur confirmChangePassword(@PathVariable("token") final String token, @RequestBody @Valid  PasswordChangeByEmailDto dto) throws BadInvitationLinkException, NotFoundException {
-        String encPassword = null;
+    public Utilisateur confirmChangePassword(@PathVariable("token") final String token, @RequestBody @Valid PasswordChangeByEmailDto dto) throws BadInvitationLinkException, NotFoundException {
+        String encPassword;
         String password = dto.getNewPassword();
-        if(has(password)){
+        if (has(password)) {
             encPassword = bCryptPasswordEncoder.encode(password);
             dto.setPasswordEnc(encPassword);
         }
@@ -128,7 +128,7 @@ public class CompteUtilisateurController {
     @Endpoint("Confirmer l'invitation d'un utilisateur par son token")
     public Utilisateur confirmInvitation(@PathVariable("token") final String token, @RequestParam(value = "password", required = false) String password) throws BadInvitationLinkException, NotFoundException {
         String encPassword = null;
-        if(has(password)){
+        if (has(password)) {
             encPassword = bCryptPasswordEncoder.encode(password);
         }
         return authenticationService.confirmUtilisateurAccount(token, password, encPassword);

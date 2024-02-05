@@ -60,7 +60,7 @@ public class RequestInterceptor extends RequestContextFilter {
             SessionContext.setCurrentUsername(username);
             SessionContext.setCurrentTenantId(tenantId);
         }
-        logger.info("Username: " + username);
+//        logger.info("Username: " + username);
 
         filterChain.doFilter(request, response);
     }
