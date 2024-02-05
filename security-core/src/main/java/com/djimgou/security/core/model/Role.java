@@ -30,6 +30,11 @@ import static com.djimgou.core.util.AppUtils.has;
 public class Role extends SecurityBaseEntity {
     public static final String ROLE_READONLY = "ROLE_READONLY";
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
+    //    @Autowired
+//    AuthoritiesRepo authoritiesRepo;
+    public static final String ROLE_ADMINISTRATEUR = "ROLE_ADMINISTRATEUR";
+    public static final String ROLE_PARTENAIRE = "ROLE_PARTENAIRE";
+    public static final String ROLE_CLIENT = "ROLE_CLIENT";
 
     @Column(name = "name", nullable = false, length = 128)
     private String name;

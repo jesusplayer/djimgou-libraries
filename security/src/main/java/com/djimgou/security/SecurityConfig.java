@@ -1,12 +1,10 @@
 package com.djimgou.security;
 
-import com.djimgou.core.util.AppUtils;
 import com.djimgou.security.core.AppSecurityConfig;
 import com.djimgou.security.core.AuthorizedUrl;
 import com.djimgou.security.core.model.PrivileEvaluator;
 import com.djimgou.security.core.model.Role;
 import com.djimgou.security.core.model.UrlsAuthorized;
-import com.djimgou.security.core.model.dto.role.AuthorityDto;
 import com.djimgou.security.core.service.MyVoter;
 import com.djimgou.security.core.tracking.authentication.dao.ResourceRepository;
 import com.djimgou.security.enpoints.EndPointsRegistry;
@@ -18,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
@@ -47,8 +44,6 @@ import org.springframework.security.web.session.SessionManagementFilter;
 import javax.servlet.Filter;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.djimgou.core.util.AppUtils.has;
 
@@ -115,12 +110,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     TenantSessionService tenantSessionService;
 
-    //    @Autowired
-//    AuthoritiesRepo authoritiesRepo;
-    public static final String ROLE_ADMINISTRATEUR = "ROLE_ADMINISTRATEUR";
-    public static final String ROLE_PARTENAIRE = "ROLE_PARTENAIRE";
-    public static final String ROLE_CLIENT = "ROLE_CLIENT";
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
@@ -157,13 +146,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
             for (Map.Entry<String, SecuredEndPoint> entry : endpointsMap.entrySet()) {
                 SecuredEndPoint v = entry.getValue();
-                req.antMatchers(v.toSecurityUrl()).hasAnyAuthority(ROLE_CLIENT, ROLE_PARTENAIRE, ROLE_ADMINISTRATEUR, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+                req.antMatchers(v.toSecurityUrl()).hasAnyAuthority(Role.ROLE_CLIENT, Role.ROLE_PARTENAIRE, Role.ROLE_ADMINISTRATEUR, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
             }
 
-            req.antMatchers("*").hasAnyAuthority(ROLE_CLIENT, ROLE_PARTENAIRE, ROLE_ADMINISTRATEUR, Role.ROLE_ADMIN, Role.ROLE_READONLY, PrivileEvaluator.FULL_ACCESS);
-            req.antMatchers("**/**").hasAnyAuthority(ROLE_CLIENT, ROLE_PARTENAIRE, ROLE_ADMINISTRATEUR, Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
-            req.antMatchers("/**/**").hasAnyAuthority(ROLE_CLIENT, ROLE_PARTENAIRE, ROLE_ADMINISTRATEUR, Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
-            req.antMatchers("/**/*").hasAnyAuthority(ROLE_CLIENT, ROLE_PARTENAIRE, ROLE_ADMINISTRATEUR, Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            req.antMatchers("*").hasAnyAuthority(Role.ROLE_CLIENT, Role.ROLE_PARTENAIRE, Role.ROLE_ADMINISTRATEUR, Role.ROLE_ADMIN, Role.ROLE_READONLY, PrivileEvaluator.FULL_ACCESS);
+            req.antMatchers("**/**").hasAnyAuthority(Role.ROLE_CLIENT, Role.ROLE_PARTENAIRE, Role.ROLE_ADMINISTRATEUR, Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            req.antMatchers("/**/**").hasAnyAuthority(Role.ROLE_CLIENT, Role.ROLE_PARTENAIRE, Role.ROLE_ADMINISTRATEUR, Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            req.antMatchers("/**/*").hasAnyAuthority(Role.ROLE_CLIENT, Role.ROLE_PARTENAIRE, Role.ROLE_ADMINISTRATEUR, Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
 
         }
 
