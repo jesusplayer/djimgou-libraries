@@ -15,6 +15,7 @@ import com.djimgou.tenantmanager.service.TenantSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -39,6 +40,7 @@ import org.springframework.security.web.access.intercept.FilterInvocationSecurit
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.session.SessionManagementFilter;
 
@@ -176,6 +178,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                                 tenantSessionService, jwtEnabled, appSecurityConfig),
                         UsernamePasswordAuthenticationFilter.class
                 )
+                .addFilterAfter(new AuditRequestFilter(),UsernamePasswordAuthenticationFilter.class)
 
                 /*.addFilterBefore(new JWTLoginFilter(UrlsAuthorized.LOGIN.toString(), authenticationManager()),
                         UsernamePasswordAuthenticationFilter.class)
@@ -213,6 +216,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilter(filterSecurityInterceptor());*/
         appSecurityConfig.configure(http);
     }
+
+   /* @Bean
+    public FilterRegistrationBean securityFilterChain(@Qualifier(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME) Filter securityFilter) {
+        FilterRegistrationBean registration = new FilterRegistrationBean(securityFilter);
+        registration.setOrder(Integer.MAX_VALUE - 1);
+        registration.setName(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME);
+        return registration;
+    }
+
+    @Bean
+    public FilterRegistrationBean userFilterFilterRegistrationBean() {
+        FilterRegistrationBean registrationBean = new FilterRegistrationBean();
+        AuditRequestFilter userFilter = new AuditRequestFilter();
+        registrationBean.setFilter(userFilter);
+        registrationBean.setOrder(Integer.MAX_VALUE);
+        return registrationBean;
+    }*/
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
