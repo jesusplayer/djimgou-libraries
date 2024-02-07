@@ -1,5 +1,6 @@
 package com.djimgou.security.core.repo;
 
+import com.djimgou.security.core.model.Role;
 import com.djimgou.security.core.model.Utilisateur;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +13,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,7 +32,6 @@ public interface UtilisateurBaseRepo<T extends Utilisateur, I> extends JpaReposi
             "LOWER(d.prenom) LIKE LOWER(CONCAT('%',:searchText, '%')) " +
             ")")
     Page<T> findBySearchText(@Param("searchText") String searchText, Pageable pageRequest);
-
 
 
     @Modifying
@@ -81,7 +82,6 @@ public interface UtilisateurBaseRepo<T extends Utilisateur, I> extends JpaReposi
     Page<T> findAll(Specification<T> spec, Pageable pageRequest);
 
 
-
     @Modifying
     @Query("UPDATE Utilisateur u SET u.enabled = ?1 where u.id = ?2")
     void validerUtilisateur(Boolean enabled, UUID id);
@@ -104,5 +104,11 @@ public interface UtilisateurBaseRepo<T extends Utilisateur, I> extends JpaReposi
     void changeUsername(
             @Param("id") UUID id,
             @Param("username") String username
-            );
+    );
+
+
+    @Query("SELECT d FROM Utilisateur d " +
+            "inner join d.authorities role " +
+            "where role.name in :rolesName")
+    List<T> usersByRoles(@Param("rolesName") List<String> rolesName);
 }

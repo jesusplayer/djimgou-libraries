@@ -22,6 +22,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import static com.djimgou.core.util.AppUtils.has;
@@ -136,6 +137,9 @@ public class CompteUtilisateurController {
         if (user.hasRole(Role.ROLE_PARTENAIRE)) {
             utilisateurBdService.desactiver(user.getId());
             user.setEnabled(false);
+           /* utilisateurBdService.usersByRoles(new ArrayList() {{
+                add(Role.ROLE_ADMINISTRATEUR);
+            }});*/
         }
         return user;
     }

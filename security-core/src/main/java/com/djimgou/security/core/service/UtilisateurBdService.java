@@ -441,4 +441,9 @@ public class UtilisateurBdService extends AbstractSecurityBdService<Utilisateur,
     public void desactiver(UUID utilisateurId) {
         repo.validerUtilisateur(false, utilisateurId);
     }
+
+    @Override
+    public List<Utilisateur> usersByRoles(List<String> rolesName) {
+        return getRepo().usersByRoles(rolesName);
+    }
 }

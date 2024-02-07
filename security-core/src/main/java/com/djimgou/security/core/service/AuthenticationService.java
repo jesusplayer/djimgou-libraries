@@ -11,6 +11,7 @@ import com.djimgou.security.core.model.dto.utilisateur.PasswordChangeByEmailDto;
 import com.djimgou.security.core.model.dto.utilisateur.PasswordChangeDto;
 import com.djimgou.security.core.model.dto.utilisateur.UserNameChangeDto;
 import com.djimgou.security.core.repo.ConfirmationTokenRepo;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -31,6 +32,7 @@ import static com.djimgou.core.util.AppUtils.has;
  * @author DJIMGOU NKENNE DANY MARC 08/2020
  */
 @Log4j2
+@Getter
 @Service
 public class AuthenticationService {
     private UtilisateurBdService utilisateurBdService;
@@ -167,6 +169,17 @@ public class AuthenticationService {
             return url;
         }
 
+    }
+
+    public void newPartenaireEmailNotif(Utilisateur user, List<String> destinationEmails) {
+        MimeMessagePreparator msg = emailSender.buildMessage(
+                mailFrom,
+                mailFromName,
+                mailSubject
+                , String.join(",", destinationEmails), null, null,
+                String.format("RalaleAuto<p>Un Nouveau partenaire <b>%s</b> s'est inscrit: <br><br> Nom utilisateur: %s <br> Email: %s <br> Téléphone: %s, Veuillez le contacter pour activer son compte", user.fullname(), user.getUsername(), user.getEmail(), user.getTelephone()),
+                null);
+        emailSender.sendEmail(msg);
     }
 
     @Transactional

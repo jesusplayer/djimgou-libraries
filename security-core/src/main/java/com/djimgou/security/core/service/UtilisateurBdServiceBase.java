@@ -67,4 +67,6 @@ public interface UtilisateurBdServiceBase<U extends Utilisateur, D extends Utili
     void activer(UUID utilisateurId);
 
     void desactiver(UUID utilisateurId);
+
+    List<U> usersByRoles(List<String> rolesName);
 }
