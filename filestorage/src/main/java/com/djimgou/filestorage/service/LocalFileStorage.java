@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.util.StringUtils;
@@ -24,6 +25,7 @@ import java.nio.file.StandardCopyOption;
 
 import static com.djimgou.core.util.AppUtils.has;
 
+@Log4j2
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 @Setter
@@ -157,10 +159,10 @@ public class LocalFileStorage implements FileStorage {
             if (resource.exists()) {
                 return resource;
             } else {
-                throw new FileNotFoundException("Fichier introuvable " + fileName);
+                throw new FileNotFoundException("Fichier local introuvable  nom: " + fileName+" Chemin: "+filePath.toAbsolutePath());
             }
         } catch (MalformedURLException | FileNotFoundException ex) {
-            throw new FileNotFoundException("Fichier introuvable  " + fileName);
+            throw new FileNotFoundException("Fichier introuvable  ou mal formé" + fileName);
         } catch (Exception e) {
             throw new AppException("Erreur de chargement du fichier " + fileName);
         }
