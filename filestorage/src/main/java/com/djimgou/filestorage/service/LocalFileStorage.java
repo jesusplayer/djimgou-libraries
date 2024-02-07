@@ -159,10 +159,12 @@ public class LocalFileStorage implements FileStorage {
             if (resource.exists()) {
                 return resource;
             } else {
-                throw new FileNotFoundException("Fichier local introuvable  nom: " + fileName+" Chemin: "+filePath.toAbsolutePath());
+                throw new FileNotFoundException("Fichier local introuvable  nom: " + fileName + " Chemin: " + filePath.toAbsolutePath());
             }
-        } catch (MalformedURLException | FileNotFoundException ex) {
-            throw new FileNotFoundException("Fichier introuvable  ou mal formé Fichier= " + fileName+", Dossier= "+dossier);
+        } catch (FileNotFoundException e) {
+            throw e;
+        } catch (MalformedURLException ex) {
+            throw new FileNotFoundException("Fichier introuvable  ou mal formé Fichier= " + fileName + ", Dossier= " + dossier);
         } catch (Exception e) {
             throw new AppException("Erreur de chargement du fichier " + fileName);
         }
