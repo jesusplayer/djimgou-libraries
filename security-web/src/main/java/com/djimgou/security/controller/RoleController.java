@@ -5,6 +5,7 @@
 package com.djimgou.security.controller;
 
 import com.djimgou.core.annotations.Endpoint;
+import com.djimgou.core.exception.ConflitException;
 import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.security.core.exceptions.RoleNotFoundException;
 import com.djimgou.security.core.model.Role;
@@ -60,14 +61,14 @@ public class RoleController {
 
     @PostMapping("/creer")
     @Endpoint("Créer un rôle")
-    public Role create(@RequestBody @Valid RoleDto roleDto) throws NotFoundException {
+    public Role create(@RequestBody @Valid RoleDto roleDto) throws NotFoundException, ConflitException {
         return roleService.createRole(roleDto);
     }
 
     @PutMapping("/modifier/{roleId}")
     @Endpoint("Modifier un rôle")
     public Role update(
-            @PathVariable("roleId") final UUID id, @RequestBody @Valid final RoleDto roleDto) throws NotFoundException {
+            @PathVariable("roleId") final UUID id, @RequestBody @Valid final RoleDto roleDto) throws NotFoundException, ConflitException {
         return roleService.saveRole(id, roleDto);
     }
 

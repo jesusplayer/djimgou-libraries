@@ -11,6 +11,7 @@ import com.djimgou.security.core.model.dto.utilisateur.PasswordChangeByEmailDto;
 import com.djimgou.security.core.model.dto.utilisateur.PasswordChangeDto;
 import com.djimgou.security.core.model.dto.utilisateur.UserNameChangeDto;
 import com.djimgou.security.core.repo.ConfirmationTokenRepo;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.MimeMessagePreparator;
@@ -29,6 +30,7 @@ import static com.djimgou.core.util.AppUtils.has;
 /**
  * @author DJIMGOU NKENNE DANY MARC 08/2020
  */
+@Log4j2
 @Service
 public class AuthenticationService {
     private UtilisateurBdService utilisateurBdService;
@@ -130,7 +132,7 @@ public class AuthenticationService {
      */
     // @Async
     @Transactional
-    public void inviteUser(Utilisateur user) throws UtilisateurConfiltException {
+    public String inviteUser(Utilisateur user) throws UtilisateurConfiltException {
 
         Optional<Utilisateur> userOpt = utilisateurBdService.getRepo().findOneByEmail(user.getEmail());
         if (userOpt.isPresent() && userOpt.get().getEnabled()) {
@@ -161,6 +163,8 @@ public class AuthenticationService {
             emailSender.sendEmail(msg);
             // gmailMessageService.send(mailMessage);
             confirmationTokenRepo.save(confirmationToken);
+            log.info("Le lien d'invitation de l'utilisateur {} roles: {} a été envoyé avec succès: urls: {}", user.getUsername(), user.getRoles(), url);
+            return url;
         }
 
     }
@@ -193,6 +197,7 @@ public class AuthenticationService {
         emailSender.sendEmail(msg);
         // gmailMessageService.send(mailMessage);
         confirmationTokenRepo.save(confirmationToken);
+        log.info("Le lien d'invitation de changement de mot de passe de l'utilisateur {} roles: {} a été envoyé avec succès: urls: {}", user.getUsername(), user.getRoles(), url);
     }
 
     public void sendPaswordToUser(Utilisateur user, String password) {
@@ -237,9 +242,11 @@ public class AuthenticationService {
             }
             utilisateurBdService.save(user);
             confirmationTokenRepo.delete(confirmationToken);
-            return utilisateurBdService.findById(user.getId()).get();
+            Utilisateur newUser = utilisateurBdService.findById(user.getId()).get();
+            log.info("Le compte utilisateur {} roles: {} a été confirmé avec succès", user.getUsername(), user.getRoles());
+            return newUser;
         } else {
-            throw new BadInvitationLinkException("Ce lien d'invitation est invalide");
+            throw new BadInvitationLinkException("bad.invitationLink");
         }
     }
 
@@ -267,9 +274,11 @@ public class AuthenticationService {
                 }
             }
             confirmationTokenRepo.delete(confirmationToken);
-            return utilisateurBdService.findById(user.getId()).get();
+            Utilisateur newUser = utilisateurBdService.findById(user.getId()).get();
+            log.info("Le mot de passe de l'utilisateur {} roles: {} a été modifié avec succès", user.getUsername(), user.getRoles());
+            return newUser;
         } else {
-            throw new BadInvitationLinkException("Ce lien d'invitation est invalide");
+            throw new BadInvitationLinkException("bad.invitationLink");
         }
     }
 

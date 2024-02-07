@@ -1,5 +1,6 @@
 package com.djimgou.security.core.service;
 
+import com.djimgou.core.exception.ConflitException;
 import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.core.infra.CustomPageable;
 import com.djimgou.security.core.exceptions.PrivilegeNotFoundException;
@@ -22,10 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -122,11 +120,16 @@ public class PrivilegeService extends AbstractSecurityBdService<Privilege, Privi
         return page;
     }
 
-    public Privilege savePrivilege(UUID id, PrivilegeDto dto) throws PrivilegeNotFoundException, NotFoundException, ReadOnlyException {
+    public Privilege savePrivilege(UUID id, PrivilegeDto dto) throws PrivilegeNotFoundException, NotFoundException, ReadOnlyException, ConflitException {
         Privilege priv = new Privilege();
         if (has(id)) {
             priv = repo.findById(id).orElseThrow(PrivilegeNotFoundException::new);
             chackreadOnly(priv);
+        }else {
+            Optional<Privilege> opt = repo.findByCode(dto.getCode());
+            if(opt.isPresent()){
+                throw new ConflitException("conflict.privilege");
+            }
         }
         priv.fromDto(dto);
         if (has(dto.getParentId())) {
@@ -136,7 +139,7 @@ public class PrivilegeService extends AbstractSecurityBdService<Privilege, Privi
         return save(priv);
     }
 
-    public Privilege createPrivilege(PrivilegeDto dto) throws PrivilegeNotFoundException, NotFoundException, ReadOnlyException {
+    public Privilege createPrivilege(PrivilegeDto dto) throws PrivilegeNotFoundException, NotFoundException, ReadOnlyException, ConflitException {
         return savePrivilege(null, dto);
     }
 

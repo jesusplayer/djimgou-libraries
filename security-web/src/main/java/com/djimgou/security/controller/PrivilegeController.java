@@ -6,6 +6,7 @@ package com.djimgou.security.controller;
 
 
 import com.djimgou.core.annotations.Endpoint;
+import com.djimgou.core.exception.ConflitException;
 import com.djimgou.core.exception.NotFoundException;
 import com.djimgou.security.core.exceptions.PrivilegeNotFoundException;
 import com.djimgou.security.core.exceptions.ReadOnlyException;
@@ -54,14 +55,14 @@ public class PrivilegeController {
 
     @PostMapping("/creer")
     @Endpoint("Créer un privilège")
-    public Privilege create(@RequestBody @Valid PrivilegeDto privilegeDto) throws NotFoundException, ReadOnlyException {
+    public Privilege create(@RequestBody @Valid PrivilegeDto privilegeDto) throws NotFoundException, ReadOnlyException, ConflitException {
         return privilegeService.createPrivilege(privilegeDto);
     }
 
     @PutMapping("/modifier/{privilegeId}")
     @Endpoint("Modifier un privilège")
     public Privilege update(
-            @PathVariable("privilegeId") final UUID id, @RequestBody @Valid final PrivilegeDto privilegeDto) throws NotFoundException, ReadOnlyException {
+            @PathVariable("privilegeId") final UUID id, @RequestBody @Valid final PrivilegeDto privilegeDto) throws NotFoundException, ReadOnlyException, ConflitException {
         return privilegeService.savePrivilege(id, privilegeDto);
     }
 

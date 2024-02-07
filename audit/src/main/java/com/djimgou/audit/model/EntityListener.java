@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
+import java.util.Calendar;
 import java.util.function.Supplier;
 
 /**
@@ -30,7 +31,9 @@ public class EntityListener {
      */
     @PrePersist
     public <T extends IBaseEntity> void prePersist(T entity) {
-
+        if (entity != null && entity.getCreatedDate() == null) {
+            entity.setCreatedDate(Calendar.getInstance().getTime());
+        }
     }
 
     /**
@@ -41,6 +44,9 @@ public class EntityListener {
      */
     @PreUpdate// @PreUpdate
     public <T extends IBaseEntity> void preUpdate(T entity) {
+        if(entity!=null){
+            entity.setLastModifiedDate(Calendar.getInstance().getTime());
+        }
         prePersist(entity);
     }
 
