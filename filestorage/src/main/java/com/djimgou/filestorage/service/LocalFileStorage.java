@@ -162,7 +162,7 @@ public class LocalFileStorage implements FileStorage {
                 throw new FileNotFoundException("Fichier local introuvable  nom: " + fileName+" Chemin: "+filePath.toAbsolutePath());
             }
         } catch (MalformedURLException | FileNotFoundException ex) {
-            throw new FileNotFoundException("Fichier introuvable  ou mal formé" + fileName);
+            throw new FileNotFoundException("Fichier introuvable  ou mal formé Fichier= " + fileName+", Dossier= "+dossier);
         } catch (Exception e) {
             throw new AppException("Erreur de chargement du fichier " + fileName);
         }
