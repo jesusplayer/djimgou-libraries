@@ -31,9 +31,13 @@ public class EntityListener {
      */
     @PrePersist
     public <T extends IBaseEntity> void prePersist(T entity) {
-        if (entity != null && entity.getCreatedDate() == null) {
-            entity.setCreatedDate(Calendar.getInstance().getTime());
+        if (entity != null) {
+            if (entity.getCreatedDate() == null) {
+                entity.setCreatedDate(Calendar.getInstance().getTime());
+            }
+            entity.setLastModifiedDate(Calendar.getInstance().getTime());
         }
+
     }
 
     /**
@@ -44,7 +48,7 @@ public class EntityListener {
      */
     @PreUpdate// @PreUpdate
     public <T extends IBaseEntity> void preUpdate(T entity) {
-        if(entity!=null){
+        if (entity != null) {
             entity.setLastModifiedDate(Calendar.getInstance().getTime());
         }
         prePersist(entity);
