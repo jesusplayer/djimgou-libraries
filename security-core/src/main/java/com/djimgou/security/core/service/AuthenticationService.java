@@ -304,6 +304,7 @@ public class AuthenticationService {
         utilisateurBdService.changePassword(encryptedPassword, utilisateur);
     }
 
+    @Transactional
     public void changeUsername(UserNameChangeDto dto) throws NotFoundException, UnautorizedException, ConflitException {
         /*Optional<UUID> optUId = sessionService.currentUserId();
         UUID userId = optUId.orElseThrow(UnautorizedException::new);*/
@@ -318,6 +319,7 @@ public class AuthenticationService {
         }
     }
 
+    @Transactional
     public void changePassword(PasswordChangeDto dto) throws NotFoundException, BadConfirmPasswordException, UnautorizedException {
         /*Optional<UUID> optUId = sessionService.currentUserId();
         UUID userId = optUId.orElseThrow(UnautorizedException::new);*/
@@ -354,6 +356,7 @@ public class AuthenticationService {
 
     }
 
+//    @Transactional
     public void validateVerificationToken(String token, String email) throws BadInvitationLinkException, NotFoundException {
         final ConfirmationToken verificationToken = confirmationTokenRepo.findByConfirmationToken(token);
         if (verificationToken == null) {
