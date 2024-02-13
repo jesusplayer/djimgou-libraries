@@ -89,7 +89,7 @@ public class ReportController {
     @GetMapping("/genererHtml/{reportId}")
     @Endpoint("Générer le contenu HTML d'un report")
     public ResponseEntity<String> genererHtml(@PathVariable("reportId") UUID reportId,
-                                              HttpServletRequest request) throws NotFoundException, IOException {
+                                              HttpServletRequest request) throws NotFoundException, IOException, AppException {
         Resource resource = reportService.getHtml(reportId, getParameters(request));
         // Try to determine file's content type
         String content = Files.readAllLines(resource.getFile().toPath())
@@ -103,7 +103,7 @@ public class ReportController {
     @GetMapping("/genererPdf/{reportId}")
     @Endpoint("Générer le fichier PDF d'un report")
     public ResponseEntity<Resource> genererPdf(@PathVariable("reportId") UUID reportId,
-                                               HttpServletRequest request) throws IOException, NotFoundException {
+                                               HttpServletRequest request) throws IOException, NotFoundException, AppException {
 
         return reportService.downloadPdf(reportId, getParameters(request));
     }
@@ -120,7 +120,7 @@ public class ReportController {
     @GetMapping("/genererXlsx/{reportId}")
     @Endpoint("Générer le fichier EXCEL d'un report")
     public ResponseEntity<Resource> genererXlsx(@PathVariable("reportId") UUID reportId,
-                                                HttpServletRequest request) throws NotFoundException, IOException {
+                                                HttpServletRequest request) throws NotFoundException, IOException, AppException {
         // Try to determine file's content type
         return reportService.downloadXlsx(reportId, getParameters(request));
     }
@@ -128,7 +128,7 @@ public class ReportController {
     @GetMapping("/genererDocx/{reportId}")
     @Endpoint("Générer le fichier WORD DOCX d'un report")
     public ResponseEntity<Resource> genererDocx(@PathVariable("reportId") UUID reportId,
-                                                HttpServletRequest request) throws NotFoundException, IOException {
+                                                HttpServletRequest request) throws NotFoundException, IOException, AppException {
         // Try to determine file's content type
         return reportService.downloadDocx(reportId, getParameters(request));
     }

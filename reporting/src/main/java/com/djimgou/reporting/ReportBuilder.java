@@ -56,7 +56,7 @@ public class ReportBuilder {
      * @param parameters
      * @param reportDir
      */
-    public Resource toHTML(String jasperFileName, String reportDir, Map<String, Object> parameters) {
+    public Resource toHTML(String jasperFileName, String reportDir, Map<String, Object> parameters) throws AppException {
      /*   Map<String, Object> pp = new HashMap<>();
         parameters.put("title", "Employee Report");
         parameters.put("minSalary", 15000.0);
@@ -82,19 +82,23 @@ public class ReportBuilder {
             String data = IOUtils.toString(fis, "UTF-8");*/
             return res;
         } catch (FileNotFoundException | SQLException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            throw new AppException(String.format("FileNotFoundException|SQLException: %s", e.getMessage()));
+
         } catch (AppException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            throw e;
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            throw new AppException(String.format("IOException: %s", e.getMessage()));
         } catch (JRException e) {
-            e.printStackTrace();
+            throw new AppException(String.format("JRException: %s", e.getMessage()));
+//            e.printStackTrace();
         }
-        return null;
     }
 
 
-    public Resource toPDF(String jasperFileName, String reportDir, Map<String, Object> parameters) {
+    public Resource toPDF(String jasperFileName, String reportDir, Map<String, Object> parameters) throws AppException {
         String store = fs.storePath(has(reportDir) ? reportDir : REPORT_DIR);
         String fileOutName = "report-pdf-" + UUID.randomUUID().toString() + ".pdf";
         try {
@@ -130,18 +134,22 @@ public class ReportBuilder {
             Resource res = fs.loadFileAsResource(store, fileOutName);
             return res;
         } catch (FileNotFoundException | SQLException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            throw new AppException(String.format("FileNotFoundException|SQLException: %s", e.getMessage()));
+
         } catch (AppException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            throw e;
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            throw new AppException(String.format("IOException: %s", e.getMessage()));
         } catch (JRException e) {
-            e.printStackTrace();
+            throw new AppException(String.format("JRException: %s", e.getMessage()));
+//            e.printStackTrace();
         }
-        return null;
     }
 
-    public Resource toXSX(String jasperFileName, String reportDir, Map<String, Object> parameters) {
+    public Resource toXSX(String jasperFileName, String reportDir, Map<String, Object> parameters) throws AppException {
         String store = fs.storePath(has(reportDir) ? reportDir : REPORT_DIR);
         String fileOutName = "report-xlsx-" + UUID.randomUUID().toString() + ".xlsx";
         try {
@@ -168,18 +176,22 @@ public class ReportBuilder {
             Resource res = fs.loadFileAsResource(store, fileOutName);
             return res;
         } catch (FileNotFoundException | SQLException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            throw new AppException(String.format("FileNotFoundException|SQLException: %s", e.getMessage()));
+
         } catch (AppException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            throw e;
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            throw new AppException(String.format("IOException: %s", e.getMessage()));
         } catch (JRException e) {
-            e.printStackTrace();
+            throw new AppException(String.format("JRException: %s", e.getMessage()));
+//            e.printStackTrace();
         }
-        return null;
     }
 
-    public Resource toDocx(String jasperFileName, String reportDir, Map<String, Object> parameters) {
+    public Resource toDocx(String jasperFileName, String reportDir, Map<String, Object> parameters) throws AppException {
         String store = fs.storePath(has(reportDir) ? reportDir : REPORT_DIR);
         String fileOutName = "report-doc-" + UUID.randomUUID().toString() + ".docx";
         try {
@@ -208,15 +220,19 @@ public class ReportBuilder {
             Resource res = fs.loadFileAsResource(store, fileOutName);
             return res;
         } catch (FileNotFoundException | SQLException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            throw new AppException(String.format("FileNotFoundException|SQLException: %s", e.getMessage()));
+
         } catch (AppException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            throw e;
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            throw new AppException(String.format("IOException: %s", e.getMessage()));
         } catch (JRException e) {
-            e.printStackTrace();
+            throw new AppException(String.format("JRException: %s", e.getMessage()));
+//            e.printStackTrace();
         }
-        return null;
     }
 
 }

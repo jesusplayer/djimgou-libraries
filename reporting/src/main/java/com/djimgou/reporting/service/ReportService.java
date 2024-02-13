@@ -77,40 +77,40 @@ public class ReportService extends AbstractDomainService<Report, ReportFindDto, 
         //reportBuilder.getFs().creerDossier(FileStorage.ROOT_FOLDER);
     }
 
-    public ResponseEntity<Resource> downloadPdf(UUID reportId, Map params) throws NotFoundException, IOException {
+    public ResponseEntity<Resource> downloadPdf(UUID reportId, Map params) throws NotFoundException, IOException, AppException {
         return downloadBlob(getPdf(reportId, params));
     }
 
-    public ResponseEntity<Resource> downloadXlsx(UUID reportId, Map params) throws NotFoundException, IOException {
+    public ResponseEntity<Resource> downloadXlsx(UUID reportId, Map params) throws NotFoundException, IOException, AppException {
         return downloadBlob(getXlsx(reportId, params));
     }
 
-    public ResponseEntity<Resource> downloadDocx(UUID reportId, Map params) throws NotFoundException, IOException {
+    public ResponseEntity<Resource> downloadDocx(UUID reportId, Map params) throws NotFoundException, IOException, AppException {
         return downloadBlob(getDocx(reportId, params));
     }
 
-    public Resource getHtml(UUID reportId, Map params) throws NotFoundException {
+    public Resource getHtml(UUID reportId, Map params) throws NotFoundException, AppException {
         Map params2 = new HashMap(params);
         Report r = findById(reportId).orElseThrow(NotFoundException::new);
         Resource resource = reportBuilder.toHTML(r.getFichier1(), r.getDossier(), params2);
         return resource;
     }
 
-    public Resource getPdf(UUID reportId, Map params) throws NotFoundException {
+    public Resource getPdf(UUID reportId, Map params) throws NotFoundException, AppException {
         Map params2 = new HashMap(params);
         Report r = findById(reportId).orElseThrow(NotFoundException::new);
         Resource resource = reportBuilder.toPDF(r.getFichier1(), r.getDossier(), params2);
         return resource;
     }
 
-    public Resource getXlsx(UUID reportId, Map params) throws NotFoundException {
+    public Resource getXlsx(UUID reportId, Map params) throws NotFoundException, AppException {
         Map params2 = new HashMap(params);
         Report r = findById(reportId).orElseThrow(NotFoundException::new);
         Resource resource = reportBuilder.toXSX(r.getFichier1(), r.getDossier(), params2);
         return resource;
     }
 
-    public Resource getDocx(UUID reportId, Map params) throws NotFoundException {
+    public Resource getDocx(UUID reportId, Map params) throws NotFoundException, AppException {
         Map params2 = new HashMap(params);
         Report r = findById(reportId).orElseThrow(NotFoundException::new);
         Resource resource = reportBuilder.toDocx(r.getFichier1(), r.getDossier(), params2);
