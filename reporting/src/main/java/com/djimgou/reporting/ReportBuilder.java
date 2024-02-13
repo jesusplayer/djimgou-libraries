@@ -4,6 +4,7 @@ import com.djimgou.core.exception.AppException;
 import com.djimgou.filestorage.service.FichierService;
 import com.djimgou.filestorage.service.FileStorage;
 import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -33,6 +34,7 @@ import static com.djimgou.core.util.AppUtils.has;
 /**
  * https://www.baeldung.com/spring-jasper
  */
+@Log4j2
 @Service
 public class ReportBuilder {
 
