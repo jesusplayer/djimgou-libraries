@@ -91,6 +91,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
      * UUID entiteentiteParentId;
      * }
      */
+    @Transactional
     public T create(DTO produitDto) throws NotFoundException, DtoMappingException {
         return save(null, produitDto);
     }
@@ -129,6 +130,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
      * UUID entiteentiteParentId;
      * }
      */
+    @Transactional
     public T update(ID id, DTO produitDto) throws NotFoundException, DtoMappingException {
         return save(id, produitDto);
     }
