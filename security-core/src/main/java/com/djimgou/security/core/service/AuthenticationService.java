@@ -160,7 +160,8 @@ public class AuthenticationService {
                     mailFromName,
                     mailSubject
                     , user.getEmail(), null, null,
-                    mailSignupMsg + " <a href=\"" + url + "\">" + mailClickLinkText + "</a>",
+                    "<h1>Salut " + user.fullname() +".</h1>"+
+                            mailSignupMsg + " avec pour login: <b>" + user.getUsername() + "</b>, <a href=\"" + url + "\">" + mailClickLinkText + "</a>",
                     null);
             emailSender.sendEmail(msg);
             // gmailMessageService.send(mailMessage);
@@ -187,7 +188,7 @@ public class AuthenticationService {
 
         Utilisateur user = utilisateurBdService.getRepo().findOneByEmail(email).orElseThrow(UtilisateurNotFoundException::new);
         if (!user.getEnabled()) {
-            throw new BadRequestException("Cet utilisateur est actif. impossible d'éffectuer cette opération");
+            throw new BadRequestException("Cet utilisateur est inactif. impossible d'éffectuer cette opération");
         }
 
         ConfirmationToken confirmationToken = new ConfirmationToken(user);
@@ -356,7 +357,7 @@ public class AuthenticationService {
 
     }
 
-//    @Transactional
+    //    @Transactional
     public void validateVerificationToken(String token, String email) throws BadInvitationLinkException, NotFoundException {
         final ConfirmationToken verificationToken = confirmationTokenRepo.findByConfirmationToken(token);
         if (verificationToken == null) {
