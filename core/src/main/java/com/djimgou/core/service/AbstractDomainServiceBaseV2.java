@@ -342,7 +342,7 @@ public abstract class AbstractDomainServiceBaseV2<T extends IBaseEntity, FIND_DT
                 }
             }
         }
-        BooleanExpression exp = expressionList.stream().reduce(null, (old, newE) -> has(old) ? (has(filter.getSearchText()) ? old.and(newE) : old.or(newE)) : newE);
+        BooleanExpression exp = expressionList.stream().reduce(null, (old, newE) -> has(old) ? (has(filter.getSearchText()) ? old.or(newE) : old.and(newE)) : newE);
 
         final QueryBase exp3 = exp2.where(exp);
         if (has(orders)) {

@@ -23,6 +23,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.mail.internet.InternetAddress;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -154,7 +155,7 @@ public class AuthenticationService {
             }
             final String url = prefixConfirmUrl +
                     confirmationToken.getConfirmationToken();
-
+//            intAdr= new InternetAddress(mailFrom)
             MimeMessagePreparator msg = emailSender.buildMessage(
                     mailFrom,
                     mailFromName,
