@@ -146,13 +146,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
             for (Map.Entry<String, SecuredEndPoint> entry : endpointsMap.entrySet()) {
                 SecuredEndPoint v = entry.getValue();
-                req.antMatchers(v.toSecurityUrl()).hasAnyAuthority(Role.ROLE_CLIENT, Role.ROLE_PARTENAIRE, Role.ROLE_ADMINISTRATEUR, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+                req.antMatchers(v.toSecurityUrl()).fullyAuthenticated();//.hasAnyAuthority(Role.ROLE_CLIENT, Role.ROLE_PARTENAIRE, Role.ROLE_ADMINISTRATEUR, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
             }
 
-            req.antMatchers("*").hasAnyAuthority(Role.ROLE_CLIENT, Role.ROLE_PARTENAIRE, Role.ROLE_ADMINISTRATEUR, Role.ROLE_ADMIN, Role.ROLE_READONLY, PrivileEvaluator.FULL_ACCESS);
-            req.antMatchers("**/**").hasAnyAuthority(Role.ROLE_CLIENT, Role.ROLE_PARTENAIRE, Role.ROLE_ADMINISTRATEUR, Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
-            req.antMatchers("/**/**").hasAnyAuthority(Role.ROLE_CLIENT, Role.ROLE_PARTENAIRE, Role.ROLE_ADMINISTRATEUR, Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
-            req.antMatchers("/**/*").hasAnyAuthority(Role.ROLE_CLIENT, Role.ROLE_PARTENAIRE, Role.ROLE_ADMINISTRATEUR, Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            req.antMatchers("*").fullyAuthenticated();//.hasAnyAuthority(Role.ROLE_CLIENT, Role.ROLE_PARTENAIRE, Role.ROLE_ADMINISTRATEUR, Role.ROLE_ADMIN, Role.ROLE_READONLY, PrivileEvaluator.FULL_ACCESS);
+            req.antMatchers("**/**").fullyAuthenticated();//.hasAnyAuthority(Role.ROLE_CLIENT, Role.ROLE_PARTENAIRE, Role.ROLE_ADMINISTRATEUR, Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            req.antMatchers("/**/**").fullyAuthenticated();//.hasAnyAuthority(Role.ROLE_CLIENT, Role.ROLE_PARTENAIRE, Role.ROLE_ADMINISTRATEUR, Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+            req.antMatchers("/**/*").fullyAuthenticated();//.hasAnyAuthority(Role.ROLE_CLIENT, Role.ROLE_PARTENAIRE, Role.ROLE_ADMINISTRATEUR, Role.ROLE_READONLY, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
 
         }
 
