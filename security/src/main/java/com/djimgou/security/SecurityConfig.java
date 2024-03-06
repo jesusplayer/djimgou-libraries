@@ -146,11 +146,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
             for (Map.Entry<String, SecuredEndPoint> entry : endpointsMap.entrySet()) {
                 SecuredEndPoint v = entry.getValue();
-                if (has(v.getHttpMethod())) {
-                    req.antMatchers(v.getHttpMethod(), v.toSecurityUrl()).hasAnyAuthority(v.getName(), Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);//.hasAnyAuthority(Role.ROLE_CLIENT, Role.ROLE_PARTENAIRE, Role.ROLE_ADMINISTRATEUR, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
-                } else {
+//                if (has(v.getHttpMethod())) {
+//                    req.antMatchers(v.getHttpMethod(), v.toSecurityUrl()).hasAnyAuthority(v.getName(), Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);//.hasAnyAuthority(Role.ROLE_CLIENT, Role.ROLE_PARTENAIRE, Role.ROLE_ADMINISTRATEUR, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
+//                } else {
                     req.antMatchers(v.toSecurityUrl()).hasAnyAuthority(v.getName(), Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);//.hasAnyAuthority(Role.ROLE_CLIENT, Role.ROLE_PARTENAIRE, Role.ROLE_ADMINISTRATEUR, Role.ROLE_ADMIN, PrivileEvaluator.FULL_ACCESS);
-                }
+//                }
             }
 
 //            req.antMatchers("*").fullyAuthenticated();//.hasAnyAuthority(Role.ROLE_CLIENT, Role.ROLE_PARTENAIRE, Role.ROLE_ADMINISTRATEUR, Role.ROLE_ADMIN, Role.ROLE_READONLY, PrivileEvaluator.FULL_ACCESS);
