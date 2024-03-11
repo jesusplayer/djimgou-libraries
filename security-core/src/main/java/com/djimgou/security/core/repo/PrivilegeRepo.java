@@ -19,6 +19,8 @@ public interface PrivilegeRepo extends JpaRepository<Privilege, UUID>, QuerydslP
     @Query("SELECT d FROM Privilege d WHERE " +
             //"(d.dirty IS NULL OR d.dirty=FALSE) AND " +
             "(LOWER(d.code) LIKE LOWER(CONCAT('%',:searchText, '%'))) OR " +
+            "(LOWER(d.description) LIKE LOWER(CONCAT('%',:searchText, '%'))) OR " +
+            "(LOWER(d.url) LIKE LOWER(CONCAT('%',:searchText, '%'))) OR " +
             //"(LOWER(d.parent.code) LIKE LOWER(CONCAT('%',:searchText, '%'))) OR " +
             //"(LOWER(d.parent.name) LIKE LOWER(CONCAT('%',:searchText, '%'))) OR " +
             "(LOWER(d.name) LIKE LOWER(CONCAT('%',:searchText, '%')))")

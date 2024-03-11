@@ -63,8 +63,10 @@ public class PrivilegeService extends AbstractSecurityBdService<Privilege, Privi
         List<BooleanExpression> expressionList = new ArrayList<>();
         expressionList.add(qPrivilege.name.containsIgnoreCase(txt));
         expressionList.add(qPrivilege.code.containsIgnoreCase(txt));
-        expressionList.add(qPrivilege.parent.name.containsIgnoreCase(txt));
-        expressionList.add(qPrivilege.parent.code.containsIgnoreCase(txt));
+        expressionList.add(qPrivilege.description.containsIgnoreCase(txt));
+        expressionList.add(qPrivilege.url.containsIgnoreCase(txt));
+//        expressionList.add(qPrivilege.parent.name.containsIgnoreCase(txt));
+//        expressionList.add(qPrivilege.parent.code.containsIgnoreCase(txt));
 
         BooleanExpression exp = expressionList.stream().reduce(null, (old, newE) -> has(old) ? old.or(newE) : newE);
 
