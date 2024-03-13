@@ -25,6 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
@@ -64,10 +65,10 @@ public class ReportBuilder {
 
         String store = fs.storePath(has(reportDir) ? reportDir : REPORT_DIR);
         String fileOutName = "report-" + UUID.randomUUID().toString() + ".html";
-        try {
+        try (Connection con = dataSource.getConnection()){
             Resource r = fs.loadFileAsResource(store, jasperFileName);
 
-            JasperPrint jasperPrint = JasperFillManager.fillReport(r.getInputStream(), parameters, dataSource.getConnection());
+            JasperPrint jasperPrint = JasperFillManager.fillReport(r.getInputStream(), parameters, con);
 
             Path p = Paths.get(store)
                     .toAbsolutePath().normalize().resolve(fileOutName).normalize();
@@ -101,10 +102,10 @@ public class ReportBuilder {
     public Resource toPDF(String jasperFileName, String reportDir, Map<String, Object> parameters) throws AppException {
         String store = fs.storePath(has(reportDir) ? reportDir : REPORT_DIR);
         String fileOutName = "report-pdf-" + UUID.randomUUID().toString() + ".pdf";
-        try {
+        try(Connection con = dataSource.getConnection()) {
             Resource r = fs.loadFileAsResource(store, jasperFileName);
 
-            JasperPrint jasperPrint = JasperFillManager.fillReport(r.getInputStream(), parameters, dataSource.getConnection());
+            JasperPrint jasperPrint = JasperFillManager.fillReport(r.getInputStream(), parameters, con);
 
             JRPdfExporter exporter = new JRPdfExporter();
 
@@ -152,9 +153,9 @@ public class ReportBuilder {
     public Resource toXSX(String jasperFileName, String reportDir, Map<String, Object> parameters) throws AppException {
         String store = fs.storePath(has(reportDir) ? reportDir : REPORT_DIR);
         String fileOutName = "report-xlsx-" + UUID.randomUUID().toString() + ".xlsx";
-        try {
+        try (Connection con = dataSource.getConnection()){
             Resource r = fs.loadFileAsResource(store, jasperFileName);
-            JasperPrint jasperPrint = JasperFillManager.fillReport(r.getInputStream(), parameters, dataSource.getConnection());
+            JasperPrint jasperPrint = JasperFillManager.fillReport(r.getInputStream(), parameters, con);
 
             JRXlsxExporter exporter = new JRXlsxExporter();
             exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
@@ -194,9 +195,9 @@ public class ReportBuilder {
     public Resource toDocx(String jasperFileName, String reportDir, Map<String, Object> parameters) throws AppException {
         String store = fs.storePath(has(reportDir) ? reportDir : REPORT_DIR);
         String fileOutName = "report-doc-" + UUID.randomUUID().toString() + ".docx";
-        try {
+        try (Connection con = dataSource.getConnection()){
             Resource r = fs.loadFileAsResource(store, jasperFileName);
-            JasperPrint jasperPrint = JasperFillManager.fillReport(r.getInputStream(), parameters, dataSource.getConnection());
+            JasperPrint jasperPrint = JasperFillManager.fillReport(r.getInputStream(), parameters, con);
 
             JRDocxExporter exporter = new JRDocxExporter();
             exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
